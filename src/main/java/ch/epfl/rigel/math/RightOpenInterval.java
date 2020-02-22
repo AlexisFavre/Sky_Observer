@@ -61,7 +61,10 @@ public final class RightOpenInterval extends Interval {
      * image of the value v by the reduced function
      */ 
     public double reduce(double v) {
-        return low() + Math.floorMod((int)(v-low()), (int)(high()-low()));
+        double a = v - low();
+        double b = high() - low();
+        //return low() + Math.floorMod((int)(v-low()), (int)(high()-low()));
+        return low() + a - b*Math.floor(a/b);
     }
 
 }

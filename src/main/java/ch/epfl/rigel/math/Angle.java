@@ -39,9 +39,17 @@ public final class Angle {
        return sec/(3600*DEG_PER_RAD); // /!\ checker si arcs degres 
     }
     
+    /**
+     * convert an given angle from sexagecimal to degrees
+     * @param deg
+     * @param min
+     * @param sec
+     * @return
+     * (double) angle in degrees only
+     */
     public static double ofDMS(int deg, int min, double sec) {
         checkArgument((0<=min) && (min<60) && (0<=sec) && (sec<60));
-        return deg + min/60 + sec/3600;
+        return ofDeg(deg + min/60.0 + sec/3600.0);
     }
     
     /**

@@ -43,7 +43,7 @@ public class AngleTest {
 
     @Test
     void ofDMSWorksOnKnownValues() {
-        //assertEquals(7.27220521664304E-5, Angle.ofDMS(0, 0, 15), 1e-8);
+        assertEquals(7.27220521664304E-5, Angle.ofDMS(0, 0, 15), 1e-8);
         assertEquals(0.004363323129985824, Angle.ofDMS(0, 15, 0), 1e-8);
         assertEquals(0.2617993877991494, Angle.ofDMS(15, 0, 0), 1e-8);
         assertEquals(-0.25736334261699717, Angle.ofDMS(-15, 15, 15), 1e-8);
