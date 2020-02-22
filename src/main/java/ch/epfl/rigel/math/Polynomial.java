@@ -1,4 +1,4 @@
-package ch.epfl.rigel.maths;
+package ch.epfl.rigel.math;
 
 import static ch.epfl.rigel.Preconditions.checkArgument;
 
@@ -17,6 +17,14 @@ public final class Polynomial {
         coefs = new double[coefficients.length+1];
         coefs[0] = coefficientN;
         System.arraycopy(coefficients, 0, coefs,1, coefficients.length);
+    }
+    /**
+     * 
+     * @return
+     * (int) degree of the polynomial
+     */
+    public int degree(){
+        return coefs.length-1;
     }
     
     /**
@@ -50,13 +58,31 @@ public final class Polynomial {
     @Override
     public String toString() {
         String s = "";
-        for(int i =coefs.length-1; i>0; --i) {
+        for(int i = 0; i<degree(); ++i) {
             if(coefs[i] !=0) {
-                s += String.format(Locale.ROOT, "%sx^%s ", coefs[i], i);
-            }
-            if((coefs[i-1] >=0)) { s += "+ ";}
+                
+                // add coef
+                if(coefs[i]!=1 && coefs[i]!=-1) { // to don't write +/- 1.0x^ but only x^
+                    s += String.format(Locale.ROOT, "%s", coefs[i]);
+                }
+                if(coefs[i]==-1) {
+                    s += "-";
+                }
+                
+                s+= "x";
+                
+                // add x and its exponent
+                if(i<degree()-1) {
+                    s += String.format(Locale.ROOT, "^%s", degree()-i); // to don't write x^1 but only x
+                }
+            }    
+            
+            // add symbol + only if next coefficient is positive
+            if((coefs[i+1] > 0)) { s += "+";} 
         }
-        if (coefs[coefs.length-1] !=0) { s += coefs[coefs.length-1]; }
+        
+        // add the constant if not null
+        if (coefs[degree()] !=0) { s += coefs[degree()]; } 
         return s;
     }
     

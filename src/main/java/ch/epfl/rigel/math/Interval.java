@@ -1,4 +1,4 @@
-package ch.epfl.rigel.maths;
+package ch.epfl.rigel.math;
 
 import static ch.epfl.rigel.Preconditions.checkArgument;
 

@@ -1,6 +1,6 @@
 package ch.epfl.rigel;
 
-import ch.epfl.rigel.maths.Interval;
+import ch.epfl.rigel.math.Interval;
 
 /**
  * 

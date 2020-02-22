@@ -1,4 +1,4 @@
-package ch.epfl.rigel.maths;
+package ch.epfl.rigel.math;
 
 import java.util.Locale;
 

@@ -1,4 +1,4 @@
-package ch.epfl.rigel.maths;
+package ch.epfl.rigel.math;
 
 import static ch.epfl.rigel.Preconditions.checkArgument;
 
@@ -40,8 +40,8 @@ public final class Angle {
     }
     
     public static double ofDMS(int deg, int min, double sec) {
-        checkArgument((0<=min) && (min<=60) && (0<=sec) && (sec<=60));
-        return deg + min/60 + sec/(60*60);
+        checkArgument((0<=min) && (min<60) && (0<=sec) && (sec<60));
+        return deg + min/60 + sec/3600;
     }
     
     /**
@@ -62,7 +62,7 @@ public final class Angle {
      * @return
      * angle in radians
      */
-    double ofDeg(double deg) {
+    public static double ofDeg(double deg) {
         return deg/DEG_PER_RAD;
     }
     
@@ -73,7 +73,7 @@ public final class Angle {
      * @return
      * angle in radians
      */
-    double ofHr(double hr) {
+    public static double ofHr(double hr) {
         return hr*RAD_PER_HOUR;
     }
     
@@ -84,7 +84,7 @@ public final class Angle {
      * @return
      * angle in hours
      */
-    double toHr(double rad) {
+    public static double toHr(double rad) {
         return rad/RAD_PER_HOUR;
     }
 
