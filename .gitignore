@@ -3,6 +3,8 @@
 bin/
 
 # Log file
+*.classPath
+*.project
 *.log
 
 # BlueJ files
