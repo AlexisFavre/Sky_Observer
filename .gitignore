@@ -3,6 +3,8 @@
 bin/
 
 # Log file
+*.classPath
+*.project
 *.log
 
 # BlueJ files
@@ -26,3 +28,6 @@ hs_err_pid*
 # IDE Config
 /.idea/*
 *.iml
+
+# MacOS
+*.DS_Store

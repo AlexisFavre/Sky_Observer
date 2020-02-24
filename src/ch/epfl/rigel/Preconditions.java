@@ -1,6 +1,6 @@
 package ch.epfl.rigel;
 
-import ch.epfl.rigel.math.Interval;
+
 
 /**
  * 
@@ -31,7 +31,7 @@ public final class Preconditions {
      * return the value if it is contained in this interval
      * otherwise throws IllegalArgumentException
      */
-    public static double checkInInterval(Interval interval, double value) {
+    public static double checkInInterval(ch.epfl.rigel.math.Interval interval, double value) {
         if(interval.contains(value)) {
             return value;
         }
