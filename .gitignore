@@ -28,3 +28,6 @@ hs_err_pid*
 # IDE Config
 /.idea/*
 *.iml
+
+# MacOS
+*.DS_Store
