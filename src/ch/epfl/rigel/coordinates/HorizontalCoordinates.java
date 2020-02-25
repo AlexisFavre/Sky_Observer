@@ -1,4 +1,4 @@
-package src.ch.epfl.rigel.coordinates;
+package ch.epfl.rigel.coordinates;
 
 import static ch.epfl.rigel.Preconditions.checkArgument;
 

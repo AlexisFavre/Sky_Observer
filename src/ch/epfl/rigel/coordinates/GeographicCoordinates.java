@@ -2,6 +2,7 @@ package ch.epfl.rigel.coordinates;
 
 import static ch.epfl.rigel.Preconditions.checkArgument;
 import java.util.Locale;
+
 import ch.epfl.rigel.math.Angle;
 
 /**
