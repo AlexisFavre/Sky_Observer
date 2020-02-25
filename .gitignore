@@ -11,3 +11,6 @@
 # if the files to be tracked are in subdirectories
 !*/src/
 !*/test/
+
+# Bug fix
+/bin/*
