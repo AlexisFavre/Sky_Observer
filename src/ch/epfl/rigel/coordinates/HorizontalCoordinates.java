@@ -67,7 +67,19 @@ public final class HorizontalCoordinates extends SphericalCoordinates {
     }
     
     public String azOctantName(String n, String e, String s, String w) {
-        return ""; // en cours reflexion
+        int normalizedAzimut = (int) Math.round(az()*8/Angle.TAU);
+        switch(normalizedAzimut) {
+        case 0 : return n;
+        case 1 : return n + e;
+        case 2 : return e;
+        case 3 : return s + e;
+        case 4 : return s;
+        case 5 : return s + w;
+        case 6 : return w;
+        case 7 : return n + w;
+        default : return n;
+        
+        }
     }
     
     /**

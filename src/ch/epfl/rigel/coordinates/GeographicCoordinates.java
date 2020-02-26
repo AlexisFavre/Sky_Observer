@@ -16,7 +16,7 @@ public final class GeographicCoordinates extends SphericalCoordinates {
         // TODO Auto-generated constructor stub
     }
     
-    public GeographicCoordinates ofDeg(double lonDeg, double latDeg) {
+    public static GeographicCoordinates ofDeg(double lonDeg, double latDeg) {
         checkArgument(isValidLatDeg(latDeg));
         checkArgument(isValidLonDeg(lonDeg));
         
@@ -36,7 +36,7 @@ public final class GeographicCoordinates extends SphericalCoordinates {
      * @return
      * (double) longitude in radians
      */
-    double lon() {
+    public double lon() {
         return lon();
     }
     
@@ -45,7 +45,7 @@ public final class GeographicCoordinates extends SphericalCoordinates {
      * @return
      * (double) latitude in radians
      */
-    double lat() {
+    public double lat() {
         return lat();
     }
     
@@ -54,7 +54,7 @@ public final class GeographicCoordinates extends SphericalCoordinates {
      * @return
      * (double) longitude in degrees
      */
-    double lonDeg() {
+    public double lonDeg() {
         return Angle.toDeg(lon());
     }
     
@@ -63,7 +63,7 @@ public final class GeographicCoordinates extends SphericalCoordinates {
      * @return
      * (double) latitude in degrees
      */
-    double latDeg() {
+    public double latDeg() {
         return Angle.toDeg(lat());
     }
     
