@@ -2,13 +2,14 @@
 
 package ch.epfl.rigel.math;
 
-import ch.epfl.rigel.math.RightOpenInterval;
-import ch.epfl.rigel.TestRandomizer;
-import org.junit.jupiter.api.Test;
-
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
+
+import ch.epfl.rigel.math.RightOpenInterval;
+import ch.epfl.rigel.TestRandomizer;
 
 class RightOpenIntervalTest {
     @Test
