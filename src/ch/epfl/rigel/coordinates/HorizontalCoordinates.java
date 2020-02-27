@@ -14,19 +14,19 @@ public final class HorizontalCoordinates extends SphericalCoordinates {
     
     /**
      * 
-     * @param azimut correspond to longitude
+     * @param azimuth correspond to longitude
      * (double) in radians
      * @param altitude correspond to latitude
      * (double) in radians
      */
-    private HorizontalCoordinates(double azimut, double altitude) {
-        super(azimut, altitude);
+    private HorizontalCoordinates(double azimuth, double altitude) {
+        super(azimuth, altitude);
     }
     
     /**
      * to create new HorizontalCoordinates
      * @param az
-     * (double) azimut in radians (must be in [0,2Pi[)
+     * (double) azimuth in radians (must be in [0,2Pi[)
      * @param alt
      * (double) altitude in radians (must be in [-Pi/2,Pi/2])
      * @return
@@ -40,9 +40,9 @@ public final class HorizontalCoordinates extends SphericalCoordinates {
     
     /**
      * to create new HorizontalCoordinates
-     * @param az
-     * (double) azimut in degrees (must be in [0,360[)
-     * @param alt
+     * @param azDeg
+     * (double) azimuth in degrees (must be in [0,360[)
+     * @param altDeg
      * (double) altitude in degrees (must be in [-90,90])
      * @return
      * new HorizontalCoordinates
@@ -56,7 +56,7 @@ public final class HorizontalCoordinates extends SphericalCoordinates {
     /**
      * 
      * @param that
-     * (HorizontalCoordiantes) of the second point
+     * (HorizontalCoordinates) of the second point
      * @return
      * (double) angular distance between this and the other point
      * in radians
@@ -67,8 +67,8 @@ public final class HorizontalCoordinates extends SphericalCoordinates {
     }
     
     public String azOctantName(String n, String e, String s, String w) {
-        int normalizedAzimut = (int) Math.round(az()*8/Angle.TAU);
-        switch(normalizedAzimut) {
+        int normalizedAzimuth = (int) Math.round(az()*8/Angle.TAU);
+        switch(normalizedAzimuth) {
         case 0 : return n;
         case 1 : return n + e;
         case 2 : return e;
@@ -85,7 +85,7 @@ public final class HorizontalCoordinates extends SphericalCoordinates {
     /**
      * 
      * @return
-     * (double) azimut in radians
+     * (double) azimuth in radians
      */
     public double az() {
         return lon();
@@ -102,7 +102,7 @@ public final class HorizontalCoordinates extends SphericalCoordinates {
     /**
      * 
      * @return
-     * (double) azimut in degrees
+     * (double) azimuth in degrees
      */
     public double azDeg() {
         return Angle.ofDeg(az());
@@ -119,7 +119,7 @@ public final class HorizontalCoordinates extends SphericalCoordinates {
     
     @Override
     public String toString() {
-        return String.format(Locale.ROOT, "(az=%.4f°, alt=%.4f°)", az(), alt());
+        return String.format(Locale.ROOT, "(az=%.4f°, alt=%.4f°)", azDeg(), altDeg());
     }
     
 }

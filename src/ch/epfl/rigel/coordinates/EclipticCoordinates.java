@@ -13,7 +13,7 @@ import ch.epfl.rigel.math.Angle;
  */
 public final class EclipticCoordinates extends SphericalCoordinates {
 
-    public EclipticCoordinates(double longitude, double latitude) {
+    private EclipticCoordinates(double longitude, double latitude) {
         super(longitude, latitude);
     }
     
@@ -22,18 +22,14 @@ public final class EclipticCoordinates extends SphericalCoordinates {
      * @return
      * (double) longitude in radians
      */
-    public double lon() {
-        return lon();
-    }
+    public double lon() { return super.lon();}
     
     /**
      * 
      * @return
      * (double) latitude in radians
      */
-    public double lat() {
-        return lat();
-    }
+    public double lat() {return super.lat();}
     
     /**
      * 
@@ -70,7 +66,7 @@ public final class EclipticCoordinates extends SphericalCoordinates {
     
     @Override
     public String toString() {
-        return String.format(Locale.ROOT, "(λ=%.4f°, β=%.4f°)", lat(), lon());
+        return String.format(Locale.ROOT, "(λ=%.4f°, β=%.4f°)", lonDeg(), latDeg());
     }
 
 }

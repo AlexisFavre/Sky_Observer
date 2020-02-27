@@ -4,47 +4,50 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * @author Augustin ALLARD (299918)
+ */
 class HorizontalCoordinatesTest {
 
     @Test
     void ofWorksWithExpectedParameters() {
-        EclipticCoordinates.of(0, Math.PI/2);
+        HorizontalCoordinates.of(0, Math.PI/2);
     }
 
     @Test
     void ofFailsWithNotExpectedParameters() {
         assertThrows(IllegalArgumentException.class, () -> {
-            EclipticCoordinates.of(2 * Math.PI, 0);
+            HorizontalCoordinates.of(2 * Math.PI, 0);
         });
         assertThrows(IllegalArgumentException.class, () -> {
-            EclipticCoordinates.of(-0.2, 0);
+            HorizontalCoordinates.of(-0.2, 0);
         });
         assertThrows(IllegalArgumentException.class, () -> {
-            EclipticCoordinates.of(0, -Math.PI);
+            HorizontalCoordinates.of(0, -Math.PI);
         });
         assertThrows(IllegalArgumentException.class, () -> {
-            EclipticCoordinates.of(0, Math.PI);
+            HorizontalCoordinates.of(0, Math.PI);
         });
     }
 
     @Test
     void ofDegWorksWithExpectedParameters() {
-        EclipticCoordinates.of(0, 360);
+        HorizontalCoordinates.ofDeg(0, 360);
     }
 
     @Test
     void ofDegFailsWithNotExpectedParameters() {
         assertThrows(IllegalArgumentException.class, () -> {
-            EclipticCoordinates.of(360, 0);
+            HorizontalCoordinates.of(360, 0);
         });
         assertThrows(IllegalArgumentException.class, () -> {
-            EclipticCoordinates.of(-0.2, 0);
+            HorizontalCoordinates.of(-0.2, 0);
         });
         assertThrows(IllegalArgumentException.class, () -> {
-            EclipticCoordinates.of(0, -90);
+            HorizontalCoordinates.of(0, -90);
         });
         assertThrows(IllegalArgumentException.class, () -> {
-            EclipticCoordinates.of(0, 90);
+            HorizontalCoordinates.of(0, 90);
         });
     }
 

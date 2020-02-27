@@ -37,7 +37,7 @@ public final class GeographicCoordinates extends SphericalCoordinates {
      * (double) longitude in radians
      */
     public double lon() {
-        return lon();
+        return super.lon();
     }
     
     /**
@@ -46,7 +46,7 @@ public final class GeographicCoordinates extends SphericalCoordinates {
      * (double) latitude in radians
      */
     public double lat() {
-        return lat();
+        return super.lat();
     }
     
     /**
