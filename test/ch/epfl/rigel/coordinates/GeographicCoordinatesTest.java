@@ -7,6 +7,27 @@ import static org.junit.jupiter.api.Assertions.*;
 public class GeographicCoordinatesTest {
 
     @Test
+    void ofDegWorksWithExpectedParameters() {
+        //EclipticCoordinates.of(0, 360);
+    }
+
+    @Test
+    void ofDegFailsWithNotExpectedParameters() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            EclipticCoordinates.of(360, 0);
+        });
+        assertThrows(IllegalArgumentException.class, () -> {
+            EclipticCoordinates.of(-0.2, 0);
+        });
+        assertThrows(IllegalArgumentException.class, () -> {
+            EclipticCoordinates.of(0, -90);
+        });
+        assertThrows(IllegalArgumentException.class, () -> {
+            EclipticCoordinates.of(0, 90);
+        });
+    }
+
+    @Test
     void isValidLonDegWorksOnExpectedDeg() {
         assertTrue(GeographicCoordinates.isValidLonDeg(-180));
         assertTrue(GeographicCoordinates.isValidLonDeg(-153));
@@ -35,7 +56,7 @@ public class GeographicCoordinatesTest {
 
     @Test
     void toStringWorksOnTrivialCoordinates() {
-        GeographicCoordinates trivialCoordinates = GeographicCoordinates.ofDeg(6.57, 46.52);
-        assertEquals(trivialCoordinates.toString(), "(lon=6.5700°, lat=46.5200°)");
+        assertEquals("(lon=6.5700°, lat=46.5200°)",
+                GeographicCoordinates.ofDeg(6.57, 46.52).toString());
     }
 }
