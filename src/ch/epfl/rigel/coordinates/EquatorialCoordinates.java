@@ -47,7 +47,7 @@ public final class EquatorialCoordinates extends SphericalCoordinates {
      * @return
      * (double) right ascension in radians
      */
-    double ra() {
+    public double ra() {
         return lon();
     }
     
@@ -56,7 +56,7 @@ public final class EquatorialCoordinates extends SphericalCoordinates {
      * @return
      * (double) declination in radians
      */
-    double dec() {
+    public double dec() {
         return lat();
     }
     
@@ -65,7 +65,7 @@ public final class EquatorialCoordinates extends SphericalCoordinates {
      * @return
      * (double) right ascension in degrees
      */
-    double raDeg() {
+    public double raDeg() {
         return Angle.toDeg(lon());
     }
     
@@ -74,7 +74,7 @@ public final class EquatorialCoordinates extends SphericalCoordinates {
      * @return
      * (double) declination in degrees
      */
-    double decDeg() {
+    public double decDeg() {
         return Angle.toDeg(lat());
     }
     
@@ -83,7 +83,7 @@ public final class EquatorialCoordinates extends SphericalCoordinates {
      * @return
      * (double) right ascension in hours
      */
-    double raHr() {
+    public double raHr() {
         return Angle.toHr(ra());
     }
     
