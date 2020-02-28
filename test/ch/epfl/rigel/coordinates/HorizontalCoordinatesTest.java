@@ -32,7 +32,8 @@ class HorizontalCoordinatesTest {
 
     @Test
     void ofDegWorksWithExpectedParameters() {
-        HorizontalCoordinates.ofDeg(0, 360);
+        HorizontalCoordinates.ofDeg(0, -90
+                );
     }
 
     @Test

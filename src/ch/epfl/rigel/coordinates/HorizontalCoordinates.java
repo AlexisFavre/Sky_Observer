@@ -105,7 +105,7 @@ public final class HorizontalCoordinates extends SphericalCoordinates {
      * (double) azimuth in degrees
      */
     public double azDeg() {
-        return Angle.ofDeg(az());
+        return Angle.toDeg(az());
     }
     
     /**
@@ -114,7 +114,7 @@ public final class HorizontalCoordinates extends SphericalCoordinates {
      * (double) altitude in radians
      */
     public double altDeg() {
-        return Angle.ofDeg(alt());
+        return Angle.toDeg(alt());
     }
     
     @Override
