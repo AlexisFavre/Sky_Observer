@@ -5,7 +5,7 @@ import ch.epfl.rigel.math.Angle;
 /**
  * 
  * @author Alexis FAVRE (310552)
- *
+ * see https://cs108.epfl.ch/p/02_spherical-coords.html#geo-coord
  */
 abstract class SphericalCoordinates {
 
