@@ -8,14 +8,25 @@ import ch.epfl.rigel.math.Angle;
 /**
  * 
  * @author Alexis FAVRE (310552)
+ * plan of reference is the equatorial plan of the earth
+ * direction of reference is the Greenwich Meridian
  */
 public final class GeographicCoordinates extends SphericalCoordinates {
 
     private GeographicCoordinates(double longitude, double latitude) {
         super(longitude, latitude);
-        // TODO Auto-generated constructor stub
     }
     
+    /**
+     * 
+     * @param lonDeg
+     * (double) longitude in degrees [–180°, +180°[ (west to east)
+     * @param latDeg
+     * (double) latitude in degrees  [–90°, +90°] (South to North)
+     * @return
+     * new GeographicCoordinates with these characteristic(if they are ok)
+     * otherwise throw IllegalArgumentException
+     */
     public static GeographicCoordinates ofDeg(double lonDeg, double latDeg) {
         checkArgument(isValidLatDeg(latDeg));
         checkArgument(isValidLonDeg(lonDeg));
@@ -23,12 +34,26 @@ public final class GeographicCoordinates extends SphericalCoordinates {
         return new GeographicCoordinates(Angle.ofDeg(lonDeg), Angle.ofDeg(latDeg));
     }
     
+    /**
+     * 
+     * @param lonDeg
+     * (double) longitude in degrees 
+     * @return
+     * true if and only if longitude is in [–180°, +180°[
+     */
     public static boolean isValidLonDeg(double lonDeg) {
-        return lonDeg<180 && lonDeg>=-180;
+        return -180 <= lonDeg && lonDeg < 180;
     }
     
+    /**
+     * 
+     * @param latDeg
+     * (double) latitude in degrees
+     * @return
+     * true if and only if longitude is in [–90°, +90°]
+     */
     public static boolean isValidLatDeg(double latDeg) {
-        return latDeg<=90 && latDeg>=-90;
+        return -90 <= latDeg && latDeg <= 90;
     }
     
     /**
@@ -66,7 +91,6 @@ public final class GeographicCoordinates extends SphericalCoordinates {
     public double latDeg() {
         return Angle.toDeg(lat());
     }
-    
     
     @Override
     public String toString() {

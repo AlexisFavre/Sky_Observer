@@ -7,9 +7,11 @@ import java.util.Locale;
 import ch.epfl.rigel.math.Angle;
 
 /**
- * 
+ * @see https://www.google.com/url?sa=i&url=https%3A%2F%2Ffr.wikipedia.org%2Fwiki%2FSyst%25C3%25A8me_de_coordonn%25C3%25A9es_%25C3%25A9quatoriales&psig=AOvVaw0C67d4KY50a1oQVwH7tsQd&ust=1582971266102000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCNDmhdKB9OcCFQAAAAAdAAAAABAR
  * @author Alexis FAVRE (310552)
- *
+ * center of the celestial sphere is the center of the earth
+ * plan of reference is the equatorial plan of the earth
+ * direction of reference is the vernal point(intersection between equatorial and elliptic plans)
  */
 public final class EquatorialCoordinates extends SphericalCoordinates {
 
@@ -26,12 +28,13 @@ public final class EquatorialCoordinates extends SphericalCoordinates {
     
     /**
      * to create new EquatoriolCoordinates
-     * @param az
+     * @param ra
      * (double) right ascension in radians (must be in [0,2Pi[)
-     * @param alt
+     * @param dec
      * (double) declination in radians (must be in [-Pi/2,Pi/2])
      * @return
-     * new EquatoriolCoordinates
+     * new EquatoriolCoordinates (if characteristics are ok)
+     * otherwise throw {@link IllegalArgumentException}
      */
     public static EquatorialCoordinates of(double ra, double dec) {
         checkArgument(0<=ra && ra < Angle.TAU);

@@ -8,16 +8,15 @@ import ch.epfl.rigel.math.Angle;
 /**
  * 
  * @author Alexis FAVRE (310552)
- *
+ * the observer is the center of the sphere
+ * plan of reference is the horizon plan of the earth
+ * direction of reference is the North
  */
 public final class HorizontalCoordinates extends SphericalCoordinates {
     
     /**
-     * 
      * @param azimuth correspond to longitude
-     * (double) in radians
      * @param altitude correspond to latitude
-     * (double) in radians
      */
     private HorizontalCoordinates(double azimuth, double altitude) {
         super(azimuth, altitude);
@@ -27,8 +26,10 @@ public final class HorizontalCoordinates extends SphericalCoordinates {
      * to create new HorizontalCoordinates
      * @param az
      * (double) azimuth in radians (must be in [0,2Pi[)
+     * angle between North and vertical plan which contains the observed object
      * @param alt
      * (double) altitude in radians (must be in [-Pi/2,Pi/2])
+     * vertical angle between horizontal plan and the observed object
      * @return
      * new HorizontalCoordinates
      */
@@ -41,9 +42,11 @@ public final class HorizontalCoordinates extends SphericalCoordinates {
     /**
      * to create new HorizontalCoordinates
      * @param azDeg
-     * (double) azimuth in degrees (must be in [0,360[)
+     * (double) azimuth in degrees (must be in [0°,360°[)
+     * angle between North and vertical plan which contains the observed object
      * @param altDeg
-     * (double) altitude in degrees (must be in [-90,90])
+     * (double) altitude in degrees (must be in [-90°,90°])
+     * vertical angle between horizontal plan and the observed object
      * @return
      * new HorizontalCoordinates
      */
@@ -65,7 +68,15 @@ public final class HorizontalCoordinates extends SphericalCoordinates {
         return Math.acos(Math.sin(this.alt()) * Math.sin(that.alt())
                 + Math.cos(this.alt()) * Math.cos(that.alt()) * Math.cos(this.az()-that.az()));
     }
-    
+    /**
+     * 
+     * @param n must be "N"
+     * @param e must be "E"
+     * @param s must be "S"
+     * @param w must be "W"
+     * @return
+     * (String) the correspond octant of the coordinates
+     */
     public String azOctantName(String n, String e, String s, String w) {
         int normalizedAzimuth = (int) Math.round(az()*8/Angle.TAU);
         switch(normalizedAzimuth) {
@@ -78,7 +89,6 @@ public final class HorizontalCoordinates extends SphericalCoordinates {
         case 6 : return w;
         case 7 : return n + w;
         default : return n;
-        
         }
     }
     

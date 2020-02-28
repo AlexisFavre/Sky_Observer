@@ -9,7 +9,9 @@ import ch.epfl.rigel.math.Angle;
 /**
  * 
  * @author Alexis FAVRE (310552)
- *
+ * center of the celestial sphere is the center of the earth (or sometimes center of the sun)
+ * plan of reference is the elliptic plan of the earth
+ * direction of reference is the vernal point(intersection between equatorial and elliptic plans)
  */
 public final class EclipticCoordinates extends SphericalCoordinates {
 
@@ -18,21 +20,18 @@ public final class EclipticCoordinates extends SphericalCoordinates {
     }
     
     /**
-     * 
      * @return
      * (double) longitude in radians
      */
     public double lon() { return super.lon();}
     
     /**
-     * 
      * @return
      * (double) latitude in radians
      */
     public double lat() {return super.lat();}
     
     /**
-     * 
      * @return
      * (double) longitude in degrees
      */
@@ -41,7 +40,6 @@ public final class EclipticCoordinates extends SphericalCoordinates {
     }
     
     /**
-     * 
      * @return
      * (double) latitude in degrees
      */
