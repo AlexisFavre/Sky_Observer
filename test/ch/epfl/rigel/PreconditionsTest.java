@@ -2,10 +2,12 @@
 
 package ch.epfl.rigel;
 
-import ch.epfl.rigel.math.ClosedInterval;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import ch.epfl.rigel.Preconditions;
+import ch.epfl.rigel.math.ClosedInterval;
 
 class PreconditionsTest {
     @Test
