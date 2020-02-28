@@ -2,13 +2,14 @@
 
 package ch.epfl.rigel.math;
 
-import ch.epfl.rigel.math.Angle;
-import ch.epfl.rigel.TestRandomizer;
-import org.junit.jupiter.api.Test;
-
 import static java.lang.Math.PI;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import org.junit.jupiter.api.Test;
+
+import ch.epfl.rigel.math.Angle;
+import ch.epfl.rigel.TestRandomizer;
 
 public class AngleTest {
 
