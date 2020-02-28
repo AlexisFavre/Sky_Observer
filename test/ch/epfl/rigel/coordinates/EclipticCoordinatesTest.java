@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * @author Augustin ALLARD (299918)
+ */
 class EclipticCoordinatesTest {
 
     @Test
