@@ -26,22 +26,27 @@ public enum Epoch {
     }
 
     /**
+     * This calculates the time gap in days between this (the epoch date) and the given date
+     *
      * @param when the date from which we want to measure the day gap with (this)
      * @return (double)
      *  exact days from the Epoch(this) until the given date (negative if anterior)
      */
-    double daysUntil(ZonedDateTime when) {
+    public double daysUntil(ZonedDateTime when) {
         double millisInDays = 8.64e+7;
         return date.until(when, ChronoUnit.MILLIS) / millisInDays;
     };
 
     /**
+     * This calculates the time gap in julianCenturies between this (the epoch date) and the given date
+     *
      * @param when the date from which we want to measure the julianCenturies gap with (this)
      * @return (double)
      *  exact julianCenturies from the Epoch(this) until the given date (negative if anterior)
      */
-    double julianCenturiesUntil(ZonedDateTime when) {
-        double millisInJCenturies = 3.15576e+12;
-        return date.until(when, ChronoUnit.MILLIS) / millisInJCenturies;
+    public double julianCenturiesUntil(ZonedDateTime when) {
+        double millisInDays = 8.64e+7;
+        double daysInJCenturies = 3.15576e+12;
+        return date.until(when, ChronoUnit.MILLIS) / (millisInDays * daysInJCenturies);
     };
 }
