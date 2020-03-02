@@ -6,12 +6,17 @@ import java.util.Objects;
 
 import ch.epfl.rigel.coordinates.EquatorialCoordinates;
 
+/**
+ * 
+ * @author Alexis FAVRE (310552)
+ *
+ */
 public abstract class CelestialObject {
 
-    private String name;
-    private EquatorialCoordinates equatorioalPos;
-    private float angularSize;
-    private float magnitude;
+    private final String name;
+    private final EquatorialCoordinates equatorioalPos;
+    private final float angularSize;
+    private final float magnitude;
 
     CelestialObject(String name, EquatorialCoordinates equatorialPos, float angularSize, float magnitude) {
         checkArgument(angularSize<=0);
