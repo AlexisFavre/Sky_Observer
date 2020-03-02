@@ -2,17 +2,22 @@ package ch.epfl.rigel.coordinates;
 
 import java.util.Locale;
 
+/**
+ * 
+ * @author Alexis FAVRE (310552)
+ *
+ */
 public final class CartesianCoordinates {
 
-    private double abscissa;
-    private double ordinate;
+    private final double abscissa;
+    private final double ordinate;
 
     private CartesianCoordinates(double abscissa, double ordinate) {
         this.abscissa = abscissa;
         this.ordinate = ordinate;
     }
         
-    public CartesianCoordinates of(double x, double y) {
+    public static CartesianCoordinates of(double x, double y) {
         return new CartesianCoordinates(x,y);
         }
 
