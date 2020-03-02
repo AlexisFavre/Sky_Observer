@@ -23,8 +23,6 @@ public final class StereographicProjection implements Function<HorizontalCoordin
         this.sinλ0 = Math.sin(λ0);
         this.cosλ0 = Math.cos(λ0);
     }
-
-    
     
     public CartesianCoordinates circleCenterForParallel(HorizontalCoordinates hor) {
         return null;
@@ -36,12 +34,22 @@ public final class StereographicProjection implements Function<HorizontalCoordin
         
     }
     
+    /**
+     * 
+     * @param rad
+     * (double) the apparent diameter of the sphere centered at the center of the projection
+     * @return
+     * (double) the projected diameter of a sphere
+     */
     public double applyToAngle(double rad) {
         return 2*Math.tan(rad/4);
         
     }
     /**
-     * @param
+     * @param azAlt
+     * (HorizontalCoordinates) coordinates of the point
+     * @return
+     * the carthesianCoordinates of the projection of the point
      */
     @Override
     public CartesianCoordinates apply(HorizontalCoordinates azAlt) {
