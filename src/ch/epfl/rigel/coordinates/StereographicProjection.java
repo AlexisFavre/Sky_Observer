@@ -8,29 +8,39 @@ import java.util.function.Function;
  */
 public final class StereographicProjection implements Function<HorizontalCoordinates, CartesianCoordinates>{
 
-    private double ɸ0;
-    private double λ0;
-    private double sinλ0;
-    private double cosλ0;
-    private double sinɸ0;
-    private double cosɸ0;
+    private final double ɸ0;
+    private final double λ0;
+    private final double sinɸ0;
+    private final double cosɸ0;
 
     public StereographicProjection(HorizontalCoordinates center) {
         this.ɸ0 = center.az();
         this.λ0 = center.alt();
         this.sinɸ0 = Math.sin(ɸ0);
         this.cosɸ0 = Math.cos(ɸ0);
-        this.sinλ0 = Math.sin(λ0);
-        this.cosλ0 = Math.cos(λ0);
     }
     
+    /**
+     * 
+     * @param hor (HorizontalCoordinates)
+     * @return (CartesianCoordinates) of the center of the circle corresponding
+     * to the parallel which across the point hor
+     * (ordinate could be infinite)
+     */
     public CartesianCoordinates circleCenterForParallel(HorizontalCoordinates hor) {
-        return null;
+        return CartesianCoordinates.of(0,circleRadiusForParallel(hor));
         
     }
     
+    /**
+     * 
+     * @param parallel (HorizontalCoordinates)
+     * @return (double) radius of corresponding circle of the projection of the parallel
+     * (could be infinite)
+     */
     public double circleRadiusForParallel(HorizontalCoordinates parallel) {
-        return 0;
+        double phi = parallel.alt();
+        return Math.cos(phi)/(sinɸ0 + Math.sin(phi));
         
     }
     
@@ -84,7 +94,12 @@ public final class StereographicProjection implements Function<HorizontalCoordin
         double phi = Math.asin(cosC*sinɸ0 + y*sinC*cosɸ0/p);
         
         return HorizontalCoordinates.of(lamda, phi);
-        
+    }
+    
+    @Override
+    public String toString() {
+        return "StereographicProjection with parameter(HorizontalCoordinates)"
+                + " : " + CartesianCoordinates.of(λ0, ɸ0).toString();
     }
     
     /**

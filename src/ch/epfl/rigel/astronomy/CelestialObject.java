@@ -14,7 +14,7 @@ import ch.epfl.rigel.coordinates.EquatorialCoordinates;
 public abstract class CelestialObject {
 
     private final String name;
-    private final EquatorialCoordinates equatorioalPos;
+    private final EquatorialCoordinates equatorialPos;
     private final float angularSize;
     private final float magnitude;
 
@@ -25,7 +25,7 @@ public abstract class CelestialObject {
         }
         
         this.name = name;
-        this.equatorioalPos = Objects.requireNonNull(equatorialPos);
+        this.equatorialPos = Objects.requireNonNull(equatorialPos);
         this.angularSize = angularSize;
         this.magnitude = magnitude;
     
@@ -41,8 +41,8 @@ public abstract class CelestialObject {
     /**
      * @return the equatorioalPos
      */
-    public EquatorialCoordinates equatorioalPos() {
-        return equatorioalPos;
+    public EquatorialCoordinates equatorialPos() {
+        return equatorialPos;
     }
 
     /**

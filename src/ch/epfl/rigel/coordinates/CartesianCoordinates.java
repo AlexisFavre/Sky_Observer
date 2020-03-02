@@ -16,7 +16,14 @@ public final class CartesianCoordinates {
         this.abscissa = abscissa;
         this.ordinate = ordinate;
     }
-        
+    
+    /**
+     * 
+     * @param x (double) abscissa
+     * @param y (double) ordinate
+     * @return
+     * new CartesianCoordinates of these characteristics
+     */
     public static CartesianCoordinates of(double x, double y) {
         return new CartesianCoordinates(x,y);
         }
@@ -37,7 +44,7 @@ public final class CartesianCoordinates {
     
     @Override
     public String toString() {
-        return String.format(Locale.ROOT, "(x=%.4f°, y=%.4f°)", x(), y());
+        return String.format(Locale.ROOT, "(x=%.4f, y=%.4f)", x(), y());
     }
     
     /**

@@ -1,6 +1,6 @@
 package ch.epfl.rigel.math;
 
-import static ch.epfl.rigel.Preconditions.checkArgument;
+import static ch.epfl.rigel.Preconditions.checkInInterval;
 
 /**
  * @author Alexis FAVRE (310552)
@@ -48,7 +48,8 @@ public final class Angle {
      * (double) angle in degrees only
      */
     public static double ofDMS(int deg, int min, double sec) {
-        checkArgument((0<=min) && (min<60) && (0<=sec) && (sec<60));
+        checkInInterval(RightOpenInterval.of(0,60), sec);
+        checkInInterval(RightOpenInterval.of(0,60), min);
         return ofDeg(deg + min/60.0 + sec/3600.0);
     }
     
