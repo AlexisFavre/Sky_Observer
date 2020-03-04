@@ -36,7 +36,7 @@ public final class Angle {
      * angle in degrees
      */
     public static double ofArcsec(double sec) {
-       return sec/(3600*DEG_PER_RAD); // /!\ checker si arcs degres 
+       return sec/(3600*DEG_PER_RAD); 
     }
     
     /**
