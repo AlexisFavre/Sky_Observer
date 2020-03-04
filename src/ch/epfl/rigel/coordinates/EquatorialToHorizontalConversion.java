@@ -3,31 +3,35 @@ package ch.epfl.rigel.coordinates;
 import java.time.ZonedDateTime;
 import java.util.function.Function;
 
-import static ch.epfl.rigel.coordinates.EclipticToEquatorialConversion.epsilon;;
+import ch.epfl.rigel.astronomy.SiderealTime;
 
 public final class EquatorialToHorizontalConversion implements Function<EquatorialCoordinates, HorizontalCoordinates> {
 
-    private final double sinOfEpsilon;
-    private final double cosOfEpsilon;
+    private final double cosOfPhi;
+    private final double sinOfPhi;
+    private final double Sl;
     
+    /**
+     * 
+     * @param when (ZonedDateTime) of the observation
+     * @param where (GeographicCoordinates) of the observer
+     */
     public EquatorialToHorizontalConversion(ZonedDateTime when, GeographicCoordinates where) {
-        double epsilon = epsilon(when); //used function of EclipticToEquatorialConversion Class
-        sinOfEpsilon = Math.sin(epsilon);
-        cosOfEpsilon = Math.cos(epsilon);
-    };
+        cosOfPhi = Math.cos(where.lat());
+        sinOfPhi = Math.sin(where.lat());
+        Sl = SiderealTime.local(when, where);
+    }
 
     @Override
     public HorizontalCoordinates apply(EquatorialCoordinates equatorialCoordinates) {
-        double H = equatorialCoordinates.ra();
-        double phi = equatorialCoordinates.dec();
-        double gamma = Math.asin(Math.sin(H) * cosOfEpsilon  +  Math.cos(H) * sinOfEpsilon * Math.sin(phi));
+        double H = Sl - equatorialCoordinates.ra(); //hourly angle
+        double sinGamma = Math.sin(equatorialCoordinates.dec());
+        double cosGamma = Math.cos(equatorialCoordinates.dec());
         
-        double alt = Math.asin(Math.sin(gamma)*Math.sin(phi) + Math.cos(gamma)*Math.cos(phi)*Math.cos(H));
-        double az = Math.atan(-Math.cos(gamma)*Math.cos(phi)*Math.sin(H)/(Math.sin(gamma)-Math.sin(phi)*Math.sin(alt)));
+        double alt = Math.asin(sinGamma*sinOfPhi + cosGamma*cosOfPhi*Math.cos(H));
+        double az = Math.atan2(-cosGamma*cosOfPhi*Math.sin(H) , sinGamma - sinOfPhi*Math.sin(alt));
+        
         return HorizontalCoordinates.of(az, alt);
-        
-        // λ = az = A = long = ra = phi
-        // β = alt = h = lat = dec = H
     }
     
     /**

@@ -27,8 +27,7 @@ public final class EclipticToEquatorialConversion implements Function<EclipticCo
     public EquatorialCoordinates apply(EclipticCoordinates equatorialCoordinates) {
         double lambda = equatorialCoordinates.lon();
         double beta = equatorialCoordinates.lat();
-        //should use atan2 !
-        double alpha = Math.atan((Math.sin(lambda) * cosOfEpsilon  -  Math.tan(beta) * sinOfEpsilon) / Math.cos(lambda));
+        double alpha = Math.atan2((Math.sin(lambda) * cosOfEpsilon  -  Math.tan(beta) * sinOfEpsilon) , Math.cos(lambda));
         double gamma = Math.asin(Math.sin(beta) * cosOfEpsilon  +  Math.cos(beta) * sinOfEpsilon * Math.sin(lambda));
         return EquatorialCoordinates.of(alpha, gamma);
     }
