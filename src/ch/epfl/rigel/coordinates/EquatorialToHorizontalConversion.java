@@ -1,9 +1,9 @@
 package ch.epfl.rigel.coordinates;
 
-import ch.epfl.rigel.astronomy.Epoch;
-
 import java.time.ZonedDateTime;
 import java.util.function.Function;
+
+import ch.epfl.rigel.astronomy.Epoch;
 
 public final class EquatorialToHorizontalConversion implements Function<EclipticCoordinates, EquatorialCoordinates> {
 
