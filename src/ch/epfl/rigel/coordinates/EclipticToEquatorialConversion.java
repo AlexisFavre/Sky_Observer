@@ -19,9 +19,9 @@ public final class EclipticToEquatorialConversion implements Function<EclipticCo
     };
     
     // return Elliptic obliqueness in radians 
-    protected static double epsilon(ZonedDateTime when) {
+    private double epsilon(ZonedDateTime when) {
         double T = Epoch.J2000.julianCenturiesUntil(when);
-        return Angle.toDeg(Angle.ofDMS(23, 26, 21.45+0.00181*T*T*T - 0.0006*T*T - 46.815*T)) ;
+        return Angle.toDeg(Angle.ofDMS(23, 26, 21.45+0.00181*T*T*T - 0.0006*T*T - 46.815*T));
     }
 
     @Override

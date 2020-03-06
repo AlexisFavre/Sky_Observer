@@ -23,7 +23,7 @@ public final class SiderealTime {
      */
     public static double greenwich(ZonedDateTime when) {
         ZonedDateTime greenwichWhen = when.withZoneSameInstant(ZoneOffset.UTC);
-        ZonedDateTime greenwichWhenDayStart = greenwichWhen.truncatedTo(ChronoUnit.HOURS);
+        ZonedDateTime greenwichWhenDayStart = greenwichWhen.truncatedTo(ChronoUnit.DAYS);
         double millisInHours = 3590170;
         double T = Epoch.J2000.julianCenturiesUntil(greenwichWhenDayStart);
         double t = greenwichWhenDayStart.until(greenwichWhen, ChronoUnit.MILLIS) / millisInHours;
