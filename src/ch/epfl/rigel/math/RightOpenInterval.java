@@ -10,6 +10,11 @@ import java.util.Locale;
  *
  */
 public final class RightOpenInterval extends Interval {
+    
+    /**
+     * interval [0,t[ (often used)
+     */
+    public static RightOpenInterval iO = new RightOpenInterval(0,Angle.TAU);
 
     /**
      * @param low

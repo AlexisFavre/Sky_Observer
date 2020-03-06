@@ -4,6 +4,10 @@ import java.util.Locale;
 
 public final class ClosedInterval extends Interval {
     /**
+     * interval [-t/4 , t/4] (often used)
+     */
+    public static ClosedInterval iC = new ClosedInterval(-Angle.TAU/4, Angle.TAU/4);
+    /**
      * 
      * @param low
      * (double) low bound of the interval
