@@ -5,6 +5,7 @@ import java.util.function.Function;
 
 import ch.epfl.rigel.astronomy.Epoch;
 import ch.epfl.rigel.math.Angle;
+import ch.epfl.rigel.math.RightOpenInterval;
 
 public final class EclipticToEquatorialConversion implements Function<EclipticCoordinates, EquatorialCoordinates> {
 
@@ -20,7 +21,7 @@ public final class EclipticToEquatorialConversion implements Function<EclipticCo
     // return Elliptic obliqueness in radians 
     protected static double epsilon(ZonedDateTime when) {
         double T = Epoch.J2000.julianCenturiesUntil(when);
-        return Angle.ofDeg(Angle.ofDMS(23, 26, 0.00181*T*T*T - 0.0006*T*T - 46.815*T + 21.45));
+        return Angle.toDeg(Angle.ofDMS(23, 26, 21.45+0.00181*T*T*T - 0.0006*T*T - 46.815*T)) ;
     }
 
     @Override
@@ -29,7 +30,7 @@ public final class EclipticToEquatorialConversion implements Function<EclipticCo
         double beta = equatorialCoordinates.lat();
         double alpha = Math.atan2((Math.sin(lambda) * cosOfEpsilon  -  Math.tan(beta) * sinOfEpsilon) , Math.cos(lambda));
         double gamma = Math.asin(Math.sin(beta) * cosOfEpsilon  +  Math.cos(beta) * sinOfEpsilon * Math.sin(lambda));
-        return EquatorialCoordinates.of(alpha, gamma);
+        return EquatorialCoordinates.of(RightOpenInterval.of(0, Angle.TAU).reduce(alpha), RightOpenInterval.of(-Angle.TAU/4, Angle.TAU/4).reduce(gamma));
     }
     
     /**
