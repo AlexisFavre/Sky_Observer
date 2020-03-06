@@ -45,7 +45,7 @@ public final class Angle {
      * @param min
      * @param sec
      * @return
-     * (double) angle in degrees only
+     * (double) radians
      */
     public static double ofDMS(int deg, int min, double sec) {
         checkArgument((0<=min) && (min<60) && (0<=sec) && (sec<60));
