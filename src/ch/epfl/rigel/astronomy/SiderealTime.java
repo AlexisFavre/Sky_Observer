@@ -42,6 +42,6 @@ public final class SiderealTime {
      *  In radians between [0, t[- the local sidereal time
      */
     public static double local(ZonedDateTime when, GeographicCoordinates where) {
-        return RightOpenInterval.of(0, Angle.TAU).reduce(greenwich(when) + where.lat());
+        return RightOpenInterval.of(0, Angle.TAU).reduce(greenwich(when) + where.lon());
     };
 }
