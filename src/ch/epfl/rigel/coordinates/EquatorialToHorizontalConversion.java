@@ -4,6 +4,8 @@ import java.time.ZonedDateTime;
 import java.util.function.Function;
 
 import ch.epfl.rigel.astronomy.SiderealTime;
+import ch.epfl.rigel.math.Angle;
+import ch.epfl.rigel.math.RightOpenInterval;
 
 public final class EquatorialToHorizontalConversion implements Function<EquatorialCoordinates, HorizontalCoordinates> {
 
@@ -31,7 +33,7 @@ public final class EquatorialToHorizontalConversion implements Function<Equatori
         double alt = Math.asin(sinGamma*sinOfPhi + cosGamma*cosOfPhi*Math.cos(H));
         double az = Math.atan2(-cosGamma*cosOfPhi*Math.sin(H) , sinGamma - sinOfPhi*Math.sin(alt));
         
-        return HorizontalCoordinates.of(az, alt);
+        return HorizontalCoordinates.of(RightOpenInterval.of(0, Angle.TAU).reduce(az), RightOpenInterval.of(-Angle.TAU/4, Angle.TAU/4).reduce(alt));
     }
     
     /**
