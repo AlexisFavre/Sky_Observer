@@ -1,9 +1,9 @@
 package ch.epfl.rigel.astronomy;
 
+import ch.epfl.rigel.math.Angle;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
+import java.time.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -11,9 +11,12 @@ class MySiderealTimeTest {
 
     @Test
     void greenwichWorksOnTrivialTime() {
-        SiderealTime.greenwich(
-                ZonedDateTime.of(LocalDateTime.of(1980, 4, 22, 4, 40, 5.23))
-        );
+        assertEquals(1.22,
+                SiderealTime.greenwich(
+                    ZonedDateTime.of(LocalDate.of(1980, Month.APRIL, 22),
+                            LocalTime.of(14, 36, 51),
+                            ZoneOffset.UTC)),
+                1.0e-2);
     }
 
     @Test
