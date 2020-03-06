@@ -79,4 +79,8 @@ class MyEpochTest {
         assertEquals(-3677.039583, Epoch.J2010.daysUntil(e), 1e-6);
     }
 
+    @Test
+    void JCenturiesUntilWorksOnTrivialEpochs() {
+
+    }
 }

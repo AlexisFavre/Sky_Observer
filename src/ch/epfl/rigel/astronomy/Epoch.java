@@ -46,7 +46,7 @@ public enum Epoch {
      */
     public double julianCenturiesUntil(ZonedDateTime when) {
         double millisInDays = 8.64e+7;
-        double daysInJCenturies = 3.15576e+12;
+        double daysInJCenturies = 36525;
         return date.until(when, ChronoUnit.MILLIS) / (millisInDays * daysInJCenturies);
     };
 }
