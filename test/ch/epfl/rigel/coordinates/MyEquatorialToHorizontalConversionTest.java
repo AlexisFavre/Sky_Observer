@@ -24,8 +24,7 @@ class MyEquatorialToHorizontalConversionTest {
                             Angle.ofDeg(121.71),
                             Angle.ofDeg(Angle.ofDMS(20, 14, 47.16))
                     )).az()
-                )
-        );
+                ), 1.e-3);
     }
 
     @Test
