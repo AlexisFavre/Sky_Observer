@@ -2,6 +2,7 @@ package ch.epfl.rigel.astronomy;
 
 import ch.epfl.rigel.coordinates.GeographicCoordinates;
 import ch.epfl.rigel.math.Angle;
+import ch.epfl.rigel.math.Polynomial;
 import ch.epfl.rigel.math.RightOpenInterval;
 
 import java.time.ZoneOffset;
@@ -24,13 +25,13 @@ public final class SiderealTime {
     public static double greenwich(ZonedDateTime when) {
         ZonedDateTime greenwichWhen = when.withZoneSameInstant(ZoneOffset.UTC);
         ZonedDateTime greenwichWhenDayStart = greenwichWhen.truncatedTo(ChronoUnit.DAYS);
-        double millisInHours = 3590170;
+        double millisInHours =  3600000;
         double T = Epoch.J2000.julianCenturiesUntil(greenwichWhenDayStart);
         double t = greenwichWhenDayStart.until(greenwichWhen, ChronoUnit.MILLIS) / millisInHours;
-        double S0 = 0.000025862 * T * T  + 2400.051336 * T + 6.697374558;
+        double S0 = Polynomial.of(0.000025862, 2400.051336, 6.697374558).at(T) ;
         double S1 = 1.002737909 * t;
         double Sg = Angle.ofHr(RightOpenInterval.of(0, 24).reduce(S0 + S1));
-        return RightOpenInterval.of(0, Angle.TAU).reduce(Sg);
+        return Angle.normalizePositive(Sg);
     };
 
     /**
