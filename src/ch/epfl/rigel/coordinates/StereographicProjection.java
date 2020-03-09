@@ -28,7 +28,7 @@ public final class StereographicProjection implements Function<HorizontalCoordin
      * (ordinate could be infinite)
      */
     public CartesianCoordinates circleCenterForParallel(HorizontalCoordinates hor) {
-        return CartesianCoordinates.of(0,circleRadiusForParallel(hor));
+        return CartesianCoordinates.of(0,cosɸ0/(sinɸ0 + hor.alt()));
         
     }
     
