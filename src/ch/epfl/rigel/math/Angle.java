@@ -36,7 +36,7 @@ public final class Angle {
      * angle in degrees
      */
     public static double ofArcsec(double sec) {
-       return sec/(3600*DEG_PER_RAD); // /!\ checker si arcs degres 
+       return sec/(3600*DEG_PER_RAD); 
     }
     
     /**
@@ -45,7 +45,7 @@ public final class Angle {
      * @param min
      * @param sec
      * @return
-     * (double) angle in degrees only
+     * (double) angle in radians
      */
     public static double ofDMS(int deg, int min, double sec) {
         checkArgument((0<=min) && (min<60) && (0<=sec) && (sec<60));
