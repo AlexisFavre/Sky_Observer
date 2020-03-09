@@ -10,7 +10,7 @@ import java.util.Locale;
  */
 public final class Polynomial {
     
-    private double[] coefs;
+    private final double[] coefs;
 
     private Polynomial(double coefficientN, double... coefficients) {
         checkArgument(coefficientN!=0);
