@@ -11,7 +11,7 @@ class MyMoonTest {
     @Test
     void info() {
         Moon moon = new Moon(EquatorialCoordinates.of(Angle.ofDeg(55.8),
-                Angle.ofDeg(19.7)), 37.5f, -1, 0.3752f);
+                Angle.ofDeg(19.7)), 0.375f, 5, 0.3752f);
         assertEquals("Lune (37.5%)", moon.info());
     }
 }
