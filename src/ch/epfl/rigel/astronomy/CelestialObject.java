@@ -54,6 +54,7 @@ public abstract class CelestialObject {
 
     /**
      * @return the magnitude
+     * in [-30,6] the main part of the time
      */
     public double magnitude() {
         return magnitude;

@@ -115,7 +115,7 @@ public final class StereographicProjection implements Function<HorizontalCoordin
      * always throws UnsupportedOperationException
      */
     @Override 
-    public final boolean equals(Object interval) {
+    public final boolean equals(Object object) {
         throw new UnsupportedOperationException();
     }
 
