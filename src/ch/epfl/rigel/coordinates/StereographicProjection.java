@@ -28,7 +28,7 @@ public final class StereographicProjection implements Function<HorizontalCoordin
      * (ordinate could be infinite)
      */
     public CartesianCoordinates circleCenterForParallel(HorizontalCoordinates hor) {
-        return CartesianCoordinates.of(0,circleRadiusForParallel(hor));
+        return CartesianCoordinates.of(0,cosɸ0/(sinɸ0 + Math.sin(hor.alt())));
         
     }
     
@@ -90,7 +90,7 @@ public final class StereographicProjection implements Function<HorizontalCoordin
         double sinC = 2*p/(p*p +1);
         double cosC = (1 - p*p)/(p*p +1);
         
-        double lamda = Math.atan(x*sinC/(p*cosɸ0*cosC - y*sinɸ0*sinC)) + this.λ0;
+        double lamda = Math.atan2(x*sinC,(p*cosɸ0*cosC - y*sinɸ0*sinC)) + this.λ0;
         double phi = Math.asin(cosC*sinɸ0 + y*sinC*cosɸ0/p);
         
         return HorizontalCoordinates.of(lamda, phi);
@@ -115,7 +115,7 @@ public final class StereographicProjection implements Function<HorizontalCoordin
      * always throws UnsupportedOperationException
      */
     @Override 
-    public final boolean equals(Object interval) {
+    public final boolean equals(Object object) {
         throw new UnsupportedOperationException();
     }
 
