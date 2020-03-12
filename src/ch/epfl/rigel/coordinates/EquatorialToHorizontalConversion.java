@@ -6,7 +6,11 @@ import java.util.function.Function;
 import ch.epfl.rigel.astronomy.SiderealTime;
 import ch.epfl.rigel.math.Angle;
 import ch.epfl.rigel.math.RightOpenInterval;
-
+/**
+ * 
+ * @author Alexis FAVRE (310552)
+ *
+ */
 public final class EquatorialToHorizontalConversion implements Function<EquatorialCoordinates, HorizontalCoordinates> {
 
     private final double cosOfPhi;
