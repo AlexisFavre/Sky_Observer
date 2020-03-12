@@ -2,16 +2,20 @@ package ch.epfl.rigel.astronomy;
 
 import ch.epfl.rigel.coordinates.EquatorialCoordinates;
 
-public final class Star extends CelestialObject { // TODO veriy immuable
+public final class Star extends CelestialObject {
 
-    private int hipparcosId;
-    private float c;
+    final private int hipparcosId;
+    final private float c;
 
     public Star(int hipparcosId, String name, EquatorialCoordinates equatorialPos,
-                float magnitude, float colorIndex) throws IllegalArgumentException {  // TODO exception
+                float magnitude, float colorIndex) throws IllegalArgumentException {
         super(name, equatorialPos, 0, magnitude);
-        this.hipparcosId = hipparcosId;
-        c = colorIndex;
+        if(!(hipparcosId<0 || colorIndex < -0.5 || colorIndex > 0.5)) {
+            this.hipparcosId = hipparcosId;
+            c = colorIndex;
+        } else {
+            throw new IllegalArgumentException();
+        }
     }
 
     public int hipparcosId() {
@@ -19,6 +23,6 @@ public final class Star extends CelestialObject { // TODO veriy immuable
     }
 
     public int colorTemperature() {
-        return (int)Math.round(4600 * (1/(0.92*c + 1.7) + 1/(0.92*c + 0.62))); // TODO transtypage
+        return (int)Math.floor(4600 * (1/(0.92*c + 1.7) + 1/(0.92*c + 0.62)));
     }
 }

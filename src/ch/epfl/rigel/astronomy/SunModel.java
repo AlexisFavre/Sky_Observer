@@ -4,13 +4,13 @@ import ch.epfl.rigel.coordinates.EclipticCoordinates;
 import ch.epfl.rigel.coordinates.EclipticToEquatorialConversion;
 import ch.epfl.rigel.math.Angle;
 
-public enum SunModel implements CelestialObjectModel<Sun> { // TODO Verify immuable
+public enum SunModel implements CelestialObjectModel<Sun> {
 
     SUN();
 
     final double E_G = Angle.ofDeg(279.557208);
     final double W_G = Angle.ofDeg(283.112438);
-    final double E = 0; // TODO Value
+    final double E = 0.016705; // TODO Veriffy Unity of Value actually not degrees (no unity)
 
     @Override
     public Sun at(double daysSinceJ2010, EclipticToEquatorialConversion eclipticToEquatorialConversion) {

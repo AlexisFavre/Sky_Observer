@@ -1,12 +1,13 @@
 package ch.epfl.rigel.astronomy;
 
+import ch.epfl.rigel.coordinates.EclipticCoordinates;
 import ch.epfl.rigel.coordinates.EclipticToEquatorialConversion;
 import ch.epfl.rigel.math.Angle;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public enum PlanetModel implements  CelestialObjectModel<Planet> { // TODO Verify immuable
+public enum PlanetModel implements  CelestialObjectModel<Planet> {
 
     MERCURY("Mercure", 0.24085, 75.5671, 77.612, 0.205627,
             0.387098, 7.0051, 48.449, 6.74, -0.42),
@@ -25,18 +26,18 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> { // TODO Verif
     NEPTUNE("Neptune", 165.84539, 326.895127, 23.07, 0.010483,
             30.1985, 1.7673, 131.879, 62.20, -6.87);
 
-    public static List<PlanetModel> planetModels = new ArrayList<PlanetModel>() {MERCURY,  };
+    final public static PlanetModel[] ALL = PlanetModel.values(); // TODO Verify if is considered as a list
 
-    private String name;
-    private double t;
-    private double eps;
-    private double w;
-    private double e;
-    private double a;
-    private double i;
-    private double omega;
-    private double tet0;
-    private double v0;
+    final private String name;
+    final private double t;
+    final private double eps;
+    final private double w;
+    final private double e;
+    final private double a;
+    final private double i;
+    final private double omega;
+    final private double tet0;
+    final private double v0;
 
     PlanetModel(String name, double t, double degEps, double degW, double e,
                 double a, double degI, double degOmega, double tet0, double v0) {
@@ -54,6 +55,14 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> { // TODO Verif
 
     @Override
     public Planet at(double daysSinceJ2010, EclipticToEquatorialConversion eclipticToEquatorialConversion) {
-        return null;
+        double meanAnomaly = 2 * Math.PI/365.242191 * daysSinceJ2010/t + e- w;
+        double trueAnomaly = meanAnomaly + 2 * e * Math.sin(meanAnomaly);
+        double radius = a * (1 - e*e)/(1 - e * Math.cos(trueAnomaly));
+        double longPlan = trueAnomaly + w;
+        double latEcl = Math.asin(Math.sin((longPlan- omega) * Math.sin(i))); 
+        double angularSize = Angle.ofDeg(0.533128) * (1 + E * Math.cos(trueAnomaly)) / (1 - E * E); // TODO Verify if of deg ok
+        double longEcl = trueAnomaly + W_G;
+        EclipticCoordinates position = EclipticCoordinates.of(longEcl, 0);
+        return new Planet(this.name, );
     }
 }
