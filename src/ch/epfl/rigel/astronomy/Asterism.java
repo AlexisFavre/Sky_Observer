@@ -1,24 +1,22 @@
 package ch.epfl.rigel.astronomy;
 
-import java.util.ArrayList;
 import java.util.List;
+import static ch.epfl.rigel.Preconditions.checkArgument;
 
 public final class Asterism {
 
-    final private List<Star> stars;
+    private final List<Star> stars;
 
     public Asterism(List<Star> stars) throws IllegalArgumentException {
-        if(!stars.isEmpty()) {
-            this.stars = new ArrayList<Star>();
-            this.stars.addAll(stars);
-        } else {
-            throw new IllegalArgumentException();
-        }
+        checkArgument(!stars.isEmpty());
+        this.stars = List.copyOf(stars);
     }
-
+    /**
+     * 
+     * @return
+     * list of the stars which composed the asterism
+     */
     public List<Star> stars() {
-        List<Star> value = new ArrayList<Star>();
-        value.addAll(stars);
-        return value;
+        return stars;
     }
 }

@@ -1,11 +1,12 @@
 package ch.epfl.rigel.astronomy;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import ch.epfl.rigel.coordinates.EclipticCoordinates;
 import ch.epfl.rigel.coordinates.EclipticToEquatorialConversion;
 import ch.epfl.rigel.math.Angle;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public enum PlanetModel implements  CelestialObjectModel<Planet> {
 
@@ -26,7 +27,7 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
     NEPTUNE("Neptune", 165.84539, 326.895127, 23.07, 0.010483,
             30.1985, 1.7673, 131.879, 62.20, -6.87);
 
-    final public static PlanetModel[] ALL = PlanetModel.values(); // TODO Verify if is considered as a list
+    public static List<PlanetModel> ALL = new ArrayList<>(List.copyOf(Arrays.asList(PlanetModel.values())));
 
     final private String name;
     final private double t;
@@ -43,12 +44,12 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
                 double a, double degI, double degOmega, double tet0, double v0) {
         this.name = name;
         this.t = t;
-        eps = Angle.ofDeg(degEps);
-        w = Angle.ofDeg(degW);
+        this.eps = Angle.ofDeg(degEps);
+        this.w = Angle.ofDeg(degW);
         this.e = e;
         this.a = a;
-        i = Angle.ofDeg(degI);
-        omega = Angle.ofDeg(degOmega);
+        this.i = Angle.ofDeg(degI);
+        this.omega = Angle.ofDeg(degOmega);
         this.tet0 = tet0;
         this.v0 = v0;
     }
@@ -73,10 +74,10 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
         double latEclHelio = Math.asin(Math.sin((longPlan(daysSinceJ2010)- omega) * Math.sin(i)));
         double radiusProj = radius(daysSinceJ2010) * Math.cos(latEclHelio);
         double longPlanProj =
-                Math.atan(
+                Math.atan2(
                         Math.sin(longPlan(daysSinceJ2010) - omega) * Math.cos(i)
-                                / Math.cos(longPlan(daysSinceJ2010) - omega)
-                ) + omega; // TODO atan2 ?
+                                , Math.cos(longPlan(daysSinceJ2010) - omega)
+                ) + omega;
 
         // Ecliptic coordinates
         double longitude = 0;
@@ -95,10 +96,10 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
         }
 
         double latitude =
-                Math.atan(
+                Math.atan2(
                         radiusProj * Math.tan(latEclHelio) * Math.sin(longitude - longPlanProj)
-                                / (EARTH.radius(daysSinceJ2010) * Math.sin(longPlanProj - EARTH.longPlan(daysSinceJ2010)))
-                ); // TODO atan2?
+                                , (EARTH.radius(daysSinceJ2010) * Math.sin(longPlanProj - EARTH.longPlan(daysSinceJ2010)))
+                );
         EclipticCoordinates position = EclipticCoordinates.of(longitude, latitude);
 
         // angular size and magnitude
