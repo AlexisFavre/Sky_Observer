@@ -53,16 +53,65 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
         this.v0 = v0;
     }
 
+    private double meanAnomaly(double daysSinceJ2010) {
+        return 2 * Math.PI / 365.242191 * daysSinceJ2010 / t + e - w;
+    }
+    private double trueAnomaly(double daysSinceJ2010) {
+        return meanAnomaly(daysSinceJ2010) + 2 * e * Math.sin(meanAnomaly(daysSinceJ2010));
+    }
+    private double radius(double daysSinceJ2010) {
+        return a * (1 - e * e) / (1 - e * Math.cos(trueAnomaly(daysSinceJ2010)));
+    }
+    private double longPlan(double daysSinceJ2010) {
+        return trueAnomaly(daysSinceJ2010) + w;
+    }
+
     @Override
     public Planet at(double daysSinceJ2010, EclipticToEquatorialConversion eclipticToEquatorialConversion) {
-        double meanAnomaly = 2 * Math.PI/365.242191 * daysSinceJ2010/t + e- w;
-        double trueAnomaly = meanAnomaly + 2 * e * Math.sin(meanAnomaly);
-        double radius = a * (1 - e*e)/(1 - e * Math.cos(trueAnomaly));
-        double longPlan = trueAnomaly + w;
-        double latEcl = Math.asin(Math.sin((longPlan- omega) * Math.sin(i))); 
-        double angularSize = Angle.ofDeg(0.533128) * (1 + E * Math.cos(trueAnomaly)) / (1 - E * E); // TODO Verify if of deg ok
-        double longEcl = trueAnomaly + W_G;
-        EclipticCoordinates position = EclipticCoordinates.of(longEcl, 0);
-        return new Planet(this.name, );
+
+        // planet info at the given time
+        double latEclHelio = Math.asin(Math.sin((longPlan(daysSinceJ2010)- omega) * Math.sin(i)));
+        double radiusProj = radius(daysSinceJ2010) * Math.cos(latEclHelio);
+        double longPlanProj =
+                Math.atan(
+                        Math.sin(longPlan(daysSinceJ2010) - omega) * Math.cos(i)
+                                / Math.cos(longPlan(daysSinceJ2010) - omega)
+                ) + omega; // TODO atan2 ?
+
+        // Ecliptic coordinates
+        double longitude = 0;
+        if(this.a < EARTH.a) { // TODO what about earth?
+            longitude =
+                    Math.atan(
+                            radiusProj * Math.sin(EARTH.longPlan(daysSinceJ2010) - longPlanProj))
+                            / (EARTH.radius(daysSinceJ2010) - radiusProj * Math.cos(EARTH.longPlan(daysSinceJ2010) - longPlanProj)
+                    ) + Math.PI + EARTH.longPlan(daysSinceJ2010);
+        } else {
+            longitude =
+                    Math.atan(
+                            EARTH.radius(daysSinceJ2010) * Math.sin(longPlanProj - EARTH.longPlan(daysSinceJ2010)))
+                            / (radiusProj - EARTH.radius(daysSinceJ2010) * Math.cos(longPlanProj - EARTH.longPlan(daysSinceJ2010))
+                    ) + longPlanProj;
+        }
+
+        double latitude =
+                Math.atan(
+                        radiusProj * Math.tan(latEclHelio) * Math.sin(longitude - longPlanProj)
+                                / (EARTH.radius(daysSinceJ2010) * Math.sin(longPlanProj - EARTH.longPlan(daysSinceJ2010)))
+                ); // TODO atan2?
+        EclipticCoordinates position = EclipticCoordinates.of(longitude, latitude);
+
+        // angular size and magnitude
+        double p = Math.sqrt(EARTH.radius(daysSinceJ2010) * EARTH.radius(daysSinceJ2010)
+                + radius(daysSinceJ2010) * radius(daysSinceJ2010)
+                - 2 * EARTH.radius(daysSinceJ2010) * radius(daysSinceJ2010)
+                * Math.cos(longPlan(daysSinceJ2010) - EARTH.longPlan(daysSinceJ2010)) * Math.cos(latEclHelio)
+        ); // TODO verify neg
+        double phase = (1 + Math.cos(longitude - longPlan(daysSinceJ2010)))/2;
+        double angularSize = tet0 / p;
+        double magnitude = v0 + 5 * Math.log10(radius(daysSinceJ2010) * p / Math.sqrt(phase));
+
+        // TODO transtype
+        return new Planet(this.name, eclipticToEquatorialConversion.apply(position), (float)angularSize, (float)magnitude);
     }
 }
