@@ -14,10 +14,10 @@ public final class Star extends CelestialObject {
     public Star(int hipparcosId, String name, EquatorialCoordinates equatorialPos,
                 float magnitude, float colorIndex) throws IllegalArgumentException {
         super(name, equatorialPos, 0, magnitude);
-        checkArgument(hipparcosId>=0 || colorIndex < -0.5 || colorIndex > 0.5);
-        c = colorIndex;
-        checkInInterval(ClosedInterval.of(-0.5, 5.5), hipparcosId);
+        checkArgument(hipparcosId>=0);
+        checkInInterval(ClosedInterval.of(-0.5, 5.5), colorIndex);
         this.hipparcosId = hipparcosId;
+        c = colorIndex;
     }
     
     /**
