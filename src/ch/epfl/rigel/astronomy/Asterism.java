@@ -3,6 +3,9 @@ package ch.epfl.rigel.astronomy;
 import java.util.List;
 import static ch.epfl.rigel.Preconditions.checkArgument;
 
+/**
+ * @author Augustin ALLARD (299918)
+ */
 public final class Asterism {
 
     private final List<Star> stars;
@@ -11,6 +14,7 @@ public final class Asterism {
         checkArgument(!stars.isEmpty());
         this.stars = List.copyOf(stars);
     }
+
     /**
      * 
      * @return

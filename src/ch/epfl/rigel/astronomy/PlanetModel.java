@@ -8,6 +8,9 @@ import ch.epfl.rigel.coordinates.EclipticCoordinates;
 import ch.epfl.rigel.coordinates.EclipticToEquatorialConversion;
 import ch.epfl.rigel.math.Angle;
 
+/**
+ * @author Augustin ALLARD (299918)
+ */
 public enum PlanetModel implements  CelestialObjectModel<Planet> {
 
     MERCURY("Mercure", 0.24085, 75.5671, 77.612, 0.205627,
@@ -29,17 +32,30 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
 
     public static List<PlanetModel> ALL = new ArrayList<>(List.copyOf(Arrays.asList(PlanetModel.values())));
 
-    final private String name;
-    final private double t;
-    final private double eps;
-    final private double w;
-    final private double e;
-    final private double a;
-    final private double i;
-    final private double omega;
-    final private double tet0;
-    final private double v0;
+    private final String name;
+    private final double t;
+    private final double eps; // in radians
+    private final double w;
+    private final double e;
+    private final double a;
+    private final double i;
+    private final double omega;
+    private final double tet0;
+    private final double v0;
 
+    /**
+     *
+     * @param name the name of the planetModel
+     * @param t the revolution period in tropic years
+     * @param degEps the longitude at J2010 in degrees
+     * @param degW the longitude at the perigee in degrees
+     * @param e the eccentricity no unity
+     * @param a the half major axis of the orbit in UA
+     * @param degI the inclination of the orbit at the ecliptic in degrees
+     * @param degOmega the longitude of ascending node in degrees
+     * @param tet0 the angular size at a one UA distance in arc seconds
+     * @param v0 the magnitude // TODO unities?
+     */
     PlanetModel(String name, double t, double degEps, double degW, double e,
                 double a, double degI, double degOmega, double tet0, double v0) {
         this.name = name;
@@ -50,19 +66,38 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
         this.a = a;
         this.i = Angle.ofDeg(degI);
         this.omega = Angle.ofDeg(degOmega);
-        this.tet0 = tet0;
+        this.tet0 = tet0; // TODO conversion degrees (!! arc seconds all should be in degrees)?
         this.v0 = v0;
     }
 
+    /**
+     *
+     * @return in radians
+     */
     private double meanAnomaly(double daysSinceJ2010) {
-        return Angle.TAU * daysSinceJ2010 / (365.242191*t) + e - w;
+        return Angle.TAU * daysSinceJ2010 / (365.242191*t) + eps - w; // TODO verify that t is 2 pi
     }
+
+    /**
+     *
+     * @return in radians
+     */
     private double trueAnomaly(double daysSinceJ2010) {
         return meanAnomaly(daysSinceJ2010) + 2 * e * Math.sin(meanAnomaly(daysSinceJ2010));
     }
+
+    /**
+     *
+     * @return in UA
+     */
     private double radius(double daysSinceJ2010) {
         return a * (1 - e * e) / (1 - e * Math.cos(trueAnomaly(daysSinceJ2010)));
     }
+
+    /**
+     *
+     * @return heliocentric longitude in the orbit plan in radians
+     */
     private double longPlan(double daysSinceJ2010) {
         return trueAnomaly(daysSinceJ2010) + w;
     }

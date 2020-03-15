@@ -6,6 +6,9 @@ import static ch.epfl.rigel.Preconditions.checkInInterval;
 import ch.epfl.rigel.coordinates.EquatorialCoordinates;
 import ch.epfl.rigel.math.ClosedInterval;
 
+/**
+ * @author Augustin ALLARD (299918)
+ */
 public final class Star extends CelestialObject {
 
     private final int hipparcosId;
