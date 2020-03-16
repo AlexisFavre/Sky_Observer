@@ -131,11 +131,11 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
         }
 
         double latitude =
-                Math.atan2(
+                Math.atan(
                         radiusProj * Math.tan(latEclHelio) * Math.sin(longitude - longPlanProj)
-                                , (EARTH.radius(daysSinceJ2010) * Math.sin(longPlanProj - EARTH.longPlan(daysSinceJ2010)))
+                                / (EARTH.radius(daysSinceJ2010) * Math.sin(longPlanProj - EARTH.longPlan(daysSinceJ2010)))
                 );
-        EclipticCoordinates position = EclipticCoordinates.of(longitude, latitude);
+        EclipticCoordinates position = EclipticCoordinates.of(Angle.normalizePositive(longitude), latitude);
 
         // angular size and magnitude
         double p = Math.sqrt(Math.pow(EARTH.radius(daysSinceJ2010),2) 
@@ -147,7 +147,6 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
         double angularSize = Angle.ofDeg(Angle.ofArcsec(tet0)) / p;
         double magnitude = v0 + 5 * Math.log10(radius(daysSinceJ2010) * p / Math.sqrt(phase));
 
-        // TODO transtype ???
         return new Planet(this.name, eclipticToEquatorialConversion.apply(position), (float)angularSize, (float)magnitude);
     }
 }
