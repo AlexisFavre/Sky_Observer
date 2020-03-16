@@ -20,7 +20,7 @@ public enum SunModel implements CelestialObjectModel<Sun> {
         double meanAnomaly = daysSinceJ2010 * Angle.TAU/365.242191 + E_G - W_G; // TODO verify that t is 2 pi
         double trueAnomaly = meanAnomaly + 2 * E * Math.sin(meanAnomaly);
         double angularSize = Angle.ofDeg(0.533128) * Math.round((1 + E * Math.cos(trueAnomaly)) / (1 - E * E));
-        double longEcl = trueAnomaly + W_G;
+        double longEcl = Angle.normalizePositive(trueAnomaly + W_G);
         EclipticCoordinates position = EclipticCoordinates.of(longEcl, 0);
         // TODO transtype
         return new Sun(position, eclipticToEquatorialConversion.apply(position), (float)angularSize, (float)meanAnomaly);
