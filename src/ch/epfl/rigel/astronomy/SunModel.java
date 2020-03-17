@@ -14,12 +14,28 @@ public enum SunModel implements CelestialObjectModel<Sun> {
 
     @Override
     public Sun at(double daysSinceJ2010, EclipticToEquatorialConversion eclipticToEquatorialConversion) {
-        double meanAnomaly = 2 * Math.PI/365.242191 * daysSinceJ2010 + E_G- W_G;
-        double trueAnomaly = meanAnomaly + 2 * E * Math.sin(meanAnomaly);
-        double angularSize = Angle.ofDeg(0.533128) * (1 + E * Math.cos(trueAnomaly)) / (1 - E * E); // TODO Verify if of deg ok
-        double longEcl = trueAnomaly + W_G;
-        EclipticCoordinates position = EclipticCoordinates.of(longEcl, 0);
+        double angularSize = Angle.ofDeg(0.533128) * (1 + E * Math.cos(longEclipticofSun(daysSinceJ2010)-W_G)) / (1 - E * E); // TODO Verify if of deg ok
+        EclipticCoordinates position = EclipticCoordinates.of(longEclipticofSun(daysSinceJ2010), 0);
         // TODO Transtype
-        return new Sun(position, eclipticToEquatorialConversion.apply(position), (float)angularSize, (float)meanAnomaly);
+        return new Sun(position, eclipticToEquatorialConversion.apply(position), (float)angularSize, (float)meanAnomalyOfSun(daysSinceJ2010));
+    }
+    /**
+     * 
+     * @param daysSinceJ2010
+     * @return
+     * meanAnomaly (used for MoonModel too)
+     */
+    protected double meanAnomalyOfSun(double daysSinceJ2010) {
+        return Angle.TAU/365.242191 * daysSinceJ2010 + E_G- W_G;
+    }
+    
+    /**
+     * 
+     * @param daysSinceJ2010
+     * @return
+     * longitude ecliptic of the sun(used for the MoonModel too)
+     */
+    protected double longEclipticofSun(double daysSinceJ2010) {
+        return meanAnomalyOfSun(daysSinceJ2010) + 2 * E * Math.sin(meanAnomalyOfSun(daysSinceJ2010)) + W_G;
     }
 }
