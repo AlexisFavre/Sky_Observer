@@ -19,13 +19,9 @@ public abstract class CelestialObject {
     private final float magnitude;
 
     CelestialObject(String name, EquatorialCoordinates equatorialPos, float angularSize, float magnitude) {
-        checkArgument(angularSize>0);
-        if(name == null || equatorialPos == null) {
-            throw new NullPointerException();
-        }
-        
-        this.name = name;
-        this.equatorialPos = Objects.requireNonNull(equatorialPos);
+        checkArgument(angularSize>=0);
+        this.name = Objects.requireNonNull(name); // throws NullPointerException if null
+        this.equatorialPos = Objects.requireNonNull(equatorialPos); // same
         this.angularSize = angularSize;
         this.magnitude = magnitude;
     
