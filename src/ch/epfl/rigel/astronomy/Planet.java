@@ -13,7 +13,4 @@ public final class Planet extends CelestialObject{
             float magnitude) {
         super(name, equatorialPos, angularSize, magnitude);
     }
-
-    
-
 }
