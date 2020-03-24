@@ -4,20 +4,25 @@ import ch.epfl.rigel.coordinates.EclipticCoordinates;
 import ch.epfl.rigel.coordinates.EclipticToEquatorialConversion;
 import ch.epfl.rigel.math.Angle;
 
+/**
+ * @author Augustin ALLARD (299918)
+ */
 public enum SunModel implements CelestialObjectModel<Sun> {
 
     SUN();
 
-    final double E_G = Angle.ofDeg(279.557208);
-    final double W_G = Angle.ofDeg(283.112438);
-    final double E = 0.016705; // TODO Veriffy Unity of Value actually not degrees (no unity)
+    private final double E_G = Angle.ofDeg(279.557208); // longitude of sun at J2010 in radians
+    private final double W_G = Angle.ofDeg(283.112438); // longitude of sun at perigee in radians
+    private final double E = 0.016705; // eccentricity of the ellipse sun/earth no unity
 
     @Override
     public Sun at(double daysSinceJ2010, EclipticToEquatorialConversion eclipticToEquatorialConversion) {
-        double angularSize = Angle.ofDeg(0.533128) * (1 + E * Math.cos(longEclipticofSun(daysSinceJ2010)-W_G)) / (1 - E * E); // TODO Verify if of deg ok
-        EclipticCoordinates position = EclipticCoordinates.of(longEclipticofSun(daysSinceJ2010), 0);
-        // TODO Transtype
-        return new Sun(position, eclipticToEquatorialConversion.apply(position), (float)angularSize, (float)meanAnomalyOfSun(daysSinceJ2010));
+        double meanAnomaly = daysSinceJ2010 * Angle.TAU/365.242191 + E_G - W_G;
+        double trueAnomaly = meanAnomaly + 2 * E * Math.sin(meanAnomaly);
+        double angularSize = Angle.ofDeg(0.533128) * Math.round((1 + E * Math.cos(trueAnomaly)) / (1 - E * E));
+        double longEcl = Angle.normalizePositive(trueAnomaly + W_G);
+        EclipticCoordinates position = EclipticCoordinates.of(longEcl, 0);
+        return new Sun(position, eclipticToEquatorialConversion.apply(position), (float)angularSize, (float)meanAnomaly);
     }
     /**
      * 
