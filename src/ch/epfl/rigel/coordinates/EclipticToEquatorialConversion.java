@@ -8,6 +8,9 @@ import ch.epfl.rigel.math.Angle;
 import ch.epfl.rigel.math.Polynomial;
 import ch.epfl.rigel.math.RightOpenInterval;
 
+/**
+ * @author Augustin ALLARD (299918)
+ */
 public final class EclipticToEquatorialConversion implements Function<EclipticCoordinates, EquatorialCoordinates> {
 
     private final double sinOfEpsilon;

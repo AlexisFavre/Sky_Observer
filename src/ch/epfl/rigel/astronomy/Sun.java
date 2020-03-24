@@ -13,7 +13,7 @@ import ch.epfl.rigel.coordinates.EquatorialCoordinates;
 public final class Sun extends CelestialObject {
 
     private final EclipticCoordinates eclipticPos;
-    private final float meanAnomaly;
+    private final float meanAnomaly; // in radians
 
     public Sun(EclipticCoordinates eclipticPos, EquatorialCoordinates equatorialPos,
             float angularSize, float meanAnomaly) {
@@ -30,7 +30,7 @@ public final class Sun extends CelestialObject {
     }
 
     /**
-     * @return (double) the meanAnomaly
+     * @return (double) the meanAnomaly in radians
      */
     public double meanAnomaly() {
         return meanAnomaly;
