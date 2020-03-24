@@ -2,6 +2,8 @@ package ch.epfl.rigel.astronomy;
 
 import static ch.epfl.rigel.Preconditions.checkArgument;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -17,22 +19,22 @@ import java.util.Set;
 public final class StarCatalogue {
 
     private final List<Star> stars;
-    private final Map<Asterism, List<Integer>> catalogue;
+    private final Map<Asterism, List<Integer>> asterisms;
 
-    public StarCatalogue(List<Star> stars, List<Asterism> asterisms) {
-        for (Asterism asterism : asterisms) {
-            checkArgument(stars.containsAll(asterism.stars()));
+    public StarCatalogue(List<Star> my_stars, List<Asterism> my_asterisms) {
+        for (Asterism asterism : my_asterisms) {
+            checkArgument(my_stars.containsAll(asterism.stars()));
         }
         
-        this.stars = new ArrayList<Star>(List.copyOf(stars));
-        this.catalogue = new HashMap<Asterism, List<Integer>>();
+        stars = new ArrayList<Star>(List.copyOf(my_stars));
+        asterisms = new HashMap<Asterism, List<Integer>>();
         
-        for (Asterism asterism : asterisms) {
+        for (Asterism asterism : my_asterisms) {
             List<Integer> indexsOfThisAsterism = new ArrayList<>();
             for(Star star : asterism.stars()) {
                 indexsOfThisAsterism.add(this.stars.indexOf(star));
             }
-            catalogue.put(asterism, indexsOfThisAsterism);
+            asterisms.put(asterism, indexsOfThisAsterism);
         }
     }
 
@@ -47,7 +49,7 @@ public final class StarCatalogue {
      * @return the asterisms
      */
     public Set<Asterism> asterisms() {
-        return catalogue.keySet();
+        return asterisms.keySet();
     }
     
     /**
@@ -57,9 +59,11 @@ public final class StarCatalogue {
      * list of the indexes of the star in this asterism
      */
     public List<Integer> asterismIndices(Asterism asterism){
-        return catalogue.get(asterism);
+        return asterisms.get(asterism);
     }
-//================================================================================================
+
+
+    //================================================================================================
     
     public final static class Builder {
         private List<Star> stars;
@@ -103,5 +107,30 @@ public final class StarCatalogue {
         List<Asterism> asterisms(){
             return Collections.unmodifiableList(asterisms);
         }
+
+        /**
+         * Load the content of the inputStream in this via the loader
+         *
+         * @param inputStream containing stars and asterisms informations to be loaded
+         * @param loader by which it is loaded
+         * @return this (loaded builder)
+         * @throws IOException
+         */
+        Builder loadFrom(InputStream inputStream, Loader loader) throws IOException {
+            loader.load(inputStream, this);
+            return this;
+        }
+
+        StarCatalogue build() {
+            return new StarCatalogue(stars, asterisms);
+        }
+    }
+
+
+    //================================================================================================
+
+    public interface Loader {
+
+        void load(InputStream inputStream, Builder builder) throws IOException;
     }
 }
