@@ -27,5 +27,21 @@ class MyMoonModelTest {
                 new EclipticToEquatorialConversion(ZonedDateTime.of(LocalDate.of(2003,  Month.SEPTEMBER, 1),
                 LocalTime.of(0,0), ZoneOffset.UTC))).equatorialPos().dec());
     }
+    
+    @Test
+    void angularSize() {
+        assertEquals(0.009225908666849136, MoonModel.MOON.at(Epoch.J2010.daysUntil(ZonedDateTime.of(LocalDate.of(1979, 9, 1),LocalTime.of(0, 0),
+                ZoneOffset.UTC)), new EclipticToEquatorialConversion(ZonedDateTime.of(
+                        LocalDate.of(1979, 9, 1),LocalTime.of(0, 0),ZoneOffset.UTC))).
+                        angularSize());
+    }
+    
+    @Test
+    void info() {
+        assertEquals("Lune (22.5%)", MoonModel.MOON.at(Epoch.J2010.daysUntil(ZonedDateTime.of(LocalDate.of(2003, 9, 1),LocalTime.of(0, 0),
+                ZoneOffset.UTC)), new EclipticToEquatorialConversion(ZonedDateTime.of( LocalDate.of(2003, 9, 1),
+                        LocalTime.of(0, 0),ZoneOffset.UTC))).
+                        info());
+    }
 
 }
