@@ -37,6 +37,6 @@ public final class Star extends CelestialObject {
      * colorTemperature of the star in degree Kelvin
      */
     public int colorTemperature() {
-        return (int) Math.floor(1/(0.92*c + 1.7) + 1/(0.92*c + 0.62))*4600;
+        return (int) Math.floor((1/(0.92*c + 1.7) + 1/(0.92*c + 0.62))*4600);
     }
 }

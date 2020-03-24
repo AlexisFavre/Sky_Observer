@@ -75,7 +75,7 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
      * @return in radians
      */
     private double meanAnomaly(double daysSinceJ2010) {
-        return Angle.TAU * daysSinceJ2010 / (365.242191*t) + eps - w; // TODO verify that t is 2 pi
+        return Angle.TAU * daysSinceJ2010 / (365.242191*t) + eps - w;
     }
 
     /**
@@ -106,9 +106,9 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
     public Planet at(double daysSinceJ2010, EclipticToEquatorialConversion eclipticToEquatorialConversion) {
 
         // planet info at the given time
-        double latEclHelio = Math.asin(Math.sin((longPlan(daysSinceJ2010)- omega) * Math.sin(i)));
-        double radiusProj = radius(daysSinceJ2010) * Math.cos(latEclHelio);
-        double longPlanProj =
+        double phi = Math.asin(Math.sin((longPlan(daysSinceJ2010)- omega) * Math.sin(i))); // lat ecliptic heliocentric
+        double r_ = radius(daysSinceJ2010) * Math.cos(phi); // radius projection on ecliptic
+        double l_ = // long ecliptic heliocentric projected
                 Math.atan2(
                         Math.sin(longPlan(daysSinceJ2010) - omega) * Math.cos(i)
                                 , Math.cos(longPlan(daysSinceJ2010) - omega)
@@ -119,21 +119,21 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
         if(this.a < EARTH.a) { // TODO what about earth? -> center of elliptic coordinates
             longitude =
                     Math.atan2(
-                            radiusProj * Math.sin(EARTH.longPlan(daysSinceJ2010) - longPlanProj),
-                             (EARTH.radius(daysSinceJ2010) - radiusProj * Math.cos(EARTH.longPlan(daysSinceJ2010) - longPlanProj))
+                            r_ * Math.sin(EARTH.longPlan(daysSinceJ2010) - l_),
+                             (EARTH.radius(daysSinceJ2010) - r_ * Math.cos(EARTH.longPlan(daysSinceJ2010) - l_))
                     ) + Angle.TAU/2 + EARTH.longPlan(daysSinceJ2010);
         } else {
             longitude =
                     Math.atan2(
-                            EARTH.radius(daysSinceJ2010) * Math.sin(longPlanProj - EARTH.longPlan(daysSinceJ2010))
-                            , (radiusProj - EARTH.radius(daysSinceJ2010) * Math.cos(longPlanProj - EARTH.longPlan(daysSinceJ2010)))
-                    ) + longPlanProj;
+                            EARTH.radius(daysSinceJ2010) * Math.sin(l_ - EARTH.longPlan(daysSinceJ2010))
+                            , (r_ - EARTH.radius(daysSinceJ2010) * Math.cos(l_ - EARTH.longPlan(daysSinceJ2010)))
+                    ) + l_;
         }
 
         double latitude =
                 Math.atan(
-                        radiusProj * Math.tan(latEclHelio) * Math.sin(longitude - longPlanProj)
-                                / (EARTH.radius(daysSinceJ2010) * Math.sin(longPlanProj - EARTH.longPlan(daysSinceJ2010)))
+                        r_ * Math.tan(phi) * Math.sin(longitude - l_)
+                                / (EARTH.radius(daysSinceJ2010) * Math.sin(l_ - EARTH.longPlan(daysSinceJ2010)))
                 );
         EclipticCoordinates position = EclipticCoordinates.of(Angle.normalizePositive(longitude), latitude);
 
@@ -141,7 +141,7 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
         double p = Math.sqrt(Math.pow(EARTH.radius(daysSinceJ2010),2) 
                 + Math.pow(radius(daysSinceJ2010),2) 
                 - 2 * EARTH.radius(daysSinceJ2010) * radius(daysSinceJ2010)
-                * Math.cos(longPlan(daysSinceJ2010) - EARTH.longPlan(daysSinceJ2010)) * Math.cos(latEclHelio)
+                * Math.cos(longPlan(daysSinceJ2010) - EARTH.longPlan(daysSinceJ2010)) * Math.cos(phi)
         ); // TODO verify neg -> lancerait exception
         double phase = (1 + Math.cos(longitude - longPlan(daysSinceJ2010)))/2;
         double angularSize = Angle.ofDeg(Angle.ofArcsec(tet0)) / p;
