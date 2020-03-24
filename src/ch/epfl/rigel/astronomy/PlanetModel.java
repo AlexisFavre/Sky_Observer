@@ -41,7 +41,7 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
     private final double i;
     private final double omega;
     private final double tet0;
-    private final double v0;
+    private final double V0;
 
     /**
      *
@@ -54,10 +54,10 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
      * @param degI the inclination of the orbit at the ecliptic in degrees
      * @param degOmega the longitude of ascending node in degrees
      * @param tet0 the angular size at a one UA distance in arc seconds
-     * @param v0 the magnitude // TODO unities?
+     * @param V0 the magnitude no unity
      */
     PlanetModel(String name, double t, double degEps, double degW, double e,
-                double a, double degI, double degOmega, double tet0, double v0) {
+                double a, double degI, double degOmega, double tet0, double V0) {
         this.name = name;
         this.t = t;
         this.eps = Angle.ofDeg(degEps);
@@ -66,8 +66,8 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
         this.a = a;
         this.i = Angle.ofDeg(degI);
         this.omega = Angle.ofDeg(degOmega);
-        this.tet0 = tet0; // TODO conversion degrees (!! arc seconds all should be in degrees)?
-        this.v0 = v0;
+        this.tet0 = Angle.ofArcsec(tet0); //Angle.ofDeg(Angle.ofArcsec(tet0));
+        this.V0 = V0;
     }
 
     /**
@@ -90,15 +90,15 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
      *
      * @return in UA
      */
-    private double radius(double daysSinceJ2010) {
-        return a * (1 - e * e) / (1 - e * Math.cos(trueAnomaly(daysSinceJ2010)));
+    private double r(double daysSinceJ2010) {
+        return a * (1 - e * e) / (1 + e * Math.cos(trueAnomaly(daysSinceJ2010)));
     }
 
     /**
      *
      * @return heliocentric longitude in the orbit plan in radians
      */
-    private double longPlan(double daysSinceJ2010) {
+    private double l(double daysSinceJ2010) {
         return trueAnomaly(daysSinceJ2010) + w;
     }
 
@@ -106,12 +106,12 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
     public Planet at(double daysSinceJ2010, EclipticToEquatorialConversion eclipticToEquatorialConversion) {
 
         // planet info at the given time
-        double phi = Math.asin(Math.sin((longPlan(daysSinceJ2010)- omega) * Math.sin(i))); // lat ecliptic heliocentric
-        double r_ = radius(daysSinceJ2010) * Math.cos(phi); // radius projection on ecliptic
+        double phi = Math.asin(Math.sin((l(daysSinceJ2010)- omega)) * Math.sin(i)); // lat ecliptic heliocentric
+        double r_ = r(daysSinceJ2010) * Math.cos(phi); // r projection on ecliptic
         double l_ = // long ecliptic heliocentric projected
                 Math.atan2(
-                        Math.sin(longPlan(daysSinceJ2010) - omega) * Math.cos(i)
-                                , Math.cos(longPlan(daysSinceJ2010) - omega)
+                        Math.sin(l(daysSinceJ2010) - omega) * Math.cos(i)
+                                , Math.cos(l(daysSinceJ2010) - omega)
                 ) + omega;
 
         // Ecliptic coordinates
@@ -119,33 +119,33 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
         if(this.a < EARTH.a) { // TODO what about earth? -> center of elliptic coordinates
             longitude =
                     Math.atan2(
-                            r_ * Math.sin(EARTH.longPlan(daysSinceJ2010) - l_),
-                             (EARTH.radius(daysSinceJ2010) - r_ * Math.cos(EARTH.longPlan(daysSinceJ2010) - l_))
-                    ) + Angle.TAU/2 + EARTH.longPlan(daysSinceJ2010);
+                            r_ * Math.sin(EARTH.l(daysSinceJ2010) - l_),
+                             (EARTH.r(daysSinceJ2010) - r_ * Math.cos(EARTH.l(daysSinceJ2010) - l_))
+                    ) + Angle.TAU/2 + EARTH.l(daysSinceJ2010);
         } else {
             longitude =
                     Math.atan2(
-                            EARTH.radius(daysSinceJ2010) * Math.sin(l_ - EARTH.longPlan(daysSinceJ2010))
-                            , (r_ - EARTH.radius(daysSinceJ2010) * Math.cos(l_ - EARTH.longPlan(daysSinceJ2010)))
+                            EARTH.r(daysSinceJ2010) * Math.sin(l_ - EARTH.l(daysSinceJ2010))
+                            , (r_ - EARTH.r(daysSinceJ2010) * Math.cos(l_ - EARTH.l(daysSinceJ2010)))
                     ) + l_;
         }
 
         double latitude =
                 Math.atan(
                         r_ * Math.tan(phi) * Math.sin(longitude - l_)
-                                / (EARTH.radius(daysSinceJ2010) * Math.sin(l_ - EARTH.longPlan(daysSinceJ2010)))
+                                / (EARTH.r(daysSinceJ2010) * Math.sin(l_ - EARTH.l(daysSinceJ2010)))
                 );
         EclipticCoordinates position = EclipticCoordinates.of(Angle.normalizePositive(longitude), latitude);
 
         // angular size and magnitude
-        double p = Math.sqrt(Math.pow(EARTH.radius(daysSinceJ2010),2) 
-                + Math.pow(radius(daysSinceJ2010),2) 
-                - 2 * EARTH.radius(daysSinceJ2010) * radius(daysSinceJ2010)
-                * Math.cos(longPlan(daysSinceJ2010) - EARTH.longPlan(daysSinceJ2010)) * Math.cos(phi)
-        ); // TODO verify neg -> lancerait exception
-        double phase = (1 + Math.cos(longitude - longPlan(daysSinceJ2010)))/2;
-        double angularSize = Angle.ofDeg(Angle.ofArcsec(tet0)) / p;
-        double magnitude = v0 + 5 * Math.log10(radius(daysSinceJ2010) * p / Math.sqrt(phase));
+        double p = Math.sqrt(Math.pow(EARTH.r(daysSinceJ2010),2) // TODO verify
+                + Math.pow(r(daysSinceJ2010),2) 
+                - 2 * EARTH.r(daysSinceJ2010) * r(daysSinceJ2010)
+                * Math.cos(l(daysSinceJ2010) - EARTH.l(daysSinceJ2010)) * Math.cos(phi)
+        );
+        double phase = (1 + Math.cos(longitude - l(daysSinceJ2010)))/2;
+        double angularSize = tet0 / p;
+        double magnitude = V0 + 5 * Math.log10(r(daysSinceJ2010) * p / Math.sqrt(phase));
 
         return new Planet(this.name, eclipticToEquatorialConversion.apply(position), (float)angularSize, (float)magnitude);
     }
