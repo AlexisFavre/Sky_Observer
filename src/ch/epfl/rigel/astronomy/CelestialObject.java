@@ -42,7 +42,7 @@ public abstract class CelestialObject {
     }
 
     /**
-     * @return the angularSize
+     * @return the angularSize (in radians)
      */
     public double angularSize() {
         return angularSize;

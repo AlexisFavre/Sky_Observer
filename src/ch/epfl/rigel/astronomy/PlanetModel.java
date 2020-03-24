@@ -34,7 +34,7 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
 
     private final String name;
     private final double t;
-    private final double eps; // in radians
+    private final double eps;
     private final double w;
     private final double e;
     private final double a;
@@ -66,7 +66,7 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
         this.a = a;
         this.i = Angle.ofDeg(degI);
         this.omega = Angle.ofDeg(degOmega);
-        this.tet0 = Angle.ofArcsec(tet0); //Angle.ofDeg(Angle.ofArcsec(tet0));
+        this.tet0 = Angle.ofArcsec(tet0);
         this.V0 = V0;
     }
 
@@ -88,7 +88,7 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
 
     /**
      *
-     * @return in UA
+     * @return radius in UA
      */
     private double r(double daysSinceJ2010) {
         return a * (1 - e * e) / (1 + e * Math.cos(trueAnomaly(daysSinceJ2010)));
@@ -104,19 +104,22 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
 
     @Override
     public Planet at(double daysSinceJ2010, EclipticToEquatorialConversion eclipticToEquatorialConversion) {
-
+//        if(this.a == EARTH.a) {
+//            throw new UnsupportedOperationException();
+//        }
+        
         // planet info at the given time
         double phi = Math.asin(Math.sin((l(daysSinceJ2010)- omega)) * Math.sin(i)); // lat ecliptic heliocentric
-        double r_ = r(daysSinceJ2010) * Math.cos(phi); // r projection on ecliptic
-        double l_ = // long ecliptic heliocentric projected
-                Math.atan2(
-                        Math.sin(l(daysSinceJ2010) - omega) * Math.cos(i)
+        double r_  = r(daysSinceJ2010) * Math.cos(phi); // r projection on ecliptic
+        double l_  = // long ecliptic heliocentric projected
+                        Math.atan2(
+                                Math.sin(l(daysSinceJ2010) - omega) * Math.cos(i)
                                 , Math.cos(l(daysSinceJ2010) - omega)
-                ) + omega;
+                        ) + omega;
 
         // Ecliptic coordinates
         double longitude = 0;
-        if(this.a < EARTH.a) { // TODO what about earth? -> center of elliptic coordinates
+        if(this.a < EARTH.a) {
             longitude =
                     Math.atan2(
                             r_ * Math.sin(EARTH.l(daysSinceJ2010) - l_),
@@ -138,7 +141,7 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
         EclipticCoordinates position = EclipticCoordinates.of(Angle.normalizePositive(longitude), latitude);
 
         // angular size and magnitude
-        double p = Math.sqrt(Math.pow(EARTH.r(daysSinceJ2010),2) // TODO verify
+        double p = Math.sqrt(Math.pow(EARTH.r(daysSinceJ2010),2) 
                 + Math.pow(r(daysSinceJ2010),2) 
                 - 2 * EARTH.r(daysSinceJ2010) * r(daysSinceJ2010)
                 * Math.cos(l(daysSinceJ2010) - EARTH.l(daysSinceJ2010)) * Math.cos(phi)

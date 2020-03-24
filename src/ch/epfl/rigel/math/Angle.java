@@ -33,7 +33,7 @@ public final class Angle {
      * @param sec
      * (double)
      * @return
-     * angle in degrees
+     * angle in radians
      */
     public static double ofArcsec(double sec) {
        return sec/(3600*DEG_PER_RAD); 
