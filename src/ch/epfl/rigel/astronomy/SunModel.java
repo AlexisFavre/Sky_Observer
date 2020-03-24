@@ -30,7 +30,7 @@ public enum SunModel implements CelestialObjectModel<Sun> {
      * @return
      * meanAnomaly (used for MoonModel too)
      */
-    protected double meanAnomalyOfSun(double daysSinceJ2010) {
+    protected double meanAnomaly(double daysSinceJ2010) {
         return Angle.TAU/365.242191 * daysSinceJ2010 + E_G- W_G;
     }
     
@@ -40,7 +40,7 @@ public enum SunModel implements CelestialObjectModel<Sun> {
      * @return
      * longitude ecliptic of the sun(used for the MoonModel too)
      */
-    protected double longEclipticofSun(double daysSinceJ2010) {
-        return meanAnomalyOfSun(daysSinceJ2010) + 2 * E * Math.sin(meanAnomalyOfSun(daysSinceJ2010)) + W_G;
+    protected double longEcliptic(double daysSinceJ2010) {
+        return meanAnomaly(daysSinceJ2010) + 2 * E * Math.sin(meanAnomaly(daysSinceJ2010)) + W_G;
     }
 }
