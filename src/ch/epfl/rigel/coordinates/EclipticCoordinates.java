@@ -1,10 +1,12 @@
 package ch.epfl.rigel.coordinates;
 
-import static ch.epfl.rigel.Preconditions.checkArgument;
+import static ch.epfl.rigel.Preconditions.checkInInterval;
 
 import java.util.Locale;
 
 import ch.epfl.rigel.math.Angle;
+import ch.epfl.rigel.math.ClosedInterval;
+import ch.epfl.rigel.math.RightOpenInterval;
 
 /**
  * 
@@ -57,8 +59,8 @@ public final class EclipticCoordinates extends SphericalCoordinates {
      * new EclipticCoordinates
      */
     public static EclipticCoordinates of(double lon, double lat) {
-        checkArgument(0<=lon && lon < Angle.TAU);
-        checkArgument(-Angle.TAU/4<= lat && lat<=Angle.TAU/4);
+        checkInInterval(RightOpenInterval.of(0, Angle.TAU), lon);
+        checkInInterval(ClosedInterval.of(-Angle.TAU/4, Angle.TAU/4), lat);
         return new EclipticCoordinates(lon, lat);
     }
     
