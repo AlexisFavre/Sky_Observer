@@ -6,7 +6,7 @@ public final class ClosedInterval extends Interval {
     /**
      * interval [-t/4 , t/4] (often used)
      */
-    public static ClosedInterval iC = new ClosedInterval(-Angle.TAU/4, Angle.TAU/4);
+    public static ClosedInterval clInt = new ClosedInterval(-Angle.TAU/4, Angle.TAU/4);
     /**
      * 
      * @param low
