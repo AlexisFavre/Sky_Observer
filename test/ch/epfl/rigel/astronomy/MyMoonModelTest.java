@@ -18,14 +18,14 @@ class MyMoonModelTest {
     void at() {
         assertEquals(14.211456457835897, MoonModel.MOON.at(-2313, 
                 new EclipticToEquatorialConversion(ZonedDateTime.of(LocalDate.of(2003,  Month.SEPTEMBER, 1),LocalTime.of(0,0), 
-                        ZoneOffset.UTC))).equatorialPos().raHr());
+                        ZoneOffset.UTC))).equatorialPos().raHr(), 1e-8);
     }
     
     @Test
     void at2() {
         assertEquals(-0.20114171346014934, MoonModel.MOON.at(-2313, 
                 new EclipticToEquatorialConversion(ZonedDateTime.of(LocalDate.of(2003,  Month.SEPTEMBER, 1),
-                LocalTime.of(0,0), ZoneOffset.UTC))).equatorialPos().dec());
+                LocalTime.of(0,0), ZoneOffset.UTC))).equatorialPos().dec(), 1e-8);
     }
     
     @Test

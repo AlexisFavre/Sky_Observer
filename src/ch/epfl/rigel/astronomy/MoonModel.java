@@ -5,7 +5,6 @@ import ch.epfl.rigel.coordinates.EclipticToEquatorialConversion;
 import ch.epfl.rigel.math.Angle;
 
 /**
- * 
  * @author Alexis FAVRE (310552)
  * Model of the moon
  */
@@ -13,11 +12,11 @@ public enum MoonModel implements CelestialObjectModel<Moon>{
     
     MOON;
     
-    final double l0 = Angle.ofDeg(91.929336); 
-    final double P0 = Angle.ofDeg(130.143076);
-    final double N0 = Angle.ofDeg(291.682547);
-    final double i  = Angle.ofDeg(5.145396);
-    final double e  = 0.0549; 
+    private final double l0 = Angle.ofDeg(91.929336); 
+    private final double P0 = Angle.ofDeg(130.143076);
+    private final double N0 = Angle.ofDeg(291.682547);
+    private final double i  = Angle.ofDeg(5.145396);
+    private final double e  = 0.0549; 
 
     @Override
     public Moon at(double daysSinceJ2010,
@@ -35,16 +34,16 @@ public enum MoonModel implements CelestialObjectModel<Moon>{
         double MmCcorrect = Mm + Ev - Ae - A3; // Mm' in formulas
         double Ec = Angle.ofDeg(6.2886) * Math.sin(MmCcorrect);
         double A4 = Angle.ofDeg(0.214)  * Math.sin(2*MmCcorrect);
-        double lCorrect = l + Ev + Ec - Ae + A4;
-        double V = Angle.ofDeg(0.6583)  * Math.sin(2*(lCorrect-lambda));
-        double trueLong = lCorrect + V; // l'' in formulas
+        double lCorrect   = l + Ev + Ec - Ae + A4;
+        double V  = Angle.ofDeg(0.6583) * Math.sin(2*(lCorrect-lambda));
+        double trueLong   = lCorrect + V; // l'' in formulas
         
         // to determine ecliptic position of the moon
         double N = N0 - Angle.ofDeg(0.0529539)*daysSinceJ2010;
         double NCorrect = N - Angle.ofDeg(0.16)*Math.sin(M);
-        double eclipticLong = Math.atan(Math.sin(trueLong - NCorrect) * Math.cos(i) 
-                                / Math.cos(trueLong - NCorrect)) + NCorrect;
-        double eclipticLat = Math.asin(Math.sin(trueLong - NCorrect) * Math.sin(i));
+        double eclipticLong = Math.atan2(Math.sin(trueLong - NCorrect) * Math.cos(i) 
+                                , Math.cos(trueLong - NCorrect)) + NCorrect;
+        double eclipticLat  = Math.asin(Math.sin(trueLong - NCorrect) * Math.sin(i));
         EclipticCoordinates position = EclipticCoordinates.of(Angle.normalizePositive(eclipticLong), eclipticLat);
         
         // phase of the moon
