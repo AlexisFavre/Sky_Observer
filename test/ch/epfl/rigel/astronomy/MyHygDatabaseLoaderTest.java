@@ -9,7 +9,7 @@ import java.io.InputStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class HygDatabaseLoaderTest {
+class MyHygDatabaseLoaderTest {
 
     private static final String HYG_CATALOGUE_NAME =
             "/hygdata_v3.csv";
@@ -91,7 +91,7 @@ class HygDatabaseLoaderTest {
 
     @Test
     void trivialStarsColorIndexIsWellLoaded() throws IOException {
-        assertEquals(, rigel().co(), 1.0e-10);
+        //assertEquals(, rigel().colorTemperature(), 1.0e-10);
         //assertEquals(, betelgeuse().colorTemperature(), 1.0e-10);
     }
 
