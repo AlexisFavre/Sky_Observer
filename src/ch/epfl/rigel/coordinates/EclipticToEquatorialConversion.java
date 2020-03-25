@@ -9,6 +9,8 @@ import ch.epfl.rigel.math.Polynomial;
 import ch.epfl.rigel.math.RightOpenInterval;
 
 /**
+ * this class enable the transformation of the EclipticCoordinates to EquatorialCoordinates
+ * at a precise ZonedDateTime
  * @author Augustin ALLARD (299918)
  */
 public final class EclipticToEquatorialConversion implements Function<EclipticCoordinates, EquatorialCoordinates> {
@@ -16,6 +18,10 @@ public final class EclipticToEquatorialConversion implements Function<EclipticCo
     private final double sinOfEpsilon;
     private final double cosOfEpsilon;
     
+    /**
+     * initialise the parameters need for the conversion
+     * @param (ZonedDateTime) when of the observation
+     */
     public EclipticToEquatorialConversion(ZonedDateTime when) {
         double epsilon = epsilon(when);
         sinOfEpsilon = Math.sin(epsilon);
@@ -29,6 +35,10 @@ public final class EclipticToEquatorialConversion implements Function<EclipticCo
     }
 
     @Override
+    /**
+     * @return EquatorialCoordinates corresponding to these Ecliptic Coordinates
+     * for a precise ZonedDateTime @see EclipticToEquatorialConversion
+     */
     public EquatorialCoordinates apply(EclipticCoordinates eclipticCoordinates) {
         double lambda = eclipticCoordinates.lon();
         double beta = eclipticCoordinates.lat();
@@ -37,21 +47,15 @@ public final class EclipticToEquatorialConversion implements Function<EclipticCo
         return EquatorialCoordinates.of(Angle.normalizePositive(alpha), gamma);
     }
     
-    /**
-     * always throws UnsupportedOperationException
-     */
     @Override
-    public final int hashCode() {
+    /** always throws UnsupportedOperationException */
+    public final int hashCode() throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
     
-    
-    /**
-     * always throws UnsupportedOperationException
-     */
     @Override 
-    public final boolean equals(Object interval) {
-
+    /** always throws UnsupportedOperationException */
+    public final boolean equals(Object interval) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 }

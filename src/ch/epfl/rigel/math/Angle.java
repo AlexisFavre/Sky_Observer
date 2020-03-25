@@ -5,11 +5,11 @@ import static ch.epfl.rigel.Preconditions.checkInInterval;
 /**
  * @author Alexis FAVRE (310552)
  * 
- * by default angles are in RADIANS !
- * non instanciable class
+ * by default angles are in RADIANS in this project!
+ * non instanciable class used to works on angles
  */
 public final class Angle {
-    
+    /** Tau = 2π*/
     public final static double TAU = 2*Math.PI;
     private static final double DEG_PER_RAD = 360.0 / TAU;
     private static final double RAD_PER_HOUR = TAU / 24;
@@ -18,7 +18,7 @@ public final class Angle {
     private Angle() {}
     
     /**
-     * Normalize angle on [0,tau[
+     * Normalize angle in [0,tau[
      * @param rad
      * (double) angle
      * @return

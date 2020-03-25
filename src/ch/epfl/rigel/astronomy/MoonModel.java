@@ -5,11 +5,12 @@ import ch.epfl.rigel.coordinates.EclipticToEquatorialConversion;
 import ch.epfl.rigel.math.Angle;
 
 /**
+ * Model of the moon to calculte the diffrents characteristics of the
+ * moon at a precise day
  * @author Alexis FAVRE (310552)
- * Model of the moon
  */
 public enum MoonModel implements CelestialObjectModel<Moon>{
-    
+    /** the Moon */
     MOON;
     
     private final double l0 = Angle.ofDeg(91.929336); 
@@ -19,6 +20,12 @@ public enum MoonModel implements CelestialObjectModel<Moon>{
     private final double e  = 0.0549; 
 
     @Override
+    /**
+     * calculate postion of the Moon at a precise day
+     * @param daysSinceJ2010 and this day
+     * @param eclipticToEquatorialConversion is a converter from elliptic to equatorial coordinates 
+     * @return the Moon at this day
+     */
     public Moon at(double daysSinceJ2010,
             EclipticToEquatorialConversion eclipticToEquatorialConversion) {
         

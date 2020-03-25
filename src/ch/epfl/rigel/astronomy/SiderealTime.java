@@ -10,6 +10,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
 /**
+ * this Class enable diffrents operations with the time
  * @author Augustin ALLARD (299918)
  * @author Alexis FAVRE (310552)
  */

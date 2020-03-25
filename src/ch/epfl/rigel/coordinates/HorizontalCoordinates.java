@@ -1,23 +1,21 @@
 package ch.epfl.rigel.coordinates;
 
-import static ch.epfl.rigel.Preconditions.checkArgument;
+import static ch.epfl.rigel.Preconditions.checkInInterval;
 
 import java.util.Locale;
 
 import ch.epfl.rigel.math.Angle;
+import ch.epfl.rigel.math.ClosedInterval;
+import ch.epfl.rigel.math.RightOpenInterval;
 /**
- * 
- * @author Alexis FAVRE (310552)
+ * system of coordinates :
  * the observer is the center of the sphere
  * plan of reference is the horizon plan of the earth
  * direction of reference is the North
+ * @author Alexis FAVRE (310552)
  */
 public final class HorizontalCoordinates extends SphericalCoordinates {
     
-    /**
-     * @param azimuth correspond to longitude
-     * @param altitude correspond to latitude
-     */
     private HorizontalCoordinates(double azimuth, double altitude) {
         super(azimuth, altitude);
     }
@@ -30,12 +28,13 @@ public final class HorizontalCoordinates extends SphericalCoordinates {
      * @param alt
      * (double) altitude in radians (must be in [-Pi/2,Pi/2])
      * vertical angle between horizontal plan and the observed object
-     * @return
-     * new HorizontalCoordinates
+     * @return new HorizontalCoordinates
+     * @throws IllegalArgumentException if az does not belong in [0,2Pi[
+     *         or if alt is not in [-Pi/2,Pi/2]
      */
-    public static HorizontalCoordinates of(double az, double alt) {
-        checkArgument(0<=az && az < Angle.TAU);
-        checkArgument(-Angle.TAU/4<= alt && alt<=Angle.TAU/4);
+    public static HorizontalCoordinates of(double az, double alt) throws IllegalArgumentException{
+        checkInInterval(RightOpenInterval.of(0, Angle.TAU), az);
+        checkInInterval(ClosedInterval.of(-Angle.TAU/4, Angle.TAU/4), alt);
         return new HorizontalCoordinates(az, alt);
     }
     
@@ -47,17 +46,18 @@ public final class HorizontalCoordinates extends SphericalCoordinates {
      * @param altDeg
      * (double) altitude in degrees (must be in [-90°,90°])
      * vertical angle between horizontal plan and the observed object
-     * @return
-     * new HorizontalCoordinates
+     * @return new HorizontalCoordinates
+     * @throws IllegalArgumentException if lonDes does not belong in [0°, +360°[
+     *       or if latDeg is not in [–90°, +90°]
      */
-    public static HorizontalCoordinates ofDeg(double azDeg, double altDeg) {
-        checkArgument(0<=azDeg && azDeg< 360);
-        checkArgument(-90<=altDeg && altDeg<=90);
+    public static HorizontalCoordinates ofDeg(double azDeg, double altDeg) throws IllegalArgumentException {
+        checkInInterval(RightOpenInterval.of(0, 360), azDeg);
+        checkInInterval(ClosedInterval.of(-90, 90), altDeg);
+        
         return new HorizontalCoordinates(Angle.ofDeg(azDeg), Angle.ofDeg(altDeg));
     }
     
     /**
-     * 
      * @param that
      * (HorizontalCoordinates) of the second point
      * @return
@@ -69,7 +69,6 @@ public final class HorizontalCoordinates extends SphericalCoordinates {
                 + Math.cos(this.alt()) * Math.cos(that.alt()) * Math.cos(this.az()-that.az()));
     }
     /**
-     * 
      * @param n must be "N"
      * @param e must be "E"
      * @param s must be "S"
@@ -93,7 +92,6 @@ public final class HorizontalCoordinates extends SphericalCoordinates {
     }
     
     /**
-     * 
      * @return
      * (double) azimuth in radians
      */
@@ -102,7 +100,6 @@ public final class HorizontalCoordinates extends SphericalCoordinates {
     }
     
     /**
-     * 
      * @return
      * (double) altitude in radians
      */
@@ -110,7 +107,6 @@ public final class HorizontalCoordinates extends SphericalCoordinates {
         return lat();
     }
     /**
-     * 
      * @return
      * (double) azimuth in degrees
      */
@@ -119,7 +115,6 @@ public final class HorizontalCoordinates extends SphericalCoordinates {
     }
     
     /**
-     * 
      * @return
      * (double) altitude in radians
      */
@@ -128,6 +123,7 @@ public final class HorizontalCoordinates extends SphericalCoordinates {
     }
     
     @Override
+    /** @return an representation of the coordinates */
     public String toString() {
         return String.format(Locale.ROOT, "(az=%.4f°, alt=%.4f°)", azDeg(), altDeg());
     }

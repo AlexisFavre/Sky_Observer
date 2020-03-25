@@ -3,9 +3,8 @@ package ch.epfl.rigel.coordinates;
 import java.util.Locale;
 
 /**
- * 
+ * represent the Cartesian coordinates System
  * @author Alexis FAVRE (310552)
- *
  */
 public final class CartesianCoordinates {
 
@@ -18,7 +17,6 @@ public final class CartesianCoordinates {
     }
     
     /**
-     * 
      * @param x (double) abscissa
      * @param y (double) ordinate
      * @return
@@ -43,24 +41,20 @@ public final class CartesianCoordinates {
     }
     
     @Override
+    /** @return a representation of the coordinates */
     public String toString() {
         return String.format(Locale.ROOT, "(x=%.4f, y=%.4f)", x(), y());
     }
     
-    /**
-     * always throws UnsupportedOperationException
-     */
     @Override
-    public final int hashCode() {
+    /** always throws UnsupportedOperationException */
+    public final int hashCode() throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
     
-    
-    /**
-     * always throws UnsupportedOperationException
-     */
     @Override 
-    public final boolean equals(Object interval) {
+    /** always throws UnsupportedOperationException */
+    public final boolean equals(Object interval) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 

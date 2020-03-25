@@ -9,16 +9,32 @@ import ch.epfl.rigel.math.ClosedInterval;
 import ch.epfl.rigel.math.RightOpenInterval;
 
 /**
- * 
- * @author Alexis FAVRE (310552)
+ * system of coordinates :
  * center of the celestial sphere is the center of the earth (or sometimes center of the sun)
  * plan of reference is the elliptic plan of the earth
  * direction of reference is the vernal point(intersection between equatorial and elliptic plans)
+ * @author Alexis FAVRE (310552)
  */
 public final class EclipticCoordinates extends SphericalCoordinates {
 
     private EclipticCoordinates(double longitude, double latitude) {
         super(longitude, latitude);
+    }
+    
+    /**
+     * to create new EclipticCoordinates
+     * @param lon
+     * (double) longitude in radians (must be in [0,2Pi[)
+     * @param lat
+     * (double) latitude in radians (must be in [-Pi/2,Pi/2])
+     * @return new EclipticCoordinates of these coordinates
+     * @throws IllegalArgumentException if lon does not belong in [0,2Pi[
+     *         or if lat is not in [-Pi/2,Pi/2]
+     */
+    public static EclipticCoordinates of(double lon, double lat) throws IllegalArgumentException {
+        checkInInterval(RightOpenInterval.of(0, Angle.TAU), lon);
+        checkInInterval(ClosedInterval.of(-Angle.TAU/4, Angle.TAU/4), lat);
+        return new EclipticCoordinates(lon, lat);
     }
     
     /**
@@ -49,22 +65,8 @@ public final class EclipticCoordinates extends SphericalCoordinates {
         return Angle.toDeg(lat());
     }
     
-    /**
-     * to create new EclipticCoordinates
-     * @param lon
-     * (double) longitude in radians (must be in [0,2Pi[)
-     * @param lat
-     * (double) latitude in radians (must be in [-Pi/2,Pi/2])
-     * @return
-     * new EclipticCoordinates
-     */
-    public static EclipticCoordinates of(double lon, double lat) {
-        checkInInterval(RightOpenInterval.of(0, Angle.TAU), lon);
-        checkInInterval(ClosedInterval.of(-Angle.TAU/4, Angle.TAU/4), lat);
-        return new EclipticCoordinates(lon, lat);
-    }
-    
     @Override
+    /** @return an representation of the coordinates */
     public String toString() {
         return String.format(Locale.ROOT, "(λ=%.4f°, β=%.4f°)", lonDeg(), latDeg());
     }

@@ -7,8 +7,13 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * these class enable to load all the asterisms from a file
+ * @author Augustin ALLARD (299918)
+ *
+ */
 public enum AsterismLoader implements StarCatalogue.Loader {
-
+    /** used for the loading*/
     INSTANCE;
 
     // return the corresponding star if contained in the builder else return null
@@ -22,6 +27,12 @@ public enum AsterismLoader implements StarCatalogue.Loader {
     }
 
     @Override
+    /**
+     * load the asterisms
+     * @param inputStream the file which contains all the asterisms
+     * @param builder of the StarCatalogue in construction
+     * @throw IOException if there is a problem during the lecture of the file
+     */
     public void load(InputStream inputStream, StarCatalogue.Builder builder) throws IOException {
 
         try(BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {

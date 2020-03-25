@@ -1,50 +1,45 @@
 package ch.epfl.rigel.math;
 
 import static ch.epfl.rigel.Preconditions.checkArgument;
-
 import java.util.Locale;
+
 /**
- * 
+ * represents a Polynomial function, not instanciable
  * @author Alexis FAVRE (310552)
- *
  */
 public final class Polynomial {
     
     private final double[] coefs;
 
-    private Polynomial(double coefficientN, double... coefficients) {
-        checkArgument(coefficientN!=0);
+    private Polynomial(double coefficientN, double... coefficients) throws IllegalArgumentException {
+        checkArgument(coefficientN != 0);
         coefs = new double[coefficients.length+1];
         coefs[0] = coefficientN;
         System.arraycopy(coefficients, 0, coefs,1, coefficients.length);
     }
+    
     /**
-     * 
-     * @return
-     * (int) degree of the polynomial
+     * @return the degree of the polynomial
      */
     public int degree(){
         return coefs.length-1;
     }
     
     /**
-     * 
-     * @param coefficientN
-     * @param coefficients
-     * other coefficients of the polynomial
-     * @return
-     * a copy of our Polynomial
+     * to construct a Polynomial function
+     * @param coefficientN the highest coefficient
+     * @param coefficients other coefficients of the polynomial
+     * @return the corresponding Polynomial function
+     * @throws IllegalArgumentException if the highest coefficient is null
      */
-    public final static Polynomial of(double coefficientN, double... coefficients) {
+    public final static Polynomial of(double coefficientN, double... coefficients) throws IllegalArgumentException{
         return new Polynomial(coefficientN, coefficients);
     }
     
     /**
-     * calculate the image of x by the polynomial
+     * calculate the image of the value x by the polynomial
      * @param x
-     * (double)
-     * @return
-     * the image
+     * @return the image of x
      */
     public double at(double x) {
         double result = 0;
@@ -56,6 +51,7 @@ public final class Polynomial {
     }
 
     @Override
+    /** @return a representation of the Polynomial */
     public String toString() {
         String s = "";
         for(int i = 0; i<degree(); ++i) {
@@ -87,12 +83,14 @@ public final class Polynomial {
     }
     
     @Override
-    public final int hashCode() {
+    /** always throws UnsupportedOperationException */
+    public final int hashCode() throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
     
     @Override 
-    public final boolean equals(Object interval) {
+    /** always throws UnsupportedOperationException */
+    public final boolean equals(Object interval) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 }

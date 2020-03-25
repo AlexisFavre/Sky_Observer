@@ -4,11 +4,19 @@ import ch.epfl.rigel.coordinates.EquatorialCoordinates;
 
 import java.io.*;
 
+/**
+ * to load the stars and their characteristics from the hygdata_v3
+ * @author Augustin ALLARD (299918)
+ */
 public enum HygDatabaseLoader implements StarCatalogue.Loader {
 
     INSTANCE;
 
     @Override
+    /**
+     * to load the stars
+     * @throws IOException if the loading does not run correctly
+     */
     public void load(InputStream inputStream, StarCatalogue.Builder builder) throws IOException {
 
         try(BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {

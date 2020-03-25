@@ -3,9 +3,8 @@ package ch.epfl.rigel.coordinates;
 import ch.epfl.rigel.math.Angle;
 
 /**
- * 
- * @author Alexis FAVRE (310552)
  * see https://cs108.epfl.ch/p/02_spherical-coords.html#geo-coord
+ * @author Alexis FAVRE (310552)
  */
 abstract class SphericalCoordinates {
 
@@ -59,20 +58,15 @@ abstract class SphericalCoordinates {
         return Angle.toDeg(lat());
     }
     
-    /**
-     * always throws UnsupportedOperationException
-     */
     @Override
-    public final int hashCode() {
+    /** always throws UnsupportedOperationException */
+    public final int hashCode() throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
     
-    
-    /**
-     * always throws UnsupportedOperationException
-     */
     @Override 
-    public final boolean equals(Object interval) {
+    /** always throws UnsupportedOperationException */
+    public final boolean equals(Object interval) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 

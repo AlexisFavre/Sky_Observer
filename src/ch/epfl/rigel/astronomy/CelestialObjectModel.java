@@ -3,6 +3,7 @@ package ch.epfl.rigel.astronomy;
 import ch.epfl.rigel.coordinates.EclipticToEquatorialConversion;
 
 /**
+ * to models an celestial object at a given time
  * @author Augustin ALLARD (299918)
  */
 public interface CelestialObjectModel <O> {

@@ -9,6 +9,8 @@ import ch.epfl.rigel.coordinates.EclipticToEquatorialConversion;
 import ch.epfl.rigel.math.Angle;
 
 /**
+ * Model of the Planets to calculte the diffrents characteristics of the
+ * Differents planets at a precise day
  * @author Augustin ALLARD (299918)
  */
 public enum PlanetModel implements  CelestialObjectModel<Planet> {
@@ -29,7 +31,10 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
             19.21814, 0.773059, 73.926961, 65.80, -7.19),
     NEPTUNE("Neptune", 165.84539, 326.895127, 23.07, 0.010483,
             30.1985, 1.7673, 131.879, 62.20, -6.87);
-
+    
+    /**
+     * List of all these Planets with their characteristics
+     */
     public static List<PlanetModel> ALL = new ArrayList<>(List.copyOf(Arrays.asList(PlanetModel.values())));
 
     private final String name;
@@ -103,6 +108,12 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
     }
 
     @Override
+    /**
+     * calculate postion of the Planet at a precise day
+     * @param daysSinceJ2010 and this day
+     * @param eclipticToEquatorialConversion is a converter from elliptic to equatorial coordinates 
+     * @return the Planet at this day
+     */
     public Planet at(double daysSinceJ2010, EclipticToEquatorialConversion eclipticToEquatorialConversion) {
 //        if(this.a == EARTH.a) {
 //            throw new UnsupportedOperationException();

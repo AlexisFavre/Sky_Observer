@@ -5,10 +5,12 @@ import ch.epfl.rigel.coordinates.EclipticToEquatorialConversion;
 import ch.epfl.rigel.math.Angle;
 
 /**
+ * Model of the Sun to calculte the diffrents characteristics of the
+ * Sun at a precise day
  * @author Augustin ALLARD (299918)
  */
 public enum SunModel implements CelestialObjectModel<Sun> {
-
+    /** the Sun */
     SUN();
 
     private final double E_G = Angle.ofDeg(279.557208); // longitude of sun at J2010 in radians
@@ -16,6 +18,12 @@ public enum SunModel implements CelestialObjectModel<Sun> {
     private final double E   = 0.016705; // eccentricity of the ellipse sun/earth no unity
 
     @Override
+    /**
+     * calculate postion of the Sun at a precise day
+     * @param daysSinceJ2010 and this day
+     * @param eclipticToEquatorialConversion is a converter from elliptic to equatorial coordinates 
+     * @return the Sun at this day
+     */
     public Sun at(double daysSinceJ2010, EclipticToEquatorialConversion eclipticToEquatorialConversion) {
         double meanAnomaly = meanAnomaly(daysSinceJ2010);
         double trueAnomaly = meanAnomaly + 2 * E * Math.sin(meanAnomaly);

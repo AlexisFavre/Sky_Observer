@@ -1,36 +1,25 @@
-/**
- * 
- */
 package ch.epfl.rigel.math;
 
 import java.util.Locale;
 
 /**
+ * represent an right open Interval, not instanciable
  * @author Alexis FAVRE (310552)
- *
  */
 public final class RightOpenInterval extends Interval {
     
-    /**
-     * interval [0,t[ (often used)
-     */
-    public static RightOpenInterval iO = new RightOpenInterval(0,Angle.TAU);
-
-    /**
-     * @param low
-     * @param high
-     */
     private RightOpenInterval(double low, double high) {
         super(low, high);
     }
 
     @Override
+    /** @return true if and only if v belong of the interval */
     public boolean contains(double value) {
         return (low()<=value) && (value < high());
     }
     
     /**
-     * 
+     * to construct an right open Interval
      * @param low 
      * low bound of the interval
      * @param high
@@ -43,7 +32,7 @@ public final class RightOpenInterval extends Interval {
     }
     
     /**
-     * 
+     * to construct an Symmetric right open Interval center in 0
      * @param size
      * size of the interval
      * @return
@@ -54,16 +43,17 @@ public final class RightOpenInterval extends Interval {
     }
     
     @Override
+    /** @return an representation of the interval */
     public String toString() {
         return String.format(Locale.ROOT, "[%s, %s[", low(), high());
     }
     
     /**
-     * reduced function of the interval
+     * reduce the value on this interval
      * @param v
      * (double) value
      * @return
-     * image of the value v by the reduced function
+     * the reduced value
      */ 
     public double reduce(double v) {
         double a = v - low();

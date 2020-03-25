@@ -4,9 +4,8 @@ import java.util.function.Function;
 
 import ch.epfl.rigel.math.Angle;
 /**
- * 
+ * to simulate a stererographic projection
  * @author Alexis FAVRE (310552)
- *
  */
 public final class StereographicProjection implements Function<HorizontalCoordinates, CartesianCoordinates>{
 
@@ -35,7 +34,6 @@ public final class StereographicProjection implements Function<HorizontalCoordin
     }
     
     /**
-     * 
      * @param parallel (HorizontalCoordinates)
      * @return (double) radius of corresponding circle of the projection of the parallel
      * (could be infinite)
@@ -47,7 +45,7 @@ public final class StereographicProjection implements Function<HorizontalCoordin
     }
     
     /**
-     * 
+     * calculate the the projected diameter of a sphere
      * @param rad
      * (double) the apparent diameter of the sphere centered at the center of the projection
      * @return
@@ -58,6 +56,7 @@ public final class StereographicProjection implements Function<HorizontalCoordin
         
     }
     /**
+     * transform CartesianCoordinates in HorizontalCoordinates
      * @param azAlt
      * (HorizontalCoordinates) coordinates of the point
      * @return
@@ -80,7 +79,7 @@ public final class StereographicProjection implements Function<HorizontalCoordin
         return CartesianCoordinates.of(x,y);
     }
     /**
-     * 
+     * transform CartesianCoordinates in HorizontalCoordinates
      * @param xy (CartesianCoordinates)
      * @return
      * (HorizontalCoordinates) of the point of which xy are coordinates of its projection
@@ -99,25 +98,21 @@ public final class StereographicProjection implements Function<HorizontalCoordin
     }
     
     @Override
+    /** @return an representation of the coordinates */
     public String toString() {
         return "StereographicProjection with parameter(HorizontalCoordinates)"
                 + " : " + CartesianCoordinates.of(centerAzimut, centerAlt).toString();
     }
     
-    /**
-     * always throws UnsupportedOperationException
-     */
     @Override
-    public final int hashCode() {
+    /** always throws UnsupportedOperationException */
+    public final int hashCode() throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
     
-    
-    /**
-     * always throws UnsupportedOperationException
-     */
     @Override 
-    public final boolean equals(Object object) {
+    /** always throws UnsupportedOperationException */
+    public final boolean equals(Object interval) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 

@@ -4,8 +4,8 @@ import java.time.*;
 import java.time.temporal.ChronoUnit;
 
 /**
+ * the differents epoch of reference of the project
  * @author Augustin ALLARD (299918)
- *
  */
 public enum Epoch {
     J2000(ZonedDateTime.of(

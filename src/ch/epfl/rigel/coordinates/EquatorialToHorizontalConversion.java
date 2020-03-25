@@ -7,9 +7,9 @@ import ch.epfl.rigel.astronomy.SiderealTime;
 import ch.epfl.rigel.math.Angle;
 import ch.epfl.rigel.math.RightOpenInterval;
 /**
- * 
+ * this class enable the transformation of the  EquatorialCoordinates to HorizontalCoordinates
+ * at a precise ZonedDateTime and GeographicCoordinates
  * @author Alexis FAVRE (310552)
- *
  */
 public final class EquatorialToHorizontalConversion implements Function<EquatorialCoordinates, HorizontalCoordinates> {
 
@@ -18,7 +18,7 @@ public final class EquatorialToHorizontalConversion implements Function<Equatori
     private final double Sl;
     
     /**
-     * 
+     * initialise the parameters need for the conversion
      * @param when (ZonedDateTime) of the observation
      * @param where (GeographicCoordinates) of the observer
      */
@@ -29,6 +29,10 @@ public final class EquatorialToHorizontalConversion implements Function<Equatori
     }
 
     @Override
+    /**
+     * @return HorizontalCoordinates corresponding to these EquatorialCoordinates
+     * for a precise ZonedDateTime and GeographicCoordinates @see EclipticToEquatorialConversion
+     */
     public HorizontalCoordinates apply(EquatorialCoordinates equatorialCoordinates) {
         double H = Sl - equatorialCoordinates.ra(); //hourly angle
         double sinGamma = Math.sin(equatorialCoordinates.dec());
@@ -40,20 +44,15 @@ public final class EquatorialToHorizontalConversion implements Function<Equatori
         return HorizontalCoordinates.of(RightOpenInterval.of(0, Angle.TAU).reduce(az), RightOpenInterval.of(-Angle.TAU/4, Angle.TAU/4).reduce(alt));
     }
     
-    /**
-     * always throws UnsupportedOperationException
-     */
     @Override
-    public final int hashCode() {
+    /** always throws UnsupportedOperationException */
+    public final int hashCode() throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
     
-    
-    /**
-     * always throws UnsupportedOperationException
-     */
     @Override 
-    public final boolean equals(Object interval) {
+    /** always throws UnsupportedOperationException */
+    public final boolean equals(Object interval) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 }
