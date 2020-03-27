@@ -3,7 +3,9 @@ package ch.epfl.rigel.astronomy;
 import ch.epfl.rigel.coordinates.EclipticToEquatorialConversion;
 
 /**
- * to models an celestial object at a given time
+ * Model that represents a {@code CelestialObject} state at a given time
+ * Used to update a the {@code CelestialObject} corresponding to the model
+ *
  * @author Augustin ALLARD (299918)
  */
 public interface CelestialObjectModel <O> {
@@ -13,8 +15,7 @@ public interface CelestialObjectModel <O> {
      *
      * @param daysSinceJ2010 the days between J2010 and the time at which we want the object
      * @param eclipticToEquatorialConversion a conversion corresponding to the given time
-     * @return (O)
-     *  The object in the corresponding state
+     * @return The object in the corresponding state
      */
     O at(double daysSinceJ2010, EclipticToEquatorialConversion eclipticToEquatorialConversion);
 }

@@ -4,7 +4,8 @@ import java.util.List;
 import static ch.epfl.rigel.Preconditions.checkArgument;
 
 /**
- * Models an asterism which is a group of stars
+ * Describe an asterism which is a group of stars
+ *
  * @author Augustin ALLARD (299918)
  */
 public final class Asterism {
@@ -12,9 +13,9 @@ public final class Asterism {
     private final List<Star> stars;
 
     /**
-     * create an asterism 
-     * @param (List) stars
-     * @throws IllegalArgumentException if the List of Stars is empty
+     *
+     * @param stars forming the asterism
+     * @throws IllegalArgumentException if the provided {@code List} is empty
      */
     public Asterism(List<Star> stars) throws IllegalArgumentException {
         checkArgument(!stars.isEmpty());
@@ -22,7 +23,8 @@ public final class Asterism {
     }
 
     /**
-     * @return list of the stars which composed the asterism
+     *
+     * @return stars composing {@code this}
      */
     public List<Star> stars() {
         return stars;

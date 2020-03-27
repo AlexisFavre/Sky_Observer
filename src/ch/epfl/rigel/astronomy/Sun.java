@@ -6,8 +6,9 @@ import ch.epfl.rigel.coordinates.EclipticCoordinates;
 import ch.epfl.rigel.coordinates.EquatorialCoordinates;
 
 /**
- * represent the Sun
- * the characteristics of the Sun are calculate in SunModel 
+ * Represents the Sun
+ * The characteristics of the Sun are computed with a {@code SunModel}
+ *
  * @author Alexis FAVRE (310552)
  */
 public final class Sun extends CelestialObject {
@@ -16,7 +17,7 @@ public final class Sun extends CelestialObject {
     private final float meanAnomaly; // in radians
 
     /**
-     * Create a Sun with the following properties
+     *
      * @param eclipticPos of the Sun
      * @param equatorialPos of the Sun (notNull)
      * @param angularSize of the Sun
@@ -31,6 +32,7 @@ public final class Sun extends CelestialObject {
     }
 
     /**
+     *
      * @return the eclipticPos
      */
     public EclipticCoordinates eclipticPos() {
@@ -38,7 +40,8 @@ public final class Sun extends CelestialObject {
     }
 
     /**
-     * @return (double) the meanAnomaly in radians
+     *
+     * @return the meanAnomaly in radians
      */
     public double meanAnomaly() {
         return meanAnomaly;

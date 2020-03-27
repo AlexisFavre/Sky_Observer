@@ -3,15 +3,15 @@ package ch.epfl.rigel.astronomy;
 import ch.epfl.rigel.coordinates.EquatorialCoordinates;
 
 /**
- * describe a planet
- * the characteristics of the Planet are calculate in PlanetModel
- * @author Alexis FAVRE (310552)
+ * Describe a planet
+ * The characteristics of the Planet are computed by a {@code PlanetModel}
  *
+ * @author Alexis FAVRE (310552)
  */
 public final class Planet extends CelestialObject{
 
     /**
-     * create a Planet with the following characteristics
+     *
      * @param name of the Planet
      * @param equatorialPos  of the Planet
      * @param angularSize  of the Planet

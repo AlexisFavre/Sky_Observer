@@ -7,7 +7,9 @@ import ch.epfl.rigel.coordinates.EquatorialCoordinates;
 import ch.epfl.rigel.math.ClosedInterval;
 
 /**
- * represent a Star
+ * Describes a Star
+ * Characteristic are extracted with a {@code StarCatalogue}
+ *
  * @author Augustin ALLARD (299918)
  */
 public final class Star extends CelestialObject {
@@ -22,8 +24,7 @@ public final class Star extends CelestialObject {
      * @param equatorialPos of the Star
      * @param magnitude of the Star
      * @param colorIndex of the Star (must be in[-0.5, +5.5])
-     * @throws IllegalArgumentException if the hipparcosId<0 or
-     *          the colorIndex is not in [-0.5, +5.5]
+     * @throws IllegalArgumentException if the hipparcosId < 0 or the colorIndex is not in [-0.5, +5.5]
      */
     public Star(int hipparcosId, String name, EquatorialCoordinates equatorialPos,
                 float magnitude, float colorIndex) throws IllegalArgumentException {
@@ -35,15 +36,15 @@ public final class Star extends CelestialObject {
     }
     
     /**
-     * @return hipparcosId of the star
+     *
+     * @return the hipparcosId of the star
      */
     public int hipparcosId() {
         return hipparcosId;
     }
 
     /**
-     * @return
-     * colorTemperature of the star in degree Kelvin
+     * @return the colorTemperature of the star in degree Kelvin
      */
     public int colorTemperature() {
         return (int) Math.floor((1/(0.92*c + 1.7) + 1/(0.92*c + 0.62))*4600);

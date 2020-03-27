@@ -7,7 +7,7 @@ import ch.epfl.rigel.astronomy.SiderealTime;
 import ch.epfl.rigel.math.Angle;
 import ch.epfl.rigel.math.RightOpenInterval;
 /**
- *  Enables the transformation of the EquatorialCoordinates to HorizontalCoordinates
+ *  Function that enables the transformation of the EquatorialCoordinates to HorizontalCoordinates
  *  at a precise {@code ZonedDateTime} and place on the earth {@code GeographicCoordinates}
  *
  * @author Alexis FAVRE (310552)

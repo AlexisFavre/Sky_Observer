@@ -5,8 +5,9 @@ import ch.epfl.rigel.coordinates.EclipticToEquatorialConversion;
 import ch.epfl.rigel.math.Angle;
 
 /**
- * Model of the Sun to calculte the diffrents characteristics of the
- * Sun at a precise day
+ * Model that compute the Sun state at a given time
+ * Used to update the Sun
+ *
  * @author Augustin ALLARD (299918)
  */
 public enum SunModel implements CelestialObjectModel<Sun> {

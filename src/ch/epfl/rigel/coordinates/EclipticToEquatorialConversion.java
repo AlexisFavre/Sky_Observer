@@ -9,7 +9,7 @@ import ch.epfl.rigel.math.Polynomial;
 import ch.epfl.rigel.math.RightOpenInterval;
 
 /**
- * Enables the transformation of the EclipticCoordinates to EquatorialCoordinates
+ * Function that enables the transformation of the EclipticCoordinates to EquatorialCoordinates
  * at a precise {@code ZonedDateTime}
  *
  * @author Augustin ALLARD (299918)

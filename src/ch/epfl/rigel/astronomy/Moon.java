@@ -6,8 +6,8 @@ import java.util.Locale;
 import ch.epfl.rigel.math.ClosedInterval;
 
 /**
- * represent the Moon
- * the characteristics of the Moon are calculate in MoonModel 
+ * Represents the Moon
+ * The characteristics of the Moon are computed with a {@code MoonModel}
  * @author Alexis FAVRE (310552)
  */
 public final class Moon extends CelestialObject {
@@ -15,7 +15,7 @@ public final class Moon extends CelestialObject {
     private final float phase;
     
     /**
-     * create a Moon with the following characteristics
+     *
      * @param equatorialPos of the Moon
      * @param angularSize of the Moon
      * @param magnitude of the Moon
@@ -28,9 +28,12 @@ public final class Moon extends CelestialObject {
         checkInInterval(ClosedInterval.of(0,1), phase);
         this.phase = phase;
     }
-    
+
+    /**
+     *
+     * {@inheritDoc}
+     */
     @Override
-    /** @return an textual representation of the characteristics of the moon */
     public String info() {
         return String.format(Locale.ROOT, "%s (%.1f", name(), phase*100) +"%)";
     }
