@@ -3,7 +3,9 @@ package ch.epfl.rigel.math;
 import java.util.Locale;
 
 /**
- * represent an closed Interval, not instanciable
+ * Represents a mathematical closed interval as
+ * (ex: [a,b] for low and high bounds a and b)
+ *
  * @author Alexis FAVRE (310552)
  */
 public final class ClosedInterval extends Interval {
@@ -13,53 +15,57 @@ public final class ClosedInterval extends Interval {
     }
 
     /**
-     * to construct an Closed Interval
-     * @param low 
-     * (double) low bound of the interval
-     * @param high
-     * (double) high bound of the interval
-     * @return new Closed Interval
+     * Construct a {@code ClosedInterval} for the given low and high bounds as
+     * [{@code low}, {@code high}]
+     *
+     * @param low the low bound of the interval
+     * @param high the high bound of the interval
+     * @return a new instance of {@code ClosedInterval} for the given bounds
      */
     public static ClosedInterval of(double low, double high) {
         return new ClosedInterval(low, high);
     }
     
     /**
-     * to construct an Symmetric Closed Interval center in 0
-     * @param size
-     * (double) size of the interval
-     * @return
-     * (ClosedInterval) new Closed and Symmetric interval center in 0
+     * Construct a symmetric {@code ClosedInterval} centered in 0 of the given size
+     * @param size wanted for the interval
+     * @return the corresponding new instance of {@code ClosedInterval}
      */
     public static ClosedInterval symmetric(double size) {
         return new ClosedInterval(-size/2, size/2);
     }
-    
-    @Override
-    /** @return true if and only if v belong of the interval */
-    public boolean contains(double value) {
-        return (value>=low()) && (value<=high());
-    }
+
     
     /**
-     * clip values for this interval
-     * @param v
-     * (double) value
-     * @return
-     * (double) image of the clip function
+     * Computes and return the corresponding clipped value of {@code v}
+     * that is by definition always into the interval {@code this} for any given {@code v}
+     *
+     * @param v the value of which we want the clipped image in the interval {@code this}
+     * @return {@code v} if the value is already in the interval and the low or high bounds
+     * if {@code v} is respectively too small or too big
      */
     public double clip(double v) {
-        if(v<=low()) {
+        if(v <= low()) {
             return low();
         } else {
-            if(v>=high()) {
-                return high();
-            } else { return v; }
+            return Math.min(v, high());
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    /** @return an representaion of the interval */
+    public boolean contains(double value) {
+        return (value>=low()) && (value<=high());
+    }
+
+    /**
+     *
+     * @return a {@code String} view of {@code this} with the format
+     * [a,b]
+     */
+    @Override
     public String toString() {
         return String.format(Locale.ROOT, "[%s,%s]", low(), high());
     }

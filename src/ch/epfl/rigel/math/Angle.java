@@ -3,49 +3,45 @@ package ch.epfl.rigel.math;
 import static ch.epfl.rigel.Preconditions.checkInInterval;
 
 /**
+ * Non instantiable class containing only {@code static} methods
+ *
+ * Used to normalize angles between 0-2pi and to perform conversion between angles unities
+ * RADIANS is the unity that we want to use by defaults for computations
+ *
  * @author Alexis FAVRE (310552)
- * 
- * by default angles are in RADIANS in this project!
- * non instanciable class used to works on angles
  */
 public final class Angle {
-    /** Tau = 2π*/
-    public final static double TAU = 2*Math.PI;
+
+    public static final double TAU = 2*Math.PI;
     private static final double DEG_PER_RAD = 360.0 / TAU;
     private static final double RAD_PER_HOUR = TAU / 24;
-
 
     private Angle() {}
     
     /**
-     * Normalize angle in [0,tau[
-     * @param rad
-     * (double) angle
-     * @return
-     * (double) normalized angle
+     * Normalize the given angle value in [0,2pi[
+     * @param rad angle value to be normalized
+     * @return normalized angle value
      */
     public static double normalizePositive(double rad) {
         return (rad%TAU + TAU)%TAU;
     }
     
     /**
-     * convert Arc seconds in degrees
-     * @param sec
-     * (double)
-     * @return
-     * angle in radians
+     * Convert Arc seconds in degrees
+     * @param sec angle value in Arc-seconds to be converted
+     * @return corresponding angle value in radians
      */
     public static double ofArcsec(double sec) {
        return sec/(3600*DEG_PER_RAD); 
     }
     
     /**
-     * convert an given angle from sexagecimal to degrees
-     * @param deg
-     * @param min
-     * @param sec
-     * @return
-     * (double) angle in radians
+     * Convert sexagesimal to degrees
+     * @param deg degrees of angle value
+     * @param min minutes of angle value
+     * @param sec seconds of angle value
+     * @return corresponding angle value in radians
      */
     public static double ofDMS(int deg, int min, double sec) {
         checkInInterval(RightOpenInterval.of(0,60), sec);
@@ -54,44 +50,36 @@ public final class Angle {
     }
     
     /**
-     * convert radians in degrees
-     * @param rad
-     * (double)
-     * @return
-     * angle in degrees
+     * Convert radians in degrees
+     * @param rad angle value in radians to be converted
+     * @return corresponding angle value in degrees
      */
     public static double toDeg(double rad) {
         return Math.toDegrees(rad);
       }
     
     /**
-     * convert degrees in radians
-     * @param deg
-     * (double)
-     * @return
-     * angle in radians
+     * Convert degrees in radians
+     * @param deg angle value in degrees to be converted
+     * @return corresponding angle value in radians
      */
     public static double ofDeg(double deg) {
         return deg/DEG_PER_RAD;
     }
     
     /**
-     * convert hours in radians
-     * @param hr
-     * (double)
-     * @return
-     * angle in radians
+     * Convert hours in radians
+     * @param hr angle value in hours to be converted
+     * @return corresponding angle value in radians
      */
     public static double ofHr(double hr) {
         return hr*RAD_PER_HOUR;
     }
     
     /**
-     * convert radians to degree
-     * @param rad
-     * (double)
-     * @return
-     * angle in hours
+     * Convert radians to hours
+     * @param rad angle value in radians to be converted
+     * @return corresponding angle values in hours
      */
     public static double toHr(double rad) {
         return rad/RAD_PER_HOUR;
