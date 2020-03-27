@@ -29,7 +29,7 @@ public final class HorizontalCoordinates extends SphericalCoordinates {
     }
     
     /**
-     * Construct coordinates for the given azimuth and altitude
+     * Construct {@code HorizontalCoordinates} for the given azimuth and altitude
      *
      * @param az azimuth (clockwise angle of the object with the observer north)
      *           in radians (must be in [0,2Pi[)

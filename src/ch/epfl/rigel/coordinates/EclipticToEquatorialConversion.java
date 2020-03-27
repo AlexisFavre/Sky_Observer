@@ -9,8 +9,9 @@ import ch.epfl.rigel.math.Polynomial;
 import ch.epfl.rigel.math.RightOpenInterval;
 
 /**
- * this class enable the transformation of the EclipticCoordinates to EquatorialCoordinates
- * at a precise ZonedDateTime
+ * Enables the transformation of the EclipticCoordinates to EquatorialCoordinates
+ * at a precise {@code ZonedDateTime}
+ *
  * @author Augustin ALLARD (299918)
  */
 public final class EclipticToEquatorialConversion implements Function<EclipticCoordinates, EquatorialCoordinates> {
@@ -19,26 +20,22 @@ public final class EclipticToEquatorialConversion implements Function<EclipticCo
     private final double cosOfEpsilon;
     
     /**
-     * initialise the parameters need for the conversion
-     * @param (ZonedDateTime) when of the observation
+     *
+     * @param when {@code ZonedDateTime} at which the conversion and observation is made
      */
     public EclipticToEquatorialConversion(ZonedDateTime when) {
-        double epsilon = epsilon(when);
+        double jCentSinceJ2000 = Epoch.J2000.julianCenturiesUntil(when);
+        double epsilon = Angle.ofDMS(23, 26, 21.45
+                + Polynomial.of(0.00181, -0.0006, -46.815, 0).at(jCentSinceJ2000));
         sinOfEpsilon = Math.sin(epsilon);
         cosOfEpsilon = Math.cos(epsilon);
     };
-    
-    // return Elliptic obliqueness in radians 
-    private double epsilon(ZonedDateTime when) {
-        double T = Epoch.J2000.julianCenturiesUntil(when);
-        return Angle.ofDMS(23, 26, 21.45 + Polynomial.of(0.00181, -0.0006, -46.815, 0).at(T));
-    }
 
-    @Override
     /**
-     * @return EquatorialCoordinates corresponding to these Ecliptic Coordinates
-     * for a precise ZonedDateTime @see EclipticToEquatorialConversion
+     *
+     * {@inheritDoc}
      */
+    @Override
     public EquatorialCoordinates apply(EclipticCoordinates eclipticCoordinates) {
         double lambda = eclipticCoordinates.lon();
         double beta = eclipticCoordinates.lat();
@@ -46,15 +43,25 @@ public final class EclipticToEquatorialConversion implements Function<EclipticCo
         double gamma = Math.asin(Math.sin(beta) * cosOfEpsilon  +  Math.cos(beta) * sinOfEpsilon * Math.sin(lambda));
         return EquatorialCoordinates.of(Angle.normalizePositive(alpha), gamma);
     }
-    
+
+    /**
+     * Always throw exception
+     * {@code conversion.hashCode()} is forbidden
+     *
+     * @throws UnsupportedOperationException in all conditions
+     */
     @Override
-    /** always throws UnsupportedOperationException */
     public final int hashCode() throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
-    
-    @Override 
-    /** always throws UnsupportedOperationException */
+
+    /**
+     * Always throw exception
+     * {@code conversion.equals()} is forbidden
+     *
+     * @throws UnsupportedOperationException in all conditions
+     */
+    @Override
     public final boolean equals(Object interval) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }

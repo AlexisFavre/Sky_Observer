@@ -24,7 +24,7 @@ public final class EquatorialCoordinates extends SphericalCoordinates {
     }
     
     /**
-     * Construct coordinates for the given ascension and declination
+     * Construct {@code EquatorialCoordinates} for the given ascension and declination
      *
      * @param ra right ascension in radians (must be in [0,2Pi[)
      * @param dec declination in radians (must be in [-Pi/2,Pi/2])

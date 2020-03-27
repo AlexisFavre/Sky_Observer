@@ -23,7 +23,8 @@ public final class EclipticCoordinates extends SphericalCoordinates {
     }
     
     /**
-     * Construct coordinates for the given ecliptic longitude and ecliptic latitude
+     * Construct {@code EclipticCoordinates} for the given ecliptic longitude and ecliptic latitude
+     *
      * @param lon ecliptic longitude in radians (must be in [0,2Pi[)
      * @param lat ecliptic latitude in radians (must be in [-Pi/2,Pi/2])
      * @return new {@code EclipticCoordinates} instance

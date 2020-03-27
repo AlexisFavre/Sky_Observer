@@ -53,6 +53,7 @@ public final class ClosedInterval extends Interval {
     }
 
     /**
+     *
      * {@inheritDoc}
      */
     @Override

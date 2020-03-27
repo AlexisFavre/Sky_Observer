@@ -22,6 +22,7 @@ public final class GeographicCoordinates extends SphericalCoordinates {
     }
     
     /**
+     * Construct {@code GeographicCoordinates} for the given longitude and latitude
      * 
      * @param lonDeg the longitude in degrees [–180°, +180°[ (W -> E)
      * @param latDeg the latitude in degrees  [–90°, +90°] (S -> N)
