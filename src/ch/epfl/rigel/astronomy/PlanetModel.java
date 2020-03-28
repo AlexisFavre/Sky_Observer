@@ -142,11 +142,11 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
         EclipticCoordinates position = EclipticCoordinates.of(Angle.normalizePositive(longitude), latitude);
 
         // ANGULAR SIZE AND MAGNITUDE
-        double p = Math.sqrt(Math.pow(EARTH.r(daysSinceJ2010),2) 
-                + Math.pow(r(daysSinceJ2010),2) 
-                - 2*EARTH.r(daysSinceJ2010)*r(daysSinceJ2010)
-                * Math.cos(l(daysSinceJ2010) - EARTH.l(daysSinceJ2010))*Math.cos(phi)
-        );
+        // distance to earth
+        double p = Math.sqrt(Math.pow(EARTH.r(daysSinceJ2010),2) + Math.pow(r(daysSinceJ2010),2)
+                - 2*EARTH.r(daysSinceJ2010)*r(daysSinceJ2010)*Math.cos(l(daysSinceJ2010)
+                - EARTH.l(daysSinceJ2010))*Math.cos(phi));
+        // light portion of planet visible from earth
         double phase = (1 + Math.cos(longitude - l(daysSinceJ2010)))/2;
         double angularSize = tet0/p;
         double magnitude = V0 + 5*Math.log10(r(daysSinceJ2010)*p/Math.sqrt(phase));

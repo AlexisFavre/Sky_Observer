@@ -11,10 +11,11 @@ import ch.epfl.rigel.coordinates.EclipticToEquatorialConversion;
 public interface CelestialObjectModel <O> {
 
     /**
-     * This gives the object O in the state corresponding to the given parameters
+     * This gives the object O in the state corresponding to the given time
      *
      * @param daysSinceJ2010 the days between J2010 and the time at which we want the object
      * @param eclipticToEquatorialConversion a conversion corresponding to the given time
+     *                                       to get object position as {@code EquatorialCoordinates}
      * @return The object in the corresponding state
      */
     O at(double daysSinceJ2010, EclipticToEquatorialConversion eclipticToEquatorialConversion);
