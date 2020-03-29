@@ -32,15 +32,15 @@ public final class StarCatalogue {
     private final Map<Asterism, List<Integer>> asterismsStarIndexesMapping;
 
     /**
-     *
      * @param my_stars {@code List} of the stars to be added
      * @param my_asterisms {@code List} of the asterims to be added
      * @throws IllegalArgumentException if at least one star of an asterism is not given in the list of stars
      */
     public StarCatalogue(List<Star> my_stars, List<Asterism> my_asterisms) throws IllegalArgumentException {
-        stars = new ArrayList<>(List.copyOf(my_stars));
+        stars = List.copyOf(my_stars);
+        List<Asterism> immutablesAsterisms = List.copyOf(my_asterisms);
         asterismsStarIndexesMapping = new HashMap<>();
-        for (Asterism a : my_asterisms) {
+        for (Asterism a : immutablesAsterisms) {
             // verify that a contains only stars in the catalog
             checkArgument(stars.containsAll(a.stars()));
 
@@ -143,7 +143,6 @@ public final class StarCatalogue {
         }
         
         /**
-         *
          * @return unmodifiable view of the stars in the builder
          */
         public List<Star> stars(){

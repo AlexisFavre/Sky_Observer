@@ -14,12 +14,6 @@ class MySunTest {
             0.4f, 5.f);
 
     @Test
-    void eclipticPos() {
-
-        // TODO test
-    }
-
-    @Test
     void meanAnomaly() {
         assertEquals(5.f, TRIVIAL.meanAnomaly());
     }

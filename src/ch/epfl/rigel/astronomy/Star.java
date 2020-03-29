@@ -6,6 +6,8 @@ import static ch.epfl.rigel.Preconditions.checkInInterval;
 import ch.epfl.rigel.coordinates.EquatorialCoordinates;
 import ch.epfl.rigel.math.ClosedInterval;
 
+import java.util.Locale;
+
 /**
  * Describes a Star
  * Characteristic are extracted with a {@code StarCatalogue}
@@ -18,7 +20,6 @@ public final class Star extends CelestialObject {
     private final float c;
 
     /**
-     * 
      * @param hipparcosId of the Star (must be positive or null)
      * @param name of the Star
      * @param equatorialPos of the Star
@@ -36,7 +37,6 @@ public final class Star extends CelestialObject {
     }
     
     /**
-     *
      * @return the hipparcosId of the star
      */
     public int hipparcosId() {
@@ -48,5 +48,15 @@ public final class Star extends CelestialObject {
      */
     public int colorTemperature() {
         return (int) Math.floor((1/(0.92*c + 1.7) + 1/(0.92*c + 0.62))*4600);
+    }
+
+    /**
+     *
+     * @return a {@code String} view of {@code this} with the format
+     * Star : name, hipId : index
+     */
+    @Override
+    public String toString() {
+        return String.format(Locale.ROOT, "Star : %s , hipId : %o", name(), hipparcosId());
     }
 }

@@ -1,6 +1,8 @@
 package ch.epfl.rigel.astronomy;
 
 import java.util.List;
+import java.util.Locale;
+
 import static ch.epfl.rigel.Preconditions.checkArgument;
 
 /**
@@ -13,7 +15,6 @@ public final class Asterism {
     private final List<Star> stars;
 
     /**
-     *
      * @param stars forming the asterism
      * @throws IllegalArgumentException if the provided {@code List} is empty
      */
@@ -23,10 +24,28 @@ public final class Asterism {
     }
 
     /**
-     *
      * @return stars composing {@code this}
      */
     public List<Star> stars() {
         return stars;
+    }
+    
+    /**
+     *
+     * @return a {@code String} view of {@code this} with the format
+     * ASTERISM
+     * star1 display
+     * ...
+     * star2 display
+     * ...
+     *
+     */
+    @Override
+    public String toString() {
+        StringBuilder asterismDisplay = new StringBuilder("ASTERISM\n");
+        for(Star s: stars()) {
+            asterismDisplay.append(s.toString()).append("\n...\n");
+        }
+        return asterismDisplay.toString();
     }
 }
