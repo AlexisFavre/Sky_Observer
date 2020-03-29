@@ -32,7 +32,6 @@ public final class StarCatalogue {
     private final Map<Asterism, List<Integer>> asterismsStarIndexesMapping;
 
     /**
-     *
      * @param my_stars {@code List} of the stars to be added
      * @param my_asterisms {@code List} of the asterims to be added
      * @throws IllegalArgumentException if at least one star of an asterism is not given in the list of stars
@@ -143,7 +142,6 @@ public final class StarCatalogue {
         }
         
         /**
-         *
          * @return unmodifiable view of the stars in the builder
          */
         public List<Star> stars(){

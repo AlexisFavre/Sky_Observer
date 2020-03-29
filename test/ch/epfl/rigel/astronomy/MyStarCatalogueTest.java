@@ -9,6 +9,9 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import ch.epfl.rigel.astronomy.StarCatalogue.Builder;
+import ch.epfl.rigel.coordinates.EquatorialCoordinates;
+
 class MyStarCatalogueTest {
 
     private static final String HYG_CATALOGUE_NAME =
@@ -25,6 +28,25 @@ class MyStarCatalogueTest {
                     .loadFrom(aStream, AsterismLoader.INSTANCE).build();
         }
     }
+    public Star star = new Star(9999999, "starTest", EquatorialCoordinates.of(0, 0), 0, 0);
+    public Asterism asterism = new Asterism(List.of(star));
+    public StarCatalogue.Builder bd = new Builder();
+    
+   @Test
+   void addStarBuilderWorks() {
+       int s1 = bd.stars().size();
+       bd.addStar(star);
+       int s2 = bd.stars().size();
+       assertTrue( s1 == (s2-1) && bd.stars().contains(star));
+   }
+   
+   @Test
+   void addAsterismBuilderWorks() {
+       int s1 = bd.asterisms().size();
+       bd.addAsterism(asterism);
+       int s2 = bd.asterisms().size();
+       assertTrue( s1 == (s2-1) && bd.asterisms().contains(asterism));
+   }
 
     protected Star loadedRigel() throws IOException {
         Star rigel = null;
