@@ -1,5 +1,6 @@
 package ch.epfl.rigel.astronomy;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
@@ -16,7 +17,7 @@ class MyStarCatalogueTest {
     private static final String ASTERISM_CATALOGUE_NAME =
             "/asterisms.txt";
 
-    public StarCatalogue initializedCatalog() throws IOException {
+    public StarCatalogue initCatalog() throws IOException {
         try (InputStream hygStream = getClass().getResourceAsStream(MyStarCatalogueTest.HYG_CATALOGUE_NAME);
              InputStream aStream = getClass().getResourceAsStream(MyStarCatalogueTest.ASTERISM_CATALOGUE_NAME)) {
             return new StarCatalogue.Builder()
@@ -27,16 +28,38 @@ class MyStarCatalogueTest {
 
     protected Star loadedRigel() throws IOException {
         Star rigel = null;
-        for (Star s : initializedCatalog().stars()) {
+        for (Star s : initCatalog().stars()) {
             if (s.name().equalsIgnoreCase("rigel"))
                 rigel = s;
         }
         return rigel;
     }
+    
+    protected Asterism AsterismOfRigelserachWithName1() throws IOException {
+        for (Asterism ast : initCatalog().asterisms()) {
+            for(Star star : ast.stars()) {
+                if (star.name().equalsIgnoreCase("Rigel")) {
+                    return ast;
+                }
+            }
+        }
+        return null;
+    }
+    
+    protected Asterism AsterismOfRigelserachWithName2() throws IOException {
+        for (Asterism ast : initCatalog().asterisms()) {
+            for(Star star : ast.stars()) {
+                if (star.name().equalsIgnoreCase("Rigel") && ast != AsterismOfRigelserachWithName1()) {
+                    return ast;
+                }
+            }
+        }
+        return null;
+    }
 
     protected Star loadedSirius() throws IOException {
         Star sirius = null;
-        for (Star s : initializedCatalog().stars()) {
+        for (Star s : initCatalog().stars()) {
             if (s.name().equalsIgnoreCase("sirius"))
                 sirius = s;
         }
@@ -45,58 +68,19 @@ class MyStarCatalogueTest {
 
     protected Star loadedBetelgeuse() throws IOException {
         Star betelgeuse = null;
-        for (Star s : initializedCatalog().stars()) {
+        for (Star s : initCatalog().stars()) {
             if (s.name().equalsIgnoreCase("betelgeuse"))
                 betelgeuse = s;
         }
         return betelgeuse;
     }
     
-    protected Asterism asterismOfRigel() throws IOException {
-        for (Asterism ast : initializedCatalog().asterisms()) {
-            System.out.println(ast);
-            if(ast.stars().contains(loadedRigel())) {
-                System.out.println("OK");
-                return ast;
-            }
-        }
-        return null;
-    }
-    
-    
     @Test
     void checkIndexListRigel() throws IllegalArgumentException, IOException {
-        List<Integer> list = initializedCatalog().asterismIndices(asterismOfRigel());
+        List<Integer> list = initCatalog().asterismIndices(AsterismOfRigelserachWithName2());
         assertEquals(1019, list.get(0));
     }
     
-    @Test
-    void checkRigelisInTheAsterism() throws IOException {
-        assertNotNull(asterismOfRigel());
-    }
-
-    @Test
-    void checkSizeStarCatalogue() throws IOException {
-        System.out.println(initializedCatalog().asterisms().size());
-    }
-    @Test
-    // CE TEST NE SERT A RIEN IL EST FORCEMENT JUSTE CAR CONDITION CODEE POUR CONSTRUCTION DU CATALOG
-            // REGARDE LE CODE!!!!
-    // TEST PLUTOT LE NB D ETOILE OU UN TRUC DANS LE STYLE POUR VOIR ILS TE RENVOIENT BIEN TOUT
-    void getters() {
-        /*try{
-            boolean b = false;
-            for (Asterism asterism : initializedCatalog().asterisms()) {
-                b = initializedCatalog().stars().containsAll(asterism.stars());
-                if(b == false) { throw new Error();}
-            }
-            assertFalse(false);
-        }
-        catch(Exception e){
-            assertFalse(true);
-        }*/
-    }
-        
     @Test
     void indexBetelgeuse() throws IOException {
         assertEquals(27989, loadedBetelgeuse().hipparcosId());
