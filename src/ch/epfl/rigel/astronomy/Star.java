@@ -42,20 +42,20 @@ public final class Star extends CelestialObject {
     public int hipparcosId() {
         return hipparcosId;
     }
-    
-    /**
-     * @return hashCode of the hipparcosId of the Star
-     */
-    @Override
-    public int hashCode() {
-        return Integer.hashCode(hipparcosId);
-    }
 
     /**
      * @return the colorTemperature of the star in degree Kelvin
      */
     public int colorTemperature() {
         return (int) Math.floor((1/(0.92*c + 1.7) + 1/(0.92*c + 0.62))*4600);
+    }
+
+    /**
+     * @return hashCode of the hipparcosId of the Star
+     */
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(hipparcosId);
     }
 
     /**
