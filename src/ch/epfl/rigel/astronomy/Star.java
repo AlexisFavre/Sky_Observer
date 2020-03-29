@@ -79,6 +79,6 @@ public final class Star extends CelestialObject {
      */
     @Override
     public String toString() {
-        return String.format(Locale.ROOT, "Star : %s , id : %o", name(), hipparcosId());
+        return String.format(Locale.ROOT, "Star : %s , hipId : %o", name(), hipparcosId());
     }
 }

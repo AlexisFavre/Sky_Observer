@@ -114,8 +114,9 @@ class MyStarCatalogueTest {
     
     @Test
     void checkIndexListRigel() throws IllegalArgumentException, IOException {
+        System.out.println(AsterismOfRigelserachWithName2());
         List<Integer> list = initCatalog().asterismIndices(AsterismOfRigelserachWithName2());
-        assertEquals(1019, list.get(0));
+        assertEquals(1019, list.get(3));
     }
     
     @Test
