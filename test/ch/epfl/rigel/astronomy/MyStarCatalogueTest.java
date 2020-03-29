@@ -1,8 +1,11 @@
 package ch.epfl.rigel.astronomy;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
 class MyStarCatalogueTest {
@@ -13,7 +16,7 @@ class MyStarCatalogueTest {
     private static final String ASTERISM_CATALOGUE_NAME =
             "/asterisms.txt";
 
-    protected StarCatalogue initializedCatalog() throws IOException {
+    public StarCatalogue myCatalog() throws IOException {
         try (InputStream hygStream = getClass().getResourceAsStream(MyStarCatalogueTest.HYG_CATALOGUE_NAME);
              InputStream aStream = getClass().getResourceAsStream(MyStarCatalogueTest.ASTERISM_CATALOGUE_NAME)) {
             return new StarCatalogue.Builder()
@@ -24,7 +27,7 @@ class MyStarCatalogueTest {
 
     protected Star loadedRigel() throws IOException {
         Star rigel = null;
-        for (Star s : initializedCatalog().stars()) {
+        for (Star s : myCatalog().stars()) {
             if (s.name().equalsIgnoreCase("rigel"))
                 rigel = s;
         }
@@ -33,7 +36,7 @@ class MyStarCatalogueTest {
 
     protected Star loadedSirius() throws IOException {
         Star sirius = null;
-        for (Star s : initializedCatalog().stars()) {
+        for (Star s : myCatalog().stars()) {
             if (s.name().equalsIgnoreCase("sirius"))
                 sirius = s;
         }
@@ -42,13 +45,38 @@ class MyStarCatalogueTest {
 
     protected Star loadedBetelgeuse() throws IOException {
         Star betelgeuse = null;
-        for (Star s : initializedCatalog().stars()) {
+        for (Star s : myCatalog().stars()) {
             if (s.name().equalsIgnoreCase("betelgeuse"))
                 betelgeuse = s;
         }
         return betelgeuse;
     }
+    
+    protected Asterism asterismOfRigel() throws IOException {
+        for (Asterism ast : myCatalog().asterisms()) {
+            if(ast.stars().contains(loadedRigel())) {
+                return ast;
+            }
+        }
+        return null;
+    }
+    
+    
+    @Test
+    void checkIndexListRigel() throws IllegalArgumentException, IOException {
+        List<Integer> list = myCatalog().asterismIndices(asterismOfRigel());
+        assertEquals(1019, list.get(0));
+    }
+    
+    @Test
+    void checkRigelisInTheAsterism() throws IOException {
+        assertNotNull(asterismOfRigel());
+    }
 
+    @Test
+    void checkSizeStarCatalogue() throws IOException {
+        System.out.println(myCatalog().asterisms().size());
+    }
     @Test
     // CE TEST NE SERT A RIEN IL EST FORCEMENT JUSTE CAR CONDITION CODEE POUR CONSTRUCTION DU CATALOG
             // REGARDE LE CODE!!!!
@@ -77,5 +105,7 @@ class MyStarCatalogueTest {
         MyHygDatabaseLoaderTest hygL = new MyHygDatabaseLoaderTest();
         assertEquals(24436, loadedRigel().hipparcosId());
     }
+
+    
 }
 
