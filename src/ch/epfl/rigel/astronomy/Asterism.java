@@ -31,30 +31,6 @@ public final class Asterism {
     }
     
     /**
-     * @return hash of the sum of the hash of the stars
-     */
-    @Override
-    public int hashCode() {
-        int i = 0;
-        for (Star star : stars) {
-            i += star.hashCode();
-        }
-        return Integer.hashCode(i);
-    }
-
-    /**
-     * Compare Asterism stars equality one by one
-     *
-     * @param o the asterism that should be compare to {@code this}
-     * @return {@code true} if every stars of the asterisms are equals
-     */
-    @Override
-    public final boolean equals(Object o) {
-        Asterism a = (Asterism) o;
-        return stars().containsAll(a.stars()) && a.stars().containsAll(stars());
-    }
-
-    /**
      *
      * @return a {@code String} view of {@code this} with the format
      * ASTERISM

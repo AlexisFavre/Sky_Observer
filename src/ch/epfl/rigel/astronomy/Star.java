@@ -51,28 +51,6 @@ public final class Star extends CelestialObject {
     }
 
     /**
-     * @return hashCode of the hipparcosId of the Star
-     */
-    @Override
-    public int hashCode() {
-        return Integer.hashCode(hipparcosId);
-    }
-
-    /**
-     * Compare star name, hipId and magnitude to determine equality
-     *
-     * @param o the star that should be compare to {@code this}
-     * @return {@code true} if the two stars have the same name, hipId and magnitude
-     */
-    @Override
-    public final boolean equals(Object o) {
-        Star s = (Star) o;
-        return name().equals(s.name())
-                && hipparcosId() == s.hipparcosId()
-                && magnitude() == s.magnitude();
-    }
-
-    /**
      *
      * @return a {@code String} view of {@code this} with the format
      * Star : name, hipId : index
