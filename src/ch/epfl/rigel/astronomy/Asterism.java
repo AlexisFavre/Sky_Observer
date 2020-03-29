@@ -45,10 +45,12 @@ public final class Asterism {
     /**
      * Compare Asterism stars equality one by one
      *
-     * @param a the asterism that should be compare to {@code this}
+     * @param o the asterism that should be compare to {@code this}
      * @return {@code true} if every stars of the asterisms are equals
      */
-    public final boolean equals(Asterism a) {
+    @Override
+    public final boolean equals(Object o) {
+        Asterism a = (Asterism) o;
         return stars().containsAll(a.stars()) && a.stars().containsAll(stars());
     }
 

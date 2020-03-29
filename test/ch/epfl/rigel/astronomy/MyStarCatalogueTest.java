@@ -1,6 +1,5 @@
 package ch.epfl.rigel.astronomy;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
@@ -34,6 +33,24 @@ class MyStarCatalogueTest {
         }
         return rigel;
     }
+
+    protected Star loadedSirius() throws IOException {
+        Star sirius = null;
+        for (Star s : initCatalog().stars()) {
+            if (s.name().equalsIgnoreCase("sirius"))
+                sirius = s;
+        }
+        return sirius;
+    }
+
+    protected Star loadedBetelgeuse() throws IOException {
+        Star betelgeuse = null;
+        for (Star s : initCatalog().stars()) {
+            if (s.name().equalsIgnoreCase("betelgeuse"))
+                betelgeuse = s;
+        }
+        return betelgeuse;
+    }
     
     protected Asterism AsterismOfRigelserachWithName1() throws IOException {
         for (Asterism ast : initCatalog().asterisms()) {
@@ -57,22 +74,20 @@ class MyStarCatalogueTest {
         return null;
     }
 
-    protected Star loadedSirius() throws IOException {
-        Star sirius = null;
-        for (Star s : initCatalog().stars()) {
-            if (s.name().equalsIgnoreCase("sirius"))
-                sirius = s;
+    protected Asterism asterismOfRigel() throws IOException {
+        for (Asterism ast : initCatalog().asterisms()) {
+            //System.out.println(ast);
+            if(ast.stars().contains(loadedRigel())) {
+                System.out.println("OK");
+                return ast;
+            }
         }
-        return sirius;
+        return null;
     }
 
-    protected Star loadedBetelgeuse() throws IOException {
-        Star betelgeuse = null;
-        for (Star s : initCatalog().stars()) {
-            if (s.name().equalsIgnoreCase("betelgeuse"))
-                betelgeuse = s;
-        }
-        return betelgeuse;
+    @Test
+    void checkCatalogContainsFirstRigelAsterism() throws IOException {
+        assertNotNull(asterismOfRigel());
     }
     
     @Test

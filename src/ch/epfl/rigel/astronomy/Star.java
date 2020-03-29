@@ -61,10 +61,12 @@ public final class Star extends CelestialObject {
     /**
      * Compare star name, hipId and magnitude to determine equality
      *
-     * @param s the star that should be compare to {@code this}
+     * @param o the star that should be compare to {@code this}
      * @return {@code true} if the two stars have the same name, hipId and magnitude
      */
-    public final boolean equals(Star s) {
+    @Override
+    public final boolean equals(Object o) {
+        Star s = (Star) o;
         return name().equals(s.name())
                 && hipparcosId() == s.hipparcosId()
                 && magnitude() == s.magnitude();
