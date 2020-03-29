@@ -13,7 +13,6 @@ public final class Asterism {
     private final List<Star> stars;
 
     /**
-     *
      * @param stars forming the asterism
      * @throws IllegalArgumentException if the provided {@code List} is empty
      */
@@ -23,10 +22,21 @@ public final class Asterism {
     }
 
     /**
-     *
      * @return stars composing {@code this}
      */
     public List<Star> stars() {
         return stars;
+    }
+    
+    /**
+     * @return hash of the sum of the hash of the stars
+     */
+    @Override
+    public int hashCode() {
+        int i = 0;
+        for (Star star : stars) {
+            i += star.hashCode();
+        }
+        return Integer.hashCode(i);
     }
 }

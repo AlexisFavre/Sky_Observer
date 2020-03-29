@@ -18,7 +18,6 @@ public final class Star extends CelestialObject {
     private final float c;
 
     /**
-     * 
      * @param hipparcosId of the Star (must be positive or null)
      * @param name of the Star
      * @param equatorialPos of the Star
@@ -36,11 +35,18 @@ public final class Star extends CelestialObject {
     }
     
     /**
-     *
      * @return the hipparcosId of the star
      */
     public int hipparcosId() {
         return hipparcosId;
+    }
+    
+    /**
+     * @return hashCode of the hipparcosId of the Star
+     */
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(hipparcosId);
     }
 
     /**
