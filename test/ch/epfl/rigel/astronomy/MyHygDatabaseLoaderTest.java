@@ -15,7 +15,7 @@ class MyHygDatabaseLoaderTest {
     private static final String HYG_CATALOGUE_NAME =
             "/hygdata_v3.csv";
 
-    private Star rigel() throws IOException {
+    public Star rigel() throws IOException {
         Star rigel = null;
         try (InputStream hygStream = getClass()
                 .getResourceAsStream(HYG_CATALOGUE_NAME)) {
@@ -45,7 +45,7 @@ class MyHygDatabaseLoaderTest {
         return sirius;
     }
 
-    private Star betelgeuse() throws IOException {
+    public Star betelgeuse() throws IOException {
         Star betelgeuse = null;
         try (InputStream hygStream = getClass()
                 .getResourceAsStream(HYG_CATALOGUE_NAME)) {
