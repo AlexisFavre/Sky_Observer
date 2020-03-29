@@ -75,5 +75,4 @@ public final class EclipticCoordinates extends SphericalCoordinates {
     public String toString() {
         return String.format(Locale.ROOT, "(λ=%.4f°, β=%.4f°)", lonDeg(), latDeg());
     }
-
 }

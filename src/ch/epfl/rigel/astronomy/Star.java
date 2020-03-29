@@ -6,6 +6,8 @@ import static ch.epfl.rigel.Preconditions.checkInInterval;
 import ch.epfl.rigel.coordinates.EquatorialCoordinates;
 import ch.epfl.rigel.math.ClosedInterval;
 
+import java.util.Locale;
+
 /**
  * Describes a Star
  * Characteristic are extracted with a {@code StarCatalogue}
@@ -48,5 +50,27 @@ public final class Star extends CelestialObject {
      */
     public int colorTemperature() {
         return (int) Math.floor((1/(0.92*c + 1.7) + 1/(0.92*c + 0.62))*4600);
+    }
+
+    /**
+     * Compare star name, hipId and magnitude to determine equality
+     *
+     * @param s the star that should be compare to {@code this}
+     * @return {@code true} if the two stars have the same name, hipId and magnitude
+     */
+    public final boolean equals(Star s) {
+        return name().equals(s.name())
+                && hipparcosId() == s.hipparcosId()
+                && magnitude() == s.magnitude();
+    }
+
+    /**
+     *
+     * @return a {@code String} view of {@code this} with the format
+     * Star : name, hipId : index
+     */
+    @Override
+    public String toString() {
+        return String.format(Locale.ROOT, "Star : %s , id : %o", name(), hipparcosId());
     }
 }
