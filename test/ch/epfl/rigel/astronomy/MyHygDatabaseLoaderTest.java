@@ -67,7 +67,7 @@ class MyHygDatabaseLoaderTest {
     @Test
     void syntax() throws IOException {
         int i = 0;
-        for(Star s : CATALOG_TEST.initCatalog().stars()) {
+        for(Star s : CATALOG_TEST.CATALOG.stars()) {
             if (s.name().charAt(0) == '?') {
                 i = 1;
                 assertEquals(' ', s.name().charAt(1));

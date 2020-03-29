@@ -18,7 +18,7 @@ class MyAsterismLoaderTest {
 
         Queue<Asterism> a = new ArrayDeque<>();
         Star betelgeuse = null;
-        for (Asterism ast : CATALOG_TEST.initCatalog().asterisms()) {
+        for (Asterism ast : CATALOG_TEST.CATALOG.asterisms()) {
             for (Star s : ast.stars()) {
                 if (s.name().equalsIgnoreCase("Rigel")) {
                     a.add(ast);
