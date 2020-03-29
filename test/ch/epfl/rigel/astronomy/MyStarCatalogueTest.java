@@ -98,25 +98,27 @@ class MyStarCatalogueTest {
 
     protected Asterism asterismOfRigel() throws IOException {
         for (Asterism ast : initCatalog().asterisms()) {
-            //System.out.println(ast);
             if(ast.stars().contains(loadedRigel())) {
-                System.out.println("OK");
                 return ast;
             }
         }
         return null;
     }
-
-    @Test
-    void checkCatalogContainsFirstRigelAsterism() throws IOException {
-        assertNotNull(asterismOfRigel());
+    
+    protected Asterism asterismOfBetelgeuse() throws IOException {
+        for (Asterism ast : initCatalog().asterisms()) {
+            if(ast.stars().contains(loadedBetelgeuse())) {
+                return ast;
+            }
+        }
+        return null;
     }
     
     @Test
-    void checkIndexListRigel() throws IllegalArgumentException, IOException {
-        System.out.println(AsterismOfRigelserachWithName2());
-        List<Integer> list = initCatalog().asterismIndices(AsterismOfRigelserachWithName2());
+    void checkIndexInListStarsOfCatalogOfRigel() throws IllegalArgumentException, IOException {
+        List<Integer> list = initCatalog().asterismIndices(asterismOfRigel());
         assertEquals(1019, list.get(3));
+        System.out.println(AsterismOfRigelserachWithName2());
     }
     
     @Test
