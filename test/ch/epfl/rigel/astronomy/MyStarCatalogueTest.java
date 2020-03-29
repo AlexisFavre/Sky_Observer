@@ -51,7 +51,7 @@ class MyStarCatalogueTest {
     protected Star loadedRigel() throws IOException {
         Star rigel = null;
         for (Star s : initCatalog().stars()) {
-            if (s.name().equalsIgnoreCase("Rigel"))
+            if (s.name().equalsIgnoreCase("rigel"))
                 rigel = s;
         }
         return rigel;
@@ -113,7 +113,5 @@ class MyStarCatalogueTest {
         MyHygDatabaseLoaderTest hygL = new MyHygDatabaseLoaderTest();
         assertEquals(24436, loadedRigel().hipparcosId());
     }
-
-    
 }
 
