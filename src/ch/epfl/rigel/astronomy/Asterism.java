@@ -20,7 +20,7 @@ public final class Asterism {
      */
     public Asterism(List<Star> stars) throws IllegalArgumentException {
         checkArgument(!stars.isEmpty());
-        this.stars = stars; // TODO Immuable
+        this.stars = List.copyOf(stars);
     }
 
     /**

@@ -37,9 +37,10 @@ public final class StarCatalogue {
      * @throws IllegalArgumentException if at least one star of an asterism is not given in the list of stars
      */
     public StarCatalogue(List<Star> my_stars, List<Asterism> my_asterisms) throws IllegalArgumentException {
-        stars = my_stars; // TODO immuable
+        stars = List.copyOf(my_stars);
+        List<Asterism> immutablesAsterisms = List.copyOf(my_asterisms);
         asterismsStarIndexesMapping = new HashMap<>();
-        for (Asterism a : my_asterisms) {
+        for (Asterism a : immutablesAsterisms) {
             // verify that a contains only stars in the catalog
             checkArgument(stars.containsAll(a.stars()));
 
