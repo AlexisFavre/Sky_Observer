@@ -27,6 +27,18 @@ public final class CartesianCoordinates {
         }
 
     /**
+     * Gives the distance between the given point and {@code this}
+     *
+     * @param other the other point
+     * @return the distance between the two points, infinite if other is null
+     */
+    public double distance(CartesianCoordinates other) {
+        if(other == null)
+            return Double.POSITIVE_INFINITY;
+        return Math.hypot(x() - other.x(), y() - other.y());
+    }
+
+    /**
      *
      * @return the abscissa
      */
@@ -48,10 +60,10 @@ public final class CartesianCoordinates {
      *
      * @throws UnsupportedOperationException in all conditions
      */
-    @Override
-    public final int hashCode() throws UnsupportedOperationException {
+    /*@Override
+    public final int hashCode() throws UnsupportedOperationException { //TODO Hascode
         throw new UnsupportedOperationException();
-    }
+    }*/
 
     /**
      * Always throw exception

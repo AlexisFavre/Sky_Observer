@@ -3,9 +3,7 @@ package ch.epfl.rigel.astronomy;
 import ch.epfl.rigel.coordinates.*;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 import static ch.epfl.rigel.Preconditions.checkArgument;
@@ -19,16 +17,15 @@ import static ch.epfl.rigel.Preconditions.checkArgument;
  */
 public class ObservedSky {
 
+    private final StarCatalogue catalog;
+    private final Map<CartesianCoordinates, CelestialObject> skyObjects;
+
     private Sun sun;
-    private CartesianCoordinates sunPoint;
-
     private Moon moon;
-    private CartesianCoordinates moonPoint;
-
     private List<Planet> planets = new ArrayList<>();
+    private CartesianCoordinates sunPoint;
+    private CartesianCoordinates moonPoint;
     private double[] planetPointsRefs;
-
-    private StarCatalogue catalog;
     private double[] starPointsRefs;
 
     /**
@@ -41,26 +38,33 @@ public class ObservedSky {
     public ObservedSky(ZonedDateTime obsTime, GeographicCoordinates obsPlace,
                        StereographicProjection projection, StarCatalogue catalog) {
 
-        EclipticToEquatorialConversion eclToEqu = new EclipticToEquatorialConversion(obsTime);
-        double moment = Epoch.J2010.daysUntil(obsTime);
-        sun = SunModel.SUN.at(moment, eclToEqu);
-        moon = MoonModel.MOON.at(moment, eclToEqu);
-        for(PlanetModel p: PlanetModel.ALL) {
-            planets.add(p.at(moment, eclToEqu));
-        }
+        skyObjects = new HashMap<>();
+        this.catalog = catalog;
 
+        EclipticToEquatorialConversion eclToEqu = new EclipticToEquatorialConversion(obsTime);
         EquatorialToHorizontalConversion equToHor = new EquatorialToHorizontalConversion(obsTime, obsPlace);
-        sunPoint = projection.apply(equToHor.apply(sun.equatorialPos()));
-        moonPoint = projection.apply(equToHor.apply(moon.equatorialPos()));
+        List<PlanetModel> extraterrestrialModels = PlanetModel.ALL;
+        extraterrestrialModels.remove(PlanetModel.EARTH);
+        double moment = Epoch.J2010.daysUntil(obsTime);
+
+        sun = SunModel.SUN.at(moment, eclToEqu);
+        skyObjects.put(sunPoint= projection.apply(equToHor.apply(sun.equatorialPos())), sun);
+        moon = MoonModel.MOON.at(moment, eclToEqu);
+        skyObjects.put(moonPoint = projection.apply(equToHor.apply(moon.equatorialPos())), moon);
+
         List<Double> pprefs = new ArrayList<>();
         List<Double> sprefs = new ArrayList<>();
-        for(Planet p: planets) {
-            CartesianCoordinates pPoint = projection.apply(equToHor.apply(p.equatorialPos()));
+        CartesianCoordinates pPoint;
+        CartesianCoordinates sPoint;
+        for(PlanetModel model: extraterrestrialModels) {
+            Planet planet = model.at(moment, eclToEqu);
+            skyObjects.put(pPoint = projection.apply(equToHor.apply(planet.equatorialPos())), planet);
+            planets.add(planet);
             pprefs.add(pPoint.x());
             pprefs.add(pPoint.y());
         }
-        for(Star s: catalog.stars()) {
-            CartesianCoordinates sPoint = projection.apply(equToHor.apply(s.equatorialPos()));
+        for(Star star: catalog.stars()) {
+            skyObjects.put(sPoint = projection.apply(equToHor.apply(star.equatorialPos())), star);
             sprefs.add(sPoint.x());
             sprefs.add(sPoint.y());
         }
@@ -76,21 +80,28 @@ public class ObservedSky {
         return array;
     }
 
-    private List<CelestialObject> allSkyObjects() {
-        List<CelestialObject> skyObjects = new ArrayList<>();
-        skyObjects.addAll(planets);
-        skyObjects.addAll(stars());
-        skyObjects.add(sun);
-        skyObjects.add(sun);
-        return
-    }
-
     /**
-     * Gives the closest object to the given plan coordinates
+     * Gives the closest sky object from the place corresponding to the given plan point
      * if there exists one that is closer to the given maximal distance
+     *
+     * @param point the point from which we want the closest object
+     * @param maximalDistance distance on the map corresponding to the radius of search
+     * @return the closest object if there exist one in the maximal distance circle and {@code null}
+     * if no objects were found
      */
     public CelestialObject objectClosestTo(CartesianCoordinates point, double maximalDistance) {
-        f
+        CartesianCoordinates closestObjectPoint = null;
+        for(CartesianCoordinates p: skyObjects.keySet()) {
+            if(point.distance(p) < point.distance(closestObjectPoint)
+                    && point.distance(p) < maximalDistance
+                    && point.distance(p) > 0.0000000000000000001)// TODO for test think about close obj
+                closestObjectPoint = p;
+        }
+        if(closestObjectPoint == null)
+            return null;
+        System.out.println(sunPoint().distance(moonPoint()));
+        System.out.println(point.distance(closestObjectPoint));
+        return skyObjects.get(closestObjectPoint);
     }
 
     /**
