@@ -31,6 +31,9 @@ class MyStarCatalogueTest {
             return null;
         }
     }
+    
+  //============================================================================
+    // to check if methods add Star or Asterism of the Builder works
     public Star star = new Star(9999999, "starTest", EquatorialCoordinates.of(0, 0), 0, 0);
     public Asterism asterism = new Asterism(List.of(star));
     public StarCatalogue.Builder bd = new Builder();
@@ -50,7 +53,9 @@ class MyStarCatalogueTest {
        int s2 = bd.asterisms().size();
        assertTrue( s1 == (s2-1) && bd.asterisms().contains(asterism));
    }
-
+   
+   //============================================================================
+   //to take these Star from the catalog
     protected Star loadedRigel() {
         Star rigel = null;
         for (Star s : CATALOG.stars()) {
@@ -78,7 +83,10 @@ class MyStarCatalogueTest {
         return betelgeuse;
     }
     
-    protected Asterism AsterismOfRigelserachWithName1() {
+    
+  //============================================================================
+    // to take the asterism which contains these stars
+    protected Asterism Asterism1OfRigelserachWithName() {
         for (Asterism ast : CATALOG.asterisms()) {
             for(Star star : ast.stars()) {
                 if (star.name().equalsIgnoreCase("Rigel")) {
@@ -89,17 +97,17 @@ class MyStarCatalogueTest {
         return null;
     }
     
-    protected Asterism AsterismOfRigelserachWithName2() {
+    protected Asterism Asterism2OfRigelserachWithName() {
         for (Asterism ast : CATALOG.asterisms()) {
             for(Star star : ast.stars()) {
-                if (star.name().equalsIgnoreCase("Rigel") && ast != AsterismOfRigelserachWithName1()) {
+                if (star.name().equalsIgnoreCase("Rigel") && ast != Asterism1OfRigelserachWithName()) {
                     return ast;
                 }
             }
         }
         return null;
     }
-
+    
     protected Asterism asterismOfRigel() {
         for (Asterism ast : CATALOG.asterisms()) {
             if(ast.stars().contains(loadedRigel())) {
@@ -118,21 +126,45 @@ class MyStarCatalogueTest {
         return null;
     }
     
+    protected Asterism asterismOfSirius() {
+        for (Asterism ast : CATALOG.asterisms()) {
+            if(ast.stars().contains(loadedSirius())) {
+                return ast;
+            }
+        }
+        return null;
+    }
+
+    
+  //============================================================================
+    // check index of the asterisms
     @Test
-    void checkIndexInListStarsOfCatalogOfRigel() throws IllegalArgumentException {
-        System.out.println(CATALOG.stars().get(1019));
-        List<Integer> list = CATALOG.asterismIndices(asterismOfRigel());
-        assertEquals(1019, list.get(0));
+    void checkIndexInListStarsOfCatalogOfBetelgeuse() throws IllegalArgumentException {
+        List<Integer> list = CATALOG.asterismIndices(asterismOfBetelgeuse());
+        assertEquals(1213, list.get(0));
     }
     
     @Test
-    void indexBetelgeuse() {
+    void checkIndexInListStarsOfCatalogOfSirius() throws IllegalArgumentException {
+        List<Integer> list = CATALOG.asterismIndices(asterismOfSirius());
+        assertEquals(1419, list.get(2));
+    }
+    
+    @Test
+    void checkIndexInListStarsOfCatalogOfRigel() throws IllegalArgumentException {
+        List<Integer> list = CATALOG.asterismIndices(Asterism1OfRigelserachWithName());
+        assertEquals(1019, list.get(0));
+    }
+    
+  //============================================================================
+    //check HippocId to check loading ok
+    @Test
+    void HippocIDBetelgeuse() {
         assertEquals(27989, loadedBetelgeuse().hipparcosId());
     }
 
     @Test
-    void indexRigel() {
-        MyHygDatabaseLoaderTest hygL = new MyHygDatabaseLoaderTest();
+    void HippocIDRigel() {
         assertEquals(24436, loadedRigel().hipparcosId());
     }
 }
