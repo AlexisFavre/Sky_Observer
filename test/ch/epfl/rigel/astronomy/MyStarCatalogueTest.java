@@ -120,6 +120,7 @@ class MyStarCatalogueTest {
     
     @Test
     void checkIndexInListStarsOfCatalogOfRigel() throws IllegalArgumentException {
+        System.out.println(CATALOG.stars().get(1019));
         List<Integer> list = CATALOG.asterismIndices(asterismOfRigel());
         assertEquals(1019, list.get(0));
     }
