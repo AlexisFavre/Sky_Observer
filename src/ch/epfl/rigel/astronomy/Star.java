@@ -30,7 +30,7 @@ public final class Star extends CelestialObject {
     public Star(int hipparcosId, String name, EquatorialCoordinates equatorialPos,
                 float magnitude, float colorIndex) throws IllegalArgumentException {
         super(name, equatorialPos, 0, magnitude);
-        checkArgument(hipparcosId>=0);
+        checkArgument(hipparcosId >= 0);
         checkInInterval(ClosedInterval.of(-0.5, 5.5), colorIndex);
         this.hipparcosId = hipparcosId;
         c = colorIndex;
@@ -57,6 +57,6 @@ public final class Star extends CelestialObject {
      */
     @Override
     public String toString() {
-        return String.format(Locale.ROOT, "Star : %s , hipId : %o", name(), hipparcosId());
+        return String.format(Locale.ROOT, "Star : %s , hipId : %d", name(), hipparcosId());
     }
 }
