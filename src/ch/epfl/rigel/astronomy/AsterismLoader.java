@@ -11,7 +11,6 @@ import java.util.List;
  * Used to load {@code Asterism} objects from a hyg_data stream to a {@code StarCatalogue.Builder}
  *
  * @author Augustin ALLARD (299918)
- *
  */
 public enum AsterismLoader implements StarCatalogue.Loader {
 
