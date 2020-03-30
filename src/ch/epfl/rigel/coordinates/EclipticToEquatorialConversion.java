@@ -9,6 +9,9 @@ import ch.epfl.rigel.math.Polynomial;
 import ch.epfl.rigel.math.RightOpenInterval;
 
 /**
+ * Function that enables the transformation of the EclipticCoordinates to EquatorialCoordinates
+ * at a precise {@code ZonedDateTime}
+ *
  * @author Augustin ALLARD (299918)
  */
 public final class EclipticToEquatorialConversion implements Function<EclipticCoordinates, EquatorialCoordinates> {
@@ -16,18 +19,22 @@ public final class EclipticToEquatorialConversion implements Function<EclipticCo
     private final double sinOfEpsilon;
     private final double cosOfEpsilon;
     
+    /**
+     *
+     * @param when {@code ZonedDateTime} at which the conversion and observation is made
+     */
     public EclipticToEquatorialConversion(ZonedDateTime when) {
-        double epsilon = epsilon(when);
+        double jCentSinceJ2000 = Epoch.J2000.julianCenturiesUntil(when);
+        double epsilon = Angle.ofDMS(23, 26, 21.45
+                + Polynomial.of(0.00181, -0.0006, -46.815, 0).at(jCentSinceJ2000));
         sinOfEpsilon = Math.sin(epsilon);
         cosOfEpsilon = Math.cos(epsilon);
     };
-    
-    // return Elliptic obliqueness in radians 
-    private double epsilon(ZonedDateTime when) {
-        double T = Epoch.J2000.julianCenturiesUntil(when);
-        return Angle.ofDMS(23, 26, 21.45 + Polynomial.of(0.00181, -0.0006, -46.815, 0).at(T));
-    }
 
+    /**
+     *
+     * {@inheritDoc}
+     */
     @Override
     public EquatorialCoordinates apply(EclipticCoordinates eclipticCoordinates) {
         double lambda = eclipticCoordinates.lon();
@@ -36,22 +43,26 @@ public final class EclipticToEquatorialConversion implements Function<EclipticCo
         double gamma = Math.asin(Math.sin(beta) * cosOfEpsilon  +  Math.cos(beta) * sinOfEpsilon * Math.sin(lambda));
         return EquatorialCoordinates.of(Angle.normalizePositive(alpha), gamma);
     }
-    
+
     /**
-     * always throws UnsupportedOperationException
+     * Always throw exception
+     * {@code conversion.hashCode()} is forbidden
+     *
+     * @throws UnsupportedOperationException in all conditions
      */
     @Override
-    public final int hashCode() {
+    public final int hashCode() throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
-    
-    
-    /**
-     * always throws UnsupportedOperationException
-     */
-    @Override 
-    public final boolean equals(Object interval) {
 
+    /**
+     * Always throw exception
+     * {@code conversion.equals()} is forbidden
+     *
+     * @throws UnsupportedOperationException in all conditions
+     */
+    @Override
+    public final boolean equals(Object o) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 }

@@ -3,8 +3,13 @@ package ch.epfl.rigel.coordinates;
 import ch.epfl.rigel.math.Angle;
 
 /**
- * 
+ * Represent the concept of spherical coordinates
+ *
  * @author Alexis FAVRE (310552)
+ * @see GeographicCoordinates
+ * @see HorizontalCoordinates
+ * @see EquatorialCoordinates
+ * @see EclipticCoordinates
  * see https://cs108.epfl.ch/p/02_spherical-coords.html#geo-coord
  */
 abstract class SphericalCoordinates {
@@ -13,20 +18,18 @@ abstract class SphericalCoordinates {
     private final double latitude;
 
     /**
-     * 
-     * @param longitude
-     * (double) in radians
-     * @param latitude
-     * (double) in radians
+     *
+     * @param longitude in radians
+     * @param latitude in radians
      */
     SphericalCoordinates(double longitude, double latitude) {
         this.longitude = longitude;
         this.latitude = latitude;
     }
+
     /**
      * 
-     * @return
-     * (double) longitude in radians
+     * @return the longitude in radians
      */
     double lon() {
         return longitude;
@@ -34,8 +37,7 @@ abstract class SphericalCoordinates {
     
     /**
      * 
-     * @return
-     * (double) latitude in radians
+     * @return the latitude in radians
      */
     double lat() {
         return latitude;
@@ -43,8 +45,7 @@ abstract class SphericalCoordinates {
     
     /**
      * 
-     * @return
-     * (double) longitude in degrees
+     * @return the longitude in degrees
      */
     double lonDeg() {
         return Angle.toDeg(lon());
@@ -52,27 +53,31 @@ abstract class SphericalCoordinates {
     
     /**
      * 
-     * @return
-     * (double) latitude in degrees
+     * @return the latitude in degrees
      */
     double latDeg() {
         return Angle.toDeg(lat());
     }
-    
+
     /**
-     * always throws UnsupportedOperationException
+     * Always throw exception
+     * {@code polynomial.hashCode()} is forbidden
+     *
+     * @throws UnsupportedOperationException in all conditions
      */
     @Override
-    public final int hashCode() {
+    public final int hashCode() throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
-    
-    
+
     /**
-     * always throws UnsupportedOperationException
+     * Always throw exception
+     * {@code polynomial.equals()} is forbidden
+     *
+     * @throws UnsupportedOperationException in all conditions
      */
-    @Override 
-    public final boolean equals(Object interval) {
+    @Override
+    public final boolean equals(Object o) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 

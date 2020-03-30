@@ -62,9 +62,4 @@ class MyStereographicProjectionTest {
         assertEquals( 3.648704525474978, TRIVIAL.inverseApply(CartesianCoordinates.of(10,0)).az(),
                 1.0e-6);
     }
-
-    @Test
-    void testToString() {
-        // TODO test
-    }
 }

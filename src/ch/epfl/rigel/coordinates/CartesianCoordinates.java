@@ -3,9 +3,9 @@ package ch.epfl.rigel.coordinates;
 import java.util.Locale;
 
 /**
- * 
- * @author Alexis FAVRE (310552)
+ * Represents the cartesian coordinates System
  *
+ * @author Alexis FAVRE (310552)
  */
 public final class CartesianCoordinates {
 
@@ -18,17 +18,16 @@ public final class CartesianCoordinates {
     }
     
     /**
-     * 
-     * @param x (double) abscissa
-     * @param y (double) ordinate
-     * @return
-     * new CartesianCoordinates of these characteristics
+     * @param x abscissa
+     * @param y ordinate
+     * @return new {@code CartesianCoordinates} instance with the given {@code x} and {@code y}
      */
     public static CartesianCoordinates of(double x, double y) {
         return new CartesianCoordinates(x,y);
         }
 
     /**
+     *
      * @return the abscissa
      */
     public double x() {
@@ -36,32 +35,42 @@ public final class CartesianCoordinates {
     }
 
     /**
+     *
      * @return the ordinate
      */
     public double y() {
         return ordinate;
     }
-    
+
+    /**
+     * Always throw exception
+     * {@code conversion.hashCode()} is forbidden
+     *
+     * @throws UnsupportedOperationException in all conditions
+     */
+    @Override
+    public final int hashCode() throws UnsupportedOperationException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Always throw exception
+     * {@code conversion.equals()} is forbidden
+     *
+     * @throws UnsupportedOperationException in all conditions
+     */
+    @Override
+    public final boolean equals(Object o) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *
+     * @return a {@code String} view of {@code this} with the format
+     * (x= a, y= b)
+     */
     @Override
     public String toString() {
         return String.format(Locale.ROOT, "(x=%.4f, y=%.4f)", x(), y());
     }
-    
-    /**
-     * always throws UnsupportedOperationException
-     */
-    @Override
-    public final int hashCode() {
-        throw new UnsupportedOperationException();
-    }
-    
-    
-    /**
-     * always throws UnsupportedOperationException
-     */
-    @Override 
-    public final boolean equals(Object interval) {
-        throw new UnsupportedOperationException();
-    }
-
-    }
+}

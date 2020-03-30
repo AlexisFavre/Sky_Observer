@@ -7,9 +7,13 @@ import java.util.Objects;
 import ch.epfl.rigel.coordinates.EquatorialCoordinates;
 
 /**
+ * Represents a generic celestial objects and its information like magnitude, angular size and position
  * 
  * @author Alexis FAVRE (310552)
- *
+ * @see Planet
+ * @see Sun
+ * @see Moon
+ * @see Star
  */
 public abstract class CelestialObject {
 
@@ -18,7 +22,8 @@ public abstract class CelestialObject {
     private final float angularSize;
     private final float magnitude;
 
-    CelestialObject(String name, EquatorialCoordinates equatorialPos, float angularSize, float magnitude) {
+    CelestialObject(String name, EquatorialCoordinates equatorialPos, float angularSize, float magnitude)
+            throws IllegalArgumentException {
         checkArgument(angularSize>=0);
         this.name = Objects.requireNonNull(name); // throws NullPointerException if null
         this.equatorialPos = Objects.requireNonNull(equatorialPos); // same
@@ -28,6 +33,7 @@ public abstract class CelestialObject {
     }
 
     /**
+     *
      * @return the name
      */
     public String name() {
@@ -35,38 +41,40 @@ public abstract class CelestialObject {
     }
 
     /**
-     * @return the equatorioalPos
+     *
+     * @return the equatorialPos
      */
     public EquatorialCoordinates equatorialPos() {
         return equatorialPos;
     }
 
     /**
-     * @return the angularSize (in radians)
+     *
+     * @return the angularSize in radians
      */
     public double angularSize() {
         return angularSize;
     }
 
     /**
-     * @return the magnitude
-     * in [-30,6] the main part of the time
+     *
+     * @return the magnitude in [-30,6] the main part of the time
      */
     public double magnitude() {
         return magnitude;
     }
     
     /**
-     * text that user will see
-     * @return (String)
+     *
+     * @return object information as String for user
      */
     public String info() {
         return name;
     }
-    
+
     /**
-     * text that user will see
-     * @return (String)
+     *
+     * @return a {@code String} view of {@code this} giving the object information
      */
     @Override
     public String toString() {
