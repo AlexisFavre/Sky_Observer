@@ -1,14 +1,14 @@
 package ch.epfl.rigel.gui;
 
-import java.awt.Color; //TODO color de jfx
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javafx.scene.paint.Color;
 
 /**
  * Used to load the Color associated to the Temperature(in Kelvin) of a BlackBody
@@ -33,7 +33,7 @@ public enum ColorTemperatureLoader {
             String currentLine;
             while((currentLine = reader.readLine()) != null) {
                 if(currentLine.charAt(0) != "#".charAt(0) && currentLine.substring(10, 15).equals("10deg")) {
-                    colorList.add(web(currentLine.substring(80, 87)));
+                    colorList.add(Color.web(currentLine.substring(80, 87)));
                 }
             }
             
@@ -44,10 +44,4 @@ public enum ColorTemperatureLoader {
         }
         return colorList;
     }
-        
-    
-    public Color web(String s) {
-        return null; //TODO use web of javaFX
-    }
-
 }
