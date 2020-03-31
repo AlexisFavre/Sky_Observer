@@ -1,12 +1,20 @@
 package ch.epfl.rigel.astronomy;
 
-import ch.epfl.rigel.coordinates.*;
-
 import java.time.ZonedDateTime;
-import java.util.*;
-import java.util.function.Function;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import static ch.epfl.rigel.Preconditions.checkArgument;
+import ch.epfl.rigel.coordinates.CartesianCoordinates;
+import ch.epfl.rigel.coordinates.EclipticToEquatorialConversion;
+import ch.epfl.rigel.coordinates.EquatorialToHorizontalConversion;
+import ch.epfl.rigel.coordinates.GeographicCoordinates;
+import ch.epfl.rigel.coordinates.StereographicProjection;
 
 /**
  * Represents a set of {@code CelestialObjects} projected on a plan
@@ -15,7 +23,7 @@ import static ch.epfl.rigel.Preconditions.checkArgument;
  *
  * @author Augustin Allard (299918)
  */
-public class ObservedSky {
+public final class ObservedSky { //TODO should be final ?
 
     private final StarCatalogue catalog;
     private final Map<CartesianCoordinates, CelestialObject> skyObjects;
@@ -29,40 +37,46 @@ public class ObservedSky {
     private double[] starPointsRefs;
 
     /**
-     *
      * @param obsTime the time of the observation
      * @param obsPlace the coordinates of the observer
-     * @param projection the projection used
+     * @param projection the stereographic projection used
      * @param catalog containing the observed stars and asterisms
      */
     public ObservedSky(ZonedDateTime obsTime, GeographicCoordinates obsPlace,
                        StereographicProjection projection, StarCatalogue catalog) {
 
-        skyObjects = new HashMap<>();
-        this.catalog = catalog;
-
-        EclipticToEquatorialConversion eclToEqu = new EclipticToEquatorialConversion(obsTime);
-        EquatorialToHorizontalConversion equToHor = new EquatorialToHorizontalConversion(obsTime, obsPlace);
-        List<PlanetModel> extraterrestrialModels = PlanetModel.ALL;
-        extraterrestrialModels.remove(PlanetModel.EARTH);
+        skyObjects    = new HashMap<>();
+        this.catalog  = catalog;
         double moment = Epoch.J2010.daysUntil(obsTime);
+        
+        // create coordinates converters
+        EclipticToEquatorialConversion eclToEqu   = new EclipticToEquatorialConversion(obsTime);
+        EquatorialToHorizontalConversion equToHor = new EquatorialToHorizontalConversion(obsTime, obsPlace);
+        
+        List<PlanetModel> extraterrestrialModels = PlanetModel.ALL;
+        extraterrestrialModels.remove(PlanetModel.EARTH); //TODO check that it's effective
 
-        sun = SunModel.SUN.at(moment, eclToEqu);
-        skyObjects.put(sunPoint= projection.apply(equToHor.apply(sun.equatorialPos())), sun);
+        sun  = SunModel.SUN.at(moment, eclToEqu);
+        skyObjects.put(sunPoint = projection.apply(equToHor.apply(sun.equatorialPos())), sun);
         moon = MoonModel.MOON.at(moment, eclToEqu);
         skyObjects.put(moonPoint = projection.apply(equToHor.apply(moon.equatorialPos())), moon);
-
-        List<Double> pprefs = new ArrayList<>();
-        List<Double> sprefs = new ArrayList<>();
+        
+        // to construct planetPointsRefs and starPointsRefs
+        List<Double> pprefs = new LinkedList<>(); // points coordinates of the planets
+        List<Double> sprefs = new LinkedList<>(); // points coordinates of the stars
         CartesianCoordinates pPoint;
         CartesianCoordinates sPoint;
-        for(PlanetModel model: extraterrestrialModels) {
-            Planet planet = model.at(moment, eclToEqu);
+        
+        // construct planetPointsRefs
+        for(PlanetModel planetModel: extraterrestrialModels) {
+            Planet planet = planetModel.at(moment, eclToEqu);
             skyObjects.put(pPoint = projection.apply(equToHor.apply(planet.equatorialPos())), planet);
             planets.add(planet);
             pprefs.add(pPoint.x());
             pprefs.add(pPoint.y());
         }
+        
+        //construct starPointsRefs
         for(Star star: catalog.stars()) {
             skyObjects.put(sPoint = projection.apply(equToHor.apply(star.equatorialPos())), star);
             sprefs.add(sPoint.x());
@@ -74,9 +88,14 @@ public class ObservedSky {
 
     private double[] toArray(List<Double> list) {
         double[] array = new double[list.size()];
-        for(int i = 0; i < list.size(); ++i) {
-            array[i] = list.get(i);
+        int j = 0; //TODO check five same tab than your function
+        for (Iterator<Double> iterator = list.iterator(); iterator.hasNext();) {
+            array[j] = (Double) iterator.next();
+            ++j;
         }
+//        for(int i = 0; i < list.size(); ++i) {
+//            array[i] = list.get(i);
+//        }
         return array;
     }
 
@@ -92,9 +111,9 @@ public class ObservedSky {
     public CelestialObject objectClosestTo(CartesianCoordinates point, double maximalDistance) {
         CartesianCoordinates closestObjectPoint = null;
         for(CartesianCoordinates p: skyObjects.keySet()) {
-            if(point.distance(p) < point.distance(closestObjectPoint)
-                    && point.distance(p) < maximalDistance
-                    && point.distance(p) > 0.0000000000000000001)// TODO for test think about close obj
+            if(point.distance(p) < maximalDistance
+                    && point.distance(p) < point.distance(closestObjectPoint)
+                    && point.distance(p) > 0) //TODO order modified
                 closestObjectPoint = p;
         }
         if(closestObjectPoint == null)
@@ -105,7 +124,6 @@ public class ObservedSky {
     }
 
     /**
-     *
      * @return the point of the {@code StereographicProjection} plan
      * corresponding to the sun
      */
@@ -114,7 +132,6 @@ public class ObservedSky {
     }
 
     /**
-     *
      * @return the point of the {@code StereographicProjection} plan
      * corresponding to the moon
      */
@@ -123,23 +140,25 @@ public class ObservedSky {
     }
 
     /**
-     *
      * @return the planets points (abscissa and ordinates) of the {@code StereographicProjection} plan
      * corresponding to the 7 extraterrestrial planets
      */
     public double[] planetPointsRefs() {
-        return planetPointsRefs;
+        return planetPointsRefs.clone();
     }
 
     /**
-     *
-     * @return the planets points (abscissa and ordinates) of the {@code StereographicProjection} plan
+     * @return the planets points (abscissa and just after it ordinates) of the {@code StereographicProjection} plan
      * corresponding to the 7 extraterrestrial planets
      */
     public double[] starPointsRefs() {
-        return starPointsRefs;
+        return starPointsRefs.clone();
     }
 
+    
+    
+    
+    
     /**
      * Gives the star indexes forming the given asterism
      *
@@ -152,7 +171,6 @@ public class ObservedSky {
     }
 
     /**
-     *
      * @return the asterisms of the sky
      */
     public Set<Asterism> asterisms() {
@@ -160,7 +178,6 @@ public class ObservedSky {
     }
 
     /**
-     *
      * @return the sun in its state corresponding to the observation moment
      */
     public Sun sun() {
@@ -168,7 +185,6 @@ public class ObservedSky {
     }
 
     /**
-     *
      * @return the moon in its state corresponding to the observation moment
      */
     public Moon moon() {
@@ -176,15 +192,13 @@ public class ObservedSky {
     }
 
     /**
-     *
-     * @return the 7 planets in their state corresponding to the observation moment
+     * @return the 7 extraterrestrials planets of the SolarSystem in their state corresponding to the observation moment
      */
     public List<Planet> planets() {
-        return planets;
+        return Collections.unmodifiableList(planets);  //TODO need immutable ?
     }
 
     /**
-     *
      * @return the stars of the sky {@code this}
      */
     public List<Star> stars() {

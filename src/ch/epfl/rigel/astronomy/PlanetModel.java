@@ -50,7 +50,6 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
     private final double V0;
 
     /**
-     *
      * @param name the name of the planetModel
      * @param t the revolution period in tropic years
      * @param degEps the longitude at J2010 in degrees
@@ -77,7 +76,6 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
     }
 
     /**
-     *
      * @return in radians
      */
     private double meanAnomaly(double daysSinceJ2010) {
@@ -85,7 +83,6 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
     }
 
     /**
-     *
      * @return in radians
      */
     private double trueAnomaly(double daysSinceJ2010) {
@@ -101,7 +98,6 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
     }
 
     /**
-     *
      * @return heliocentric longitude in the orbit plan in radians
      */
     private double l(double daysSinceJ2010) {
@@ -109,13 +105,12 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
     }
 
     /**
-     *
      * {@inheritDoc}
      */
     @Override
     public Planet at(double daysSinceJ2010, EclipticToEquatorialConversion eclipticToEquatorialConversion) {
-        //if(this.a == EARTH.a)
-        //  throw new UnsupportedOperationException();
+        if(this.a == EARTH.a)
+          throw new UnsupportedOperationException("This method must not be used for calculate the position of the Eart");
         
         // PLANET INFO DEPENDING ON THE TIME
         // ecliptic heliocentric latitude
