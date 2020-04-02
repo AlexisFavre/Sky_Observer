@@ -1,7 +1,7 @@
 package ch.epfl.rigel.gui;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 
@@ -23,6 +23,16 @@ class ColorTemperatureLoaderTest {
     @Test
     void checkListOfColorsNotNull() throws Exception {
         assertNotNull(loadedList);
+    }
+    
+    @Test
+    void throwIAEifTemperatureSmallerThan1000() throws Exception {
+        assertThrows(IllegalArgumentException.class, () -> {BlackBodyColor.colorForTemperature(999);});
+    }
+    
+    @Test
+    void throwIAEifTemperatureBiggerThan40000() throws Exception {
+        assertThrows(IllegalArgumentException.class, () -> {BlackBodyColor.colorForTemperature(40001);});
     }
     
     @Test
