@@ -6,7 +6,7 @@ import java.util.Locale;
 import ch.epfl.rigel.math.ClosedInterval;
 
 /**
- * Represents the Moon
+ * Represents the Moon at a given location
  * The characteristics of the Moon are computed with a {@code MoonModel}
  * @author Alexis FAVRE (310552)
  */
@@ -15,7 +15,6 @@ public final class Moon extends CelestialObject {
     private final float phase;
     
     /**
-     *
      * @param equatorialPos of the Moon
      * @param angularSize of the Moon
      * @param magnitude of the Moon
@@ -30,7 +29,6 @@ public final class Moon extends CelestialObject {
     }
 
     /**
-     *
      * {@inheritDoc}
      */
     @Override

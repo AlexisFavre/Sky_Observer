@@ -17,7 +17,7 @@ import java.util.Locale;
 public final class Star extends CelestialObject {
 
     private final int hipparcosId;
-    private final float c;
+    private final float colorIndex;
 
     /**
      * @param hipparcosId of the Star (must be positive or null)
@@ -33,7 +33,7 @@ public final class Star extends CelestialObject {
         checkArgument(hipparcosId >= 0);
         checkInInterval(ClosedInterval.of(-0.5, 5.5), colorIndex);
         this.hipparcosId = hipparcosId;
-        c = colorIndex;
+        this.colorIndex = colorIndex;
     }
     
     /**
@@ -47,11 +47,10 @@ public final class Star extends CelestialObject {
      * @return the colorTemperature of the star in degree Kelvin
      */
     public int colorTemperature() {
-        return (int) Math.floor((1/(0.92*c + 1.7) + 1/(0.92*c + 0.62))*4600);
+        return (int) Math.floor((1/(0.92*colorIndex + 1.7) + 1/(0.92*colorIndex + 0.62))*4600);
     }
 
     /**
-     *
      * @return a {@code String} view of {@code this} with the format
      * Star : name, hipId : index
      */

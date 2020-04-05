@@ -17,6 +17,9 @@ public final class StereographicProjection implements Function<HorizontalCoordin
     private final double sinCenterAlt;
     private final double cosCenterAlt;
 
+    /**
+     * @param center of the Stereographic projection
+     */
     public StereographicProjection(HorizontalCoordinates center) {
         this.centerAlt = center.alt();
         this.centerAzimuth = center.az();
@@ -81,8 +84,10 @@ public final class StereographicProjection implements Function<HorizontalCoordin
     }
 
     /**
-     *
-     * {@inheritDoc}
+     * to make a {@code StereographicProjection} of {@code HorizontalCoordinates}
+     * @param azAlt which is the {@code HorizontalCoordinates} that 
+     * we want project
+     * @return the projection of azAlt
      */
     @Override
     public CartesianCoordinates apply(HorizontalCoordinates azAlt) {
@@ -124,7 +129,6 @@ public final class StereographicProjection implements Function<HorizontalCoordin
     }
 
     /**
-     *
      * @return a {@code String} view of {@code this} with the format
      * StereographicProjection with parameter(HorizontalCoordinates) : (x= a, y= b)
      */

@@ -20,7 +20,6 @@ public final class EclipticToEquatorialConversion implements Function<EclipticCo
     private final double cosOfEpsilon;
     
     /**
-     *
      * @param when {@code ZonedDateTime} at which the conversion and observation is made
      */
     public EclipticToEquatorialConversion(ZonedDateTime when) {
@@ -32,7 +31,6 @@ public final class EclipticToEquatorialConversion implements Function<EclipticCo
     };
 
     /**
-     *
      * {@inheritDoc}
      */
     @Override

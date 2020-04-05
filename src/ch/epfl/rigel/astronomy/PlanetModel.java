@@ -36,7 +36,7 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
     /**
      * List of all the planet instances of the model with their characteristics
      */
-    public static List<PlanetModel> ALL = new ArrayList<>(List.copyOf(Arrays.asList(PlanetModel.values())));
+    public final static List<PlanetModel> ALL = new ArrayList<>(List.copyOf(Arrays.asList(PlanetModel.values())));
 
     private final String name;
     private final double t;
@@ -50,7 +50,6 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
     private final double V0;
 
     /**
-     *
      * @param name the name of the planetModel
      * @param t the revolution period in tropic years
      * @param degEps the longitude at J2010 in degrees
@@ -77,23 +76,20 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
     }
 
     /**
-     *
-     * @return in radians
+     * @return meanAnomaly of the Planet in radians
      */
     private double meanAnomaly(double daysSinceJ2010) {
         return Angle.TAU*daysSinceJ2010/(365.242191*t) + eps - w;
     }
 
     /**
-     *
-     * @return in radians
+     * @return trueAnomaly of the Planet in radians
      */
     private double trueAnomaly(double daysSinceJ2010) {
         return meanAnomaly(daysSinceJ2010) + 2*e*Math.sin(meanAnomaly(daysSinceJ2010));
     }
 
     /**
-     *
      * @return radius in UA
      */
     private double r(double daysSinceJ2010) {
@@ -101,43 +97,43 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
     }
 
     /**
-     *
-     * @return heliocentric longitude in the orbit plan in radians
+     * @return longitude in the orbit plan of the Planet in radians
      */
     private double l(double daysSinceJ2010) {
         return trueAnomaly(daysSinceJ2010) + w;
     }
 
     /**
-     *
      * {@inheritDoc}
+     * t
+     * @throws @code{UnsupportedOperationException} if this method is used to compute the coordinates of the Earth
+     *          since we observe these Planets from the Earth
      */
     @Override
-    public Planet at(double daysSinceJ2010, EclipticToEquatorialConversion eclipticToEquatorialConversion) {
-        //if(this.a == EARTH.a)
-        //  throw new UnsupportedOperationException();
+    public Planet at(double daysSinceJ2010, EclipticToEquatorialConversion eclipticToEquatorialConversion) throws UnsupportedOperationException {
+        if(this.a == EARTH.a)
+            throw new UnsupportedOperationException("We observe the Planets from the Earth so we don't care about its Coordinates");
         
         // PLANET INFO DEPENDING ON THE TIME
         // ecliptic heliocentric latitude
-        double phi = Math.asin(Math.sin((l(daysSinceJ2010)- omega))*Math.sin(i));
+        double eclHelioLat = Math.asin(Math.sin((l(daysSinceJ2010)- omega))*Math.sin(i));
         // projection of the radius on ecliptic plan
-        double r_ = r(daysSinceJ2010)*Math.cos(phi);
+        double eclRadius = r(daysSinceJ2010)*Math.cos(eclHelioLat);
         // heliocentric longitude projected on ecliptic plan
-        double l_ = Math.atan2(Math.sin(l(daysSinceJ2010) - omega)*Math.cos(i),
+        double eclLong = Math.atan2(Math.sin(l(daysSinceJ2010) - omega)*Math.cos(i),
                 Math.cos(l(daysSinceJ2010) - omega)) + omega;
-
         // ECLIPTIC COORDINATES
         double longitude = 0;
         if(this.a < EARTH.a) {
-            longitude = Math.atan2(r_*Math.sin(EARTH.l(daysSinceJ2010) - l_),
-                             (EARTH.r(daysSinceJ2010) - r_*Math.cos(EARTH.l(daysSinceJ2010) - l_)))
+            longitude = Math.atan2(eclRadius*Math.sin(EARTH.l(daysSinceJ2010) - eclLong),
+                             (EARTH.r(daysSinceJ2010) - eclRadius*Math.cos(EARTH.l(daysSinceJ2010) - eclLong)))
                         + Angle.TAU/2 + EARTH.l(daysSinceJ2010);
         } else {
-            longitude = Math.atan2(EARTH.r(daysSinceJ2010)*Math.sin(l_ - EARTH.l(daysSinceJ2010)),
-                            (r_ - EARTH.r(daysSinceJ2010)*Math.cos(l_ - EARTH.l(daysSinceJ2010)))) + l_;
+            longitude = Math.atan2(EARTH.r(daysSinceJ2010)*Math.sin(eclLong - EARTH.l(daysSinceJ2010)),
+                            (eclRadius - EARTH.r(daysSinceJ2010)*Math.cos(eclLong - EARTH.l(daysSinceJ2010)))) + eclLong;
         }
-        double latitude = Math.atan(r_*Math.tan(phi)*Math.sin(longitude - l_)
-                        /(EARTH.r(daysSinceJ2010)*Math.sin(l_ - EARTH.l(daysSinceJ2010))));
+        double latitude = Math.atan(eclRadius*Math.tan(eclHelioLat)*Math.sin(longitude - eclLong)
+                        /(EARTH.r(daysSinceJ2010)*Math.sin(eclLong - EARTH.l(daysSinceJ2010))));
 
         EclipticCoordinates position = EclipticCoordinates.of(Angle.normalizePositive(longitude), latitude);
 
@@ -145,7 +141,7 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
         // distance to earth
         double p = Math.sqrt(Math.pow(EARTH.r(daysSinceJ2010),2) + Math.pow(r(daysSinceJ2010),2)
                 - 2*EARTH.r(daysSinceJ2010)*r(daysSinceJ2010)*Math.cos(l(daysSinceJ2010)
-                - EARTH.l(daysSinceJ2010))*Math.cos(phi));
+                - EARTH.l(daysSinceJ2010))*Math.cos(eclHelioLat));
         // light portion of planet visible from earth
         double phase = (1 + Math.cos(longitude - l(daysSinceJ2010)))/2;
         double angularSize = tet0/p;

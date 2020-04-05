@@ -31,14 +31,13 @@ public final class Asterism {
     }
     
     /**
-     *
+     * Useful to debug
      * @return a {@code String} view of {@code this} with the format
      * ASTERISM
      * star1 display
      * ...
      * star2 display
      * ...
-     *
      */
     @Override
     public String toString() {

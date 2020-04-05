@@ -35,7 +35,7 @@ public enum HygDatabaseLoader implements StarCatalogue.Loader {
                         lineInfo[Id.PROPER.ordinal()] :
                         ( (!(lineInfo[Id.BAYER.ordinal()]).equals("")) ? lineInfo[Id.BAYER.ordinal()] : "?")
                                 + " " + lineInfo[Id.CON.ordinal()];
-                float magnitude = (!(lineInfo[Id.MAG.ordinal()]).equals("")) ?
+                float magnitude  = (!(lineInfo[Id.MAG.ordinal()]).equals("")) ?
                         (float) Double.parseDouble(lineInfo[Id.MAG.ordinal()]) : 0;
                 float colorIndex = (!(lineInfo[Id.CI.ordinal()]).equals("")) ?
                         (float) Double.parseDouble(lineInfo[Id.CI.ordinal()]) : 0;

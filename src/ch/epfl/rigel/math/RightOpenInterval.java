@@ -58,7 +58,6 @@ public final class RightOpenInterval extends Interval {
     }
 
     /**
-     *
      * @return a {@code String} view of {@code this} with the format
      * [a,b[
      */

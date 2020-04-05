@@ -59,7 +59,6 @@ public final class GeographicCoordinates extends SphericalCoordinates {
     }
     
     /**
-     *
      * @return the longitude in radians
      */
     public double lon() {
@@ -67,7 +66,6 @@ public final class GeographicCoordinates extends SphericalCoordinates {
     }
     
     /**
-     *
      * @return the latitude in radians
      */
     public double lat() {
@@ -75,7 +73,6 @@ public final class GeographicCoordinates extends SphericalCoordinates {
     }
     
     /**
-     *
      * @return the longitude in degrees
      */
     public double lonDeg() {
@@ -83,7 +80,6 @@ public final class GeographicCoordinates extends SphericalCoordinates {
     }
     
     /**
-     *
      * @return the latitude in degrees
      */
     public double latDeg() {
@@ -91,7 +87,6 @@ public final class GeographicCoordinates extends SphericalCoordinates {
     }
 
     /**
-     *
      * @return a {@code String} view of {@code this} with the format
      * (lon= x, lat= y)
      */

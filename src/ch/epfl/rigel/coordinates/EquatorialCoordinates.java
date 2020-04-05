@@ -40,7 +40,6 @@ public final class EquatorialCoordinates extends SphericalCoordinates {
     }
 
     /**
-     *
      * @return right ascension in radians
      */
     public double ra() {
@@ -48,7 +47,6 @@ public final class EquatorialCoordinates extends SphericalCoordinates {
     }
     
     /**
-     *
      * @return declination in radians
      */
     public double dec() {
@@ -56,7 +54,6 @@ public final class EquatorialCoordinates extends SphericalCoordinates {
     }
     
     /**
-     *
      * @return right ascension in degrees
      */
     public double raDeg() {
@@ -64,7 +61,6 @@ public final class EquatorialCoordinates extends SphericalCoordinates {
     }
     
     /**
-     *
      * @return declination in degrees
      */
     public double decDeg() {
@@ -72,7 +68,6 @@ public final class EquatorialCoordinates extends SphericalCoordinates {
     }
     
     /**
-     * 
      * @return right ascension in hours
      */
     public double raHr() {
@@ -80,7 +75,6 @@ public final class EquatorialCoordinates extends SphericalCoordinates {
     }
 
     /**
-     *
      * @return a {@code String} view of {@code this} with the format
      * (ra= x, dec= y)
      */

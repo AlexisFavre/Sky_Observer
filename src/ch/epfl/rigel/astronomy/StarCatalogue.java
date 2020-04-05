@@ -66,7 +66,6 @@ public final class StarCatalogue {
     }
 
     /**
-     *
      * @return stars of the catalog
      */
     public List<Star> stars() {
@@ -74,7 +73,6 @@ public final class StarCatalogue {
     }
 
     /**
-     *
      * @return asterisms of the catalog
      */
     public Set<Asterism> asterisms() {
@@ -114,7 +112,6 @@ public final class StarCatalogue {
         }
 
         /**
-         *
          * @return a new StarCatalogue with the properties of the builder {@code this}
          */
         public StarCatalogue build() {

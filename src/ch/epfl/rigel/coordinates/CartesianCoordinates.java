@@ -27,7 +27,6 @@ public final class CartesianCoordinates {
         }
 
     /**
-     *
      * @return the abscissa
      */
     public double x() {
@@ -35,11 +34,19 @@ public final class CartesianCoordinates {
     }
 
     /**
-     *
      * @return the ordinate
      */
     public double y() {
         return ordinate;
+    }
+    
+    /**
+     * @return a {@code String} view of {@code this} with the format
+     * (x= a, y= b)
+     */
+    @Override
+    public String toString() {
+        return String.format(Locale.ROOT, "(x=%.4f, y=%.4f)", x(), y());
     }
 
     /**
@@ -62,15 +69,5 @@ public final class CartesianCoordinates {
     @Override
     public final boolean equals(Object o) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
-    }
-
-    /**
-     *
-     * @return a {@code String} view of {@code this} with the format
-     * (x= a, y= b)
-     */
-    @Override
-    public String toString() {
-        return String.format(Locale.ROOT, "(x=%.4f, y=%.4f)", x(), y());
     }
 }
