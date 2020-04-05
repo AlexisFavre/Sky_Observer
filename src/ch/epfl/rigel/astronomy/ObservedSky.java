@@ -88,7 +88,7 @@ public final class ObservedSky { //TODO should be final ?
 
     private double[] toArray(List<Double> list) {
         double[] array = new double[list.size()];
-        int j = 0; //TODO check five same tab than your function
+        int j = 0; // TODO check linked list <-> array list
         for (Iterator<Double> iterator = list.iterator(); iterator.hasNext();) {
             array[j] = (Double) iterator.next();
             ++j;
@@ -121,8 +121,8 @@ public final class ObservedSky { //TODO should be final ?
         }
         if(closestObjectPoint == null)
             return null;
-        System.out.println(sunPoint().distance(moonPoint()));
-        System.out.println(point.distance(closestObjectPoint));
+        //System.out.println(sunPoint().distance(moonPoint()));
+        //System.out.println(point.distance(closestObjectPoint));
         return skyObjects.get(closestObjectPoint);
     }
 
@@ -157,10 +157,6 @@ public final class ObservedSky { //TODO should be final ?
     public double[] starPointsRefs() {
         return starPointsRefs.clone();
     }
-
-    
-    
-    
     
     /**
      * Gives the star indexes forming the given asterism

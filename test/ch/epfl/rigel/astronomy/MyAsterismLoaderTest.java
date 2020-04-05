@@ -14,7 +14,7 @@ class MyAsterismLoaderTest {
     private MyStarCatalogueTest CATALOG_TEST = new MyStarCatalogueTest();
 
     @Test
-    void load() throws IOException {
+    void load() {
 
         Queue<Asterism> a = new ArrayDeque<>();
         Star betelgeuse = null;
