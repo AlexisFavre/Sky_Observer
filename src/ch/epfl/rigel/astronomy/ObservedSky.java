@@ -105,13 +105,16 @@ public final class ObservedSky { //TODO should be final ?
      *
      * @param point the point from which we want the closest object
      * @param maximalDistance distance on the map corresponding to the radius of search
-     * @return the closest object if there exist one in the maximal distance circle and {@code null}
-     * if no objects were found
+     * @return the closest object if there exist one in the maximal distance circle 
+     * and {@code null} if no objects were found
      */
     public CelestialObject objectClosestTo(CartesianCoordinates point, double maximalDistance) {
         CartesianCoordinates closestObjectPoint = null;
+        double sideOfSquare = Math.max(Math.abs(point.x()), Math.abs(point.y())) + 2*maximalDistance;
         for(CartesianCoordinates p: skyObjects.keySet()) {
-            if(point.distance(p) < maximalDistance
+            if(Math.abs(p.x()) < sideOfSquare         //make preliminary selection
+                    && Math.abs(p.y()) < sideOfSquare 
+                    && point.distance(p) < maximalDistance
                     && point.distance(p) < point.distance(closestObjectPoint)
                     && point.distance(p) > 0) //TODO order modified
                 closestObjectPoint = p;
