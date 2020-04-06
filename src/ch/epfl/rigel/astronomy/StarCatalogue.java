@@ -38,7 +38,6 @@ public final class StarCatalogue {
      */
     public StarCatalogue(List<Star> my_stars, List<Asterism> my_asterisms) throws IllegalArgumentException {
         stars = List.copyOf(my_stars);
-        //List<Asterism> immutablesAsterisms = List.copyOf(my_asterisms);
         Map<Asterism, List<Integer>> asterismsStarIndexesMappingNotImmutable = new HashMap<>();
         for (Asterism a : my_asterisms) {
             // verify that a contains only stars in the catalog
