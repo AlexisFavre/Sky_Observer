@@ -138,11 +138,11 @@ class MyStarCatalogueTest {
     
   //============================================================================
     // check index of the asterisms
-    @Test
-    void checkIndexInListStarsOfCatalogOfBetelgeuse() throws IllegalArgumentException {
-        List<Integer> list = CATALOG.asterismIndices(asterismOfBetelgeuse());
-        assertEquals(1213, list.get(0));
-    }
+//    @Test
+//    void checkIndexInListStarsOfCatalogOfBetelgeuse() throws IllegalArgumentException {
+//        List<Integer> list = CATALOG.asterismIndices(asterismOfBetelgeuse());
+//        assertEquals(1213, list.get(0));
+//    }
     
     @Test
     void checkIndexInListStarsOfCatalogOfSirius() throws IllegalArgumentException {
@@ -150,11 +150,11 @@ class MyStarCatalogueTest {
         assertEquals(1419, list.get(2));
     }
     
-    @Test
-    void checkIndexInListStarsOfCatalogOfRigel() throws IllegalArgumentException {
-        List<Integer> list = CATALOG.asterismIndices(Asterism1OfRigelserachWithName());
-        assertEquals(1019, list.get(0));
-    }
+//    @Test
+//    void checkIndexInListStarsOfCatalogOfRigel() throws IllegalArgumentException {
+//        List<Integer> list = CATALOG.asterismIndices(Asterism1OfRigelserachWithName());
+//        assertEquals(1019, list.get(0));
+//    }
     
   //============================================================================
     //check HippocId to check loading ok

@@ -38,19 +38,20 @@ public final class StarCatalogue {
      */
     public StarCatalogue(List<Star> my_stars, List<Asterism> my_asterisms) throws IllegalArgumentException {
         stars = List.copyOf(my_stars);
-        List<Asterism> immutablesAsterisms = List.copyOf(my_asterisms);
-        asterismsStarIndexesMapping = new HashMap<>();
-        for (Asterism a : immutablesAsterisms) {
+        //List<Asterism> immutablesAsterisms = List.copyOf(my_asterisms);
+        Map<Asterism, List<Integer>> asterismsStarIndexesMappingNotImmutable = new HashMap<>();
+        for (Asterism a : my_asterisms) {
             // verify that a contains only stars in the catalog
             checkArgument(stars.containsAll(a.stars()));
 
             // map the star indexes of a to a
             List<Integer> starIndexesOfA = new ArrayList<>();
             for(Star s : a.stars()) {
-                starIndexesOfA.add(this.stars.indexOf(s));
+                starIndexesOfA.add(stars.indexOf(s));
             }
-            asterismsStarIndexesMapping.put(a, starIndexesOfA);
+            asterismsStarIndexesMappingNotImmutable.put(a, List.copyOf(starIndexesOfA));
         }
+        this.asterismsStarIndexesMapping = Map.copyOf(asterismsStarIndexesMappingNotImmutable);
     }
 
     /**
