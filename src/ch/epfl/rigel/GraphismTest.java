@@ -27,20 +27,21 @@ public class GraphismTest extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        ZonedDateTime observationTime = ZonedDateTime.parse("2020-02-17T20:15:00+01:00");
+        ZonedDateTime observationTime = ZonedDateTime.parse("2020-02-17T20:17:08+01:00");
         GeographicCoordinates observerCoord = GeographicCoordinates.ofDeg(6.57, 46.52);
         // Coordinates for planet & moon OBS
-        //GeographicCoordinates observerCoord = GeographicCoordinates.ofDeg(-150, 20);
-        HorizontalCoordinates projCenter = HorizontalCoordinates.ofDeg(180, 45);
+        //GeographicCoordinates observerCoord = GeographicCoordinates.ofDeg(-150, 20); // TODO Verify moon size
+        // Coordinates for Sun
+        //GeographicCoordinates observerCoord = GeographicCoordinates.ofDeg(-100, 35);
+
+        HorizontalCoordinates projCenter = HorizontalCoordinates.ofDeg(180, 22);
         StereographicProjection projection = new StereographicProjection(projCenter);
         ObservedSky sky = new ObservedSky(observationTime, observerCoord, projection, initCatalog());
 
         Canvas canvas = new Canvas(800, 600);
         Transform planeToCanvas = Transform.affine(1300, 0, 0, -1300, 400, 300);
         SkyCanvasPainter skyPainter = new SkyCanvasPainter(canvas);
-        skyPainter.drawStars(sky, projection, planeToCanvas);
-        skyPainter.drawPlanets(sky, projection, planeToCanvas);
-        skyPainter.drawMoon(sky, projection, planeToCanvas);
+        skyPainter.drawSky(sky, projection, planeToCanvas);
 
         primaryStage.setScene(new Scene(new BorderPane(canvas)));
         primaryStage.show();

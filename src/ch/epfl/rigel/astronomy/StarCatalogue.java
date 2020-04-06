@@ -57,7 +57,7 @@ public final class StarCatalogue {
      * Gives the star indexes forming the given asterism
      *
      * @param asterism of which we want the indexes
-     * @return {@code List} of the star indexes
+     * @return {@code List} of the star indexes in the stored {@code List}
      * @throws IllegalArgumentException if the given asterism does not belongs to {@code this}
      */
     public List<Integer> asterismIndices(Asterism asterism) throws IllegalArgumentException {
