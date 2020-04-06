@@ -8,25 +8,29 @@ import ch.epfl.rigel.math.ClosedInterval;
 import javafx.scene.paint.Color;
 
 /**
- * To simulate the {@code Color} of a BlackBody
+ * Non instantiable class containing only {@code static} methods
+ *
+ * Used to obtain the {@code Color} of a black body
+ *
  * @author Alexis FAVRE (310552)
+ * @see ColorTemperatureLoader
  */
 public final class BlackBodyColor {
 
-    private static List<Color> loadedList = ColorTemperatureLoader.Instance.load();
+    // contains only colors corresponding to multiples of 100 temperatures
+    private static List<Color> allTemperatureColors = ColorTemperatureLoader.INSTANCE.load();
     
-    private BlackBodyColor() {} // not instanciable
+    private BlackBodyColor() {}
 
-    
     /**
-     * give the associated {@code Color} of the BlackBody depending of the round(to hundreds) of its temperature
+     * Gives the associated {@code Color} of the BlackBody depending of its temperature
      *
-     * @param temp temperature of the BlackBody
-     * @return the associated {@code Color} of the code BlackBody
+     * @param temp temperature of the black body
+     * @return the associated {@code Color} of the code black body
      * @throws IllegalArgumentException if {@code temp} does not belong in the interval [1 000, 40 000]
      */
     public static  Color colorForTemperature(int temp) throws IllegalArgumentException {
         checkInInterval(ClosedInterval.of(1000, 40000),temp);
-        return loadedList.get((int) Math.round(temp/100.0) -10);
+        return allTemperatureColors.get((int) Math.round(temp/100.0) -10);
     }
 }

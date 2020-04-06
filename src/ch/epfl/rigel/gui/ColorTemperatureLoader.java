@@ -11,20 +11,21 @@ import java.util.List;
 import javafx.scene.paint.Color;
 
 /**
- * Used to load the Color associated to the Temperature(in Kelvin) of a BlackBody
- * form the file /bbr_color.txt
- * Used in {@code BlackBodyColor}
+ * Used to load the set of {@code Color} corresponding to all possible temperatures of a black body
+ * (only one color for every multiples of 100)
  * 
  * @author Alexis FAVRE (310552)
+ * @see BlackBodyColor
  */
 public enum ColorTemperatureLoader {
 
-    Instance;
+    INSTANCE;
     
     /**
-     * @return the given List which contains the Color associated 
-     * to the Temperature(in Kelvin) of a BlackBody
-     * @throws if I/O error occurs
+     * Load the set of {@code Color} corresponding to all possible temperatures of a black body
+     *
+     * @return the {@code Color} set corresponding to all multiples of 100 temperatures
+     * @throws UncheckedIOException if I/O error occurs
      */
     public List<Color> load() throws UncheckedIOException {
         List<Color> colorList = new ArrayList<Color>();

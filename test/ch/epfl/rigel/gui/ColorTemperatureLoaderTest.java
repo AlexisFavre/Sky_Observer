@@ -1,18 +1,16 @@
 package ch.epfl.rigel.gui;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.jupiter.api.Assertions.*;
+import javafx.scene.paint.Color;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import org.junit.jupiter.api.Test;
-
-import javafx.scene.paint.Color;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 class ColorTemperatureLoaderTest {
     // List of the ColorAssociated to the temperature 100i (i index dans list)
-    private List<Color> loadedList = ColorTemperatureLoader.Instance.load();
+    private List<Color> loadedList = ColorTemperatureLoader.INSTANCE.load();
 
     
     @Test
