@@ -10,11 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ch.epfl.rigel.coordinates.CartesianCoordinates;
-import ch.epfl.rigel.coordinates.EclipticToEquatorialConversion;
-import ch.epfl.rigel.coordinates.EquatorialToHorizontalConversion;
-import ch.epfl.rigel.coordinates.GeographicCoordinates;
-import ch.epfl.rigel.coordinates.StereographicProjection;
+import ch.epfl.rigel.coordinates.*;
 
 /**
  * Represents a set of {@code CelestialObjects} projected on a plan
@@ -27,6 +23,7 @@ public final class ObservedSky { //TODO should be final ?
 
     private final StarCatalogue catalog;
     private final Map<CartesianCoordinates, CelestialObject> skyObjects;
+    private final StereographicProjection projection;
 
     private Sun sun;
     private Moon moon;
@@ -39,14 +36,15 @@ public final class ObservedSky { //TODO should be final ?
     /**
      * @param obsTime the time of the observation
      * @param obsPlace the coordinates of the observer
-     * @param projection the stereographic projection used
+     * @param observerLook the point where the observer is looking that will be the center of the projection
      * @param catalog containing the observed stars and asterisms
      */
     public ObservedSky(ZonedDateTime obsTime, GeographicCoordinates obsPlace,
-                       StereographicProjection projection, StarCatalogue catalog) {
+                       HorizontalCoordinates observerLook, StarCatalogue catalog) {
 
         skyObjects    = new HashMap<>();
         this.catalog  = catalog;
+        projection = new StereographicProjection(observerLook);
         double moment = Epoch.J2010.daysUntil(obsTime);
         
         // create coordinates converters
@@ -86,19 +84,6 @@ public final class ObservedSky { //TODO should be final ?
         starPointsRefs = toArray(sprefs);
     }
 
-    private double[] toArray(List<Double> list) {
-        double[] array = new double[list.size()];
-        int j = 0; // TODO check linked list <-> array list
-        for (Iterator<Double> iterator = list.iterator(); iterator.hasNext();) {
-            array[j] = (Double) iterator.next();
-            ++j;
-        }
-//        for(int i = 0; i < list.size(); ++i) {
-//            array[i] = list.get(i);
-//        }
-        return array;
-    }
-
     /**
      * Gives the closest sky object from the place corresponding to the given plan point
      * if there exists one that is closer to the given maximal distance
@@ -125,6 +110,12 @@ public final class ObservedSky { //TODO should be final ?
         //System.out.println(point.distance(closestObjectPoint));
         return skyObjects.get(closestObjectPoint);
     }
+
+    /**
+     *
+     * @return the projection used for observation
+     */
+    public StereographicProjection projection() { return projection; }
 
     /**
      * @return the point of the {@code StereographicProjection} plan
@@ -202,5 +193,17 @@ public final class ObservedSky { //TODO should be final ?
      */
     public List<Star> stars() {
         return catalog.stars();
+    }
+
+
+    // implementation stuff
+    private double[] toArray(List<Double> list) {
+        double[] array = new double[list.size()];
+        int j = 0; // TODO check linked list <-> array list
+        for (Iterator<Double> iterator = list.iterator(); iterator.hasNext();) {
+            array[j] = (Double) iterator.next();
+            ++j;
+        }
+        return array;
     }
 }

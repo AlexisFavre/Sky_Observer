@@ -18,8 +18,8 @@ class ObservedSkyTest {
                 LocalTime.of(14, 36, 51),
                 ZoneOffset.UTC),
                 GeographicCoordinates.ofDeg(6.57, 46.52),
-                new StereographicProjection(HorizontalCoordinates.ofDeg(45, 45)),
-                test.CATALOG);
+                HorizontalCoordinates.ofDeg(45, 45),
+                MyStarCatalogueTest.CATALOG);
         for(int i = 0; i < 1; ++i) {
             assertEquals(PlanetModel.MERCURY, sky.objectClosestTo(sky.sunPoint(), 1.0e+3));
         }

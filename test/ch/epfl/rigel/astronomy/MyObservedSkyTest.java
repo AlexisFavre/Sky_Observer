@@ -15,15 +15,14 @@ class MyObservedSkyTest {
             LocalTime.of(0, 0),
             ZoneOffset.UTC);
     GeographicCoordinates OBSERVER_COORD = GeographicCoordinates.ofDeg(30, 45);
-    HorizontalCoordinates PROJ_CENTER = HorizontalCoordinates.ofDeg(20, 22);
-    StereographicProjection PROJECTION = new StereographicProjection(PROJ_CENTER);
+    HorizontalCoordinates OBSERVER_LOOK = HorizontalCoordinates.ofDeg(20, 22);
 
-    ObservedSky SKY = new ObservedSky(OBSERVATION_TIME, OBSERVER_COORD, PROJECTION, new MyStarCatalogueTest().CATALOG);
+    ObservedSky SKY = new ObservedSky(OBSERVATION_TIME, OBSERVER_COORD, OBSERVER_LOOK, MyStarCatalogueTest.CATALOG);
 
     @Test
     void objectClosestTo() {
         EquatorialToHorizontalConversion convEquToHor = new EquatorialToHorizontalConversion(OBSERVATION_TIME, OBSERVER_COORD);
-        CartesianCoordinates testPoint = PROJECTION.apply(convEquToHor.apply(
+        CartesianCoordinates testPoint = SKY.projection().apply(convEquToHor.apply(
                 EquatorialCoordinates.of(0.004696959812148989,-0.861893035343076)));
         assertEquals("Tau Phe", Objects.requireNonNull(SKY.objectClosestTo(testPoint, 0.1)).name());
     }
@@ -45,10 +44,11 @@ class MyObservedSkyTest {
         EquatorialToHorizontalConversion convEquToHor = new EquatorialToHorizontalConversion(OBSERVATION_TIME, OBSERVER_COORD);
         int i = 0;
         for (Star star : SKY.stars()) {
-            assertEquals(PROJECTION.apply(convEquToHor.apply(star.equatorialPos())).x(), SKY.starPointsRefs()[i]);
+            assertEquals(SKY.projection().apply(convEquToHor.apply(star.equatorialPos())).x(), SKY.starPointsRefs()[i]);
             i += 2;
         }
-        assertEquals(new MyStarCatalogueTest().CATALOG.stars().size(), SKY.stars().size());
+        assert MyStarCatalogueTest.CATALOG != null;
+        assertEquals(MyStarCatalogueTest.CATALOG.stars().size(), SKY.stars().size());
         //Si fail: Cloner/Copier le tableau
         double firstStarXMemory = SKY.starPointsRefs()[0];
         SKY.starPointsRefs()[0] = Double.MAX_VALUE;
