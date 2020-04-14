@@ -10,7 +10,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ColorTemperatureLoaderTest {
     // List of the ColorAssociated to the temperature 100i (i index dans list)
-    private List<Color> loadedList = ColorTemperatureLoader.INSTANCE.load();
+    private List<Color> loadedList = null; //load();
+    
+    @Test
+    void testName() throws Exception {
+        System.out.println("Must put function load() de BlackBodyColor public to do these tests");
+        fail("Must put function load() de BlackBodyColor public to do these tests");
+    }
 
     
     @Test
