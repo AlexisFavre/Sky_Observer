@@ -1,33 +1,14 @@
 package ch.epfl.rigel.gui;
 
-import javafx.scene.paint.Color;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import javafx.scene.paint.Color;
 
 
 class ColorTemperatureLoaderTest {
-    // List of the ColorAssociated to the temperature 100i (i index dans list)
-    private List<Color> loadedList = null; //load();
-    
-    @Test
-    void testName() throws Exception {
-        System.out.println("Must put function load() de BlackBodyColor public to do these tests");
-        fail("Must put function load() de BlackBodyColor public to do these tests");
-    }
-
-    
-    @Test
-    void checkSizeOfTheListReturnedBy_ColorTemperatureLoader() throws Exception {
-        assertEquals(391, loadedList.size());
-    }
-    
-    @Test
-    void checkListOfColorsNotNull() throws Exception {
-        assertNotNull(loadedList);
-    }
     
     @Test
     void throwIAEifTemperatureSmallerThan1000() throws Exception {
@@ -37,13 +18,6 @@ class ColorTemperatureLoaderTest {
     @Test
     void throwIAEifTemperatureBiggerThan40000() throws Exception {
         assertThrows(IllegalArgumentException.class, () -> {BlackBodyColor.colorForTemperature(40001);});
-    }
-    
-    @Test
-    void visualTestOfLoadingOfTheList() throws Exception {
-        for (Color color : loadedList) {
-            System.out.println(color);
-        }
     }
     
     @Test
