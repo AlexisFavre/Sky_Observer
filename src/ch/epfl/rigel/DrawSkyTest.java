@@ -1,27 +1,32 @@
 package ch.epfl.rigel;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
+import java.time.ZonedDateTime;
+
+import javax.imageio.ImageIO;
+
 import ch.epfl.rigel.astronomy.AsterismLoader;
 import ch.epfl.rigel.astronomy.HygDatabaseLoader;
 import ch.epfl.rigel.astronomy.ObservedSky;
 import ch.epfl.rigel.astronomy.StarCatalogue;
 import ch.epfl.rigel.coordinates.GeographicCoordinates;
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
-import ch.epfl.rigel.coordinates.StereographicProjection;
 import ch.epfl.rigel.gui.SkyCanvasPainter;
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.transform.Transform;
 import javafx.stage.Stage;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UncheckedIOException;
-import java.time.ZonedDateTime;
-
-public class GraphismTest extends Application {
-
+public final class DrawSkyTest extends Application {
     public static void main(String[] args) {
         launch(args);
     }
@@ -35,7 +40,12 @@ public class GraphismTest extends Application {
         // Coordinates for Sun
         //GeographicCoordinates observerCoord = GeographicCoordinates.ofDeg(-100, 35);
         HorizontalCoordinates observerLook = HorizontalCoordinates.ofDeg(180, 22);
-
+        
+        //test frama : TODO check the following pictures when translation will be corrected
+        // Sun : HorizontalCoordinates projCenter = HorizontalCoordinates.ofDeg(277, -23); 
+        // Moon: HorizontalCoordinates projCenter = HorizontalCoordinates.ofDeg(3.7, -65); 
+        // Moon2: HorizontalCoordinates projCenter = HorizontalCoordinates.ofDeg(0, 23);
+        
         ObservedSky sky = new ObservedSky(observationTime, observerCoordinates, observerLook, initCatalog());
 
         Canvas canvas = new Canvas(800, 600);
@@ -46,6 +56,18 @@ public class GraphismTest extends Application {
 
         primaryStage.setScene(new Scene(new BorderPane(canvas)));
         primaryStage.show();
+        WritableImage fxImage =
+                canvas.snapshot(null, null);
+                  BufferedImage swingImage =
+                SwingFXUtils.fromFXImage(fxImage, null);
+                  try {
+                    ImageIO.write(swingImage, "png", new File("sky.png"));
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                
+                Platform.exit();
     }
 
     private StarCatalogue initCatalog() {
@@ -58,4 +80,4 @@ public class GraphismTest extends Application {
             throw new UncheckedIOException(e);
         }
     }
-}
+  }
