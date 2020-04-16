@@ -95,14 +95,17 @@ public final class ObservedSky { //TODO should be final ?
      */
     public CelestialObject objectClosestTo(CartesianCoordinates point, double maximalDistance) {
         CartesianCoordinates closestObjectPoint = null;
-        double sideOfSquare = Math.max(Math.abs(point.x()), Math.abs(point.y())) + 2*maximalDistance;
+        double d2 = Double.MAX_VALUE;
         for(CartesianCoordinates p: skyObjects.keySet()) {
-            if(Math.abs(p.x()) < sideOfSquare         //make preliminary selection
-                    && Math.abs(p.y()) < sideOfSquare 
-                    && point.distance(p) < maximalDistance
-                    && point.distance(p) < point.distance(closestObjectPoint)
-                    && point.distance(p) > 0) //TODO order modified
+            if(        Math.abs(p.x()-point.x()) < maximalDistance*2         //make preliminary selection
+                    && Math.abs(p.y()-point.y()) < maximalDistance*2) {
+                double d = point.distance(p);
+                if(    d < maximalDistance
+                    && d < d2
+                    && d > 0)
                 closestObjectPoint = p;
+                d2 = point.distance(closestObjectPoint);
+            }
         }
         if(closestObjectPoint == null)
             return null;
