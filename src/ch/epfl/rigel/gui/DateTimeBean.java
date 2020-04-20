@@ -10,7 +10,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 /**
- * a JavaFx Bean which contains an Observation Instant (date, time, zoneId)
+ * a JavaFx Bean which contains an Observation moment (date, time, zoneId)
  * with getter and setter for each of the 3 properties
  * @author Alexis FAVRE (310552)
  */
