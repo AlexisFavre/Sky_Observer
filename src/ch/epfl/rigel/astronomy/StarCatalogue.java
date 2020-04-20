@@ -57,26 +57,26 @@ public final class StarCatalogue {
      * Gives the star indexes forming the given asterism
      *
      * @param asterism of which we want the indexes
-     * @return {@code List} of the star indexes
+     * @return {@code List} of the star indexes in the stored {@code List}
      * @throws IllegalArgumentException if the given asterism does not belongs to {@code this}
      */
     public List<Integer> asterismIndices(Asterism asterism) throws IllegalArgumentException {
         checkArgument(asterismsStarIndexesMapping.containsKey(asterism));
-        return asterismsStarIndexesMapping.get(asterism);
+        return Collections.unmodifiableList(asterismsStarIndexesMapping.get(asterism)); //TODO need immutable ?
     }
 
     /**
      * @return stars of the catalog
      */
     public List<Star> stars() {
-        return stars;
+        return Collections.unmodifiableList(stars); //TODO need immutable ?
     }
 
     /**
      * @return asterisms of the catalog
      */
     public Set<Asterism> asterisms() {
-        return asterismsStarIndexesMapping.keySet();
+        return Collections.unmodifiableSet(asterismsStarIndexesMapping.keySet()); //TODO need immutable ?
     }
 
 
@@ -129,7 +129,6 @@ public final class StarCatalogue {
         }
 
         /**
-         *
          * Add the given asterism to {@code this} (catalog in construction)
          * @param asterism to be added
          * @return {@code this} the builder

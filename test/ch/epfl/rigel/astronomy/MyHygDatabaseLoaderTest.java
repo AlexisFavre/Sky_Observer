@@ -23,22 +23,22 @@ class MyHygDatabaseLoaderTest {
     }
 
     @Test
-    void hygDatabaseContainsRigel() throws IOException {
+    void hygDatabaseContainsRigel() {
         assertNotNull(CATALOG_TEST.loadedRigel());
     }
 
     @Test
-    void hygDatabaseContainsBetelgeuse() throws IOException {
+    void hygDatabaseContainsBetelgeuse() {
         assertNotNull(CATALOG_TEST.loadedBetelgeuse());
     }
 
     @Test
-    void hygDatabaseContainsSirius() throws IOException {
+    void hygDatabaseContainsSirius() {
         assertNotNull(CATALOG_TEST.loadedSirius());
     }
 
     @Test
-    void trivialStarsMagnitudeIsWellLoaded() throws IOException {
+    void trivialStarsMagnitudeIsWellLoaded() {
         // manual read (wiki verification)
         assertEquals(0.180, CATALOG_TEST.loadedRigel().magnitude(), 1.0e-7);
         assertEquals(-1.440, CATALOG_TEST.loadedSirius().magnitude(), 1.0e-7);
@@ -46,7 +46,7 @@ class MyHygDatabaseLoaderTest {
     }
 
     @Test
-    void trivialStarsColorIndexIsWellLoaded() throws IOException {
+    void trivialStarsColorIndexIsWellLoaded() {
         // wikipedia
         assertEquals(11000, CATALOG_TEST.loadedRigel().colorTemperature(), 500);
         assertEquals(9940, CATALOG_TEST.loadedSirius().colorTemperature(), 500);
@@ -54,7 +54,7 @@ class MyHygDatabaseLoaderTest {
     }
 
     @Test
-    void trivialStarsPositionIsWellLoaded() throws IOException {
+    void trivialStarsPositionIsWellLoaded() {
         // wikipedia
         assertEquals(Angle.ofHr(5.2422), CATALOG_TEST.loadedRigel().equatorialPos().ra(), 1.0e-4);
         assertEquals(Angle.ofDMS(-8, 12, 5), CATALOG_TEST.loadedRigel().equatorialPos().dec(), 1.0e-1);
@@ -65,7 +65,7 @@ class MyHygDatabaseLoaderTest {
     }
 
     @Test
-    void syntax() throws IOException {
+    void syntax() {
         int i = 0;
         for(Star s : CATALOG_TEST.CATALOG.stars()) {
             if (s.name().charAt(0) == '?') {
