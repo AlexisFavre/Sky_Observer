@@ -73,14 +73,17 @@ public final class StereographicProjection implements Function<HorizontalCoordin
     public HorizontalCoordinates inverseApply(CartesianCoordinates xy) {
         double x = xy.x();
         double y = xy.y();
+        
+        if(x == 0 && y ==0)
+            return HorizontalCoordinates.of(Angle.normalizePositive(this.centerAzimuth), this.centerAlt);
+        
         double p = Math.sqrt(x*x + y*y);
         double sinC = 2*p/(p*p +1);
         double cosC = (1 - p*p)/(p*p +1);
         
-        double lamda = Math.atan2(x*sinC,(p*cosCenterAlt*cosC - y*sinCenterAlt*sinC)) + this.centerAzimuth;
+        double lambda = Math.atan2(x*sinC,(p*cosCenterAlt*cosC - y*sinCenterAlt*sinC)) + this.centerAzimuth;
         double phi   = Math.asin(cosC*sinCenterAlt + y*sinC*cosCenterAlt/p);
-        
-        return HorizontalCoordinates.of(Angle.normalizePositive(lamda), phi);
+        return HorizontalCoordinates.of(Angle.normalizePositive(lambda), phi);
     }
 
     /**

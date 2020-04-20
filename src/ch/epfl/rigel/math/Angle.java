@@ -1,6 +1,7 @@
 package ch.epfl.rigel.math;
 
-import static ch.epfl.rigel.Preconditions.checkInInterval;
+import static ch.epfl.rigel.Preconditions.*;
+
 
 /**
  * Non instantiable class containing only {@code static} methods
@@ -38,12 +39,13 @@ public final class Angle {
     
     /**
      * Convert sexagesimal to degrees
-     * @param deg degrees of angle value
-     * @param min minutes of angle value
-     * @param sec seconds of angle value
+     * @param deg degrees of angle value (must be positive)
+     * @param min minutes of angle value (must be in [0.60])
+     * @param sec seconds of angle value (must be in [0.60])
      * @return corresponding angle value in radians
      */
     public static double ofDMS(int deg, int min, double sec) {
+        checkArgument(deg >= 0);
         checkInInterval(RightOpenInterval.of(0,60), sec);
         checkInInterval(RightOpenInterval.of(0,60), min);
         return ofDeg(deg + min/60.0 + sec/3600.0);
