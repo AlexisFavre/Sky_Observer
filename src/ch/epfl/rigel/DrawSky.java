@@ -26,7 +26,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.transform.Transform;
 import javafx.stage.Stage;
 
-public final class DrawSkyTest extends Application {
+public final class DrawSky extends Application {
+    
     public static void main(String[] args) {
         launch(args);
     }

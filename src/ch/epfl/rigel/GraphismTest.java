@@ -35,7 +35,7 @@ public class GraphismTest extends Application {
         TimeAnimator timeAnimator = new TimeAnimator(observationTime);
         timeAnimator.setAccelerator(NamedTimeAccelerator.TIMES_3000.getAccelerator());
         GeographicCoordinates observerCoordinates = GeographicCoordinates.ofDeg(6.57, 46.52);
-        HorizontalCoordinates observerLook = HorizontalCoordinates.ofDeg(180, 22);
+        HorizontalCoordinates observerLook = HorizontalCoordinates.ofDeg(80, 22);
 
         Canvas canvas = new Canvas(800, 600);
         SkyCanvasPainter skyPainter = new SkyCanvasPainter(canvas);
