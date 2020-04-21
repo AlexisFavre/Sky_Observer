@@ -18,7 +18,7 @@ public final class UseTimeAnimator extends Application {
         ZonedDateTime simulatedStart =
                 ZonedDateTime.parse("2020-06-01T23:55:00+01:00");
         TimeAccelerator accelerator =
-                NamedTimeAccelerator.SIDEREAL_DAY.getAccelerator();
+                NamedTimeAccelerator.TIMES_3000.getAccelerator();
 
         DateTimeBean dateTimeB = new DateTimeBean();
         dateTimeB.setZonedDateTime(simulatedStart);
@@ -29,7 +29,7 @@ public final class UseTimeAnimator extends Application {
         dateTimeB.dateProperty().addListener((p, o, n) -> {
             System.out.printf(" Nouvelle date : %s%n", n);
             Platform.exit();
-            System.out.println(timeAnimator.runningProperty().getValue());
+            //System.out.println(timeAnimator.runningProperty().getValue());
             //timeAnimator.stop();
         });
         dateTimeB.timeProperty().addListener((p, o, n) -> {

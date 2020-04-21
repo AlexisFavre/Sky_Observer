@@ -52,14 +52,26 @@ public class GraphismTest extends Application {
             skyPainter.drawSky(sky, planeToCanvas);
         });
 
-        scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyCode.SPACE) {
-                if (timeAnimator.runningProperty().getValue())
-                    timeAnimator.stop();
-                else
-                    timeAnimator.start();
-            }
+        observationTime.dateProperty().addListener((p, o, n) -> {
+            ObservedSky sky = new ObservedSky(observationTime.getZonedDateTime(), observerCoordinates, observerLook, initCatalog());
+            skyPainter.clear();
+            skyPainter.drawSky(sky, planeToCanvas);
         });
+
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, (event) -> {
+                switch(event.getCode()){
+                    case SPACE:
+                        if (timeAnimator.runningProperty().getValue())
+                            timeAnimator.stop();
+                        else
+                            timeAnimator.start();
+                        break;
+                    case UP:
+                        //observerLook = new HorizontalCoordinates(observerLook)
+                        break;
+                }
+            }
+        );
 
         // Coordinates for planet & moon OBS
         //GeographicCoordinates observerCoord = GeographicCoordinates.ofDeg(-150, 20); // TODO Verify moon size

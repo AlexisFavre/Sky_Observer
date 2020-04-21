@@ -50,7 +50,7 @@ public final class TimeAnimator extends AnimationTimer {
      */
     @Override
     public void handle(long now) {
-        System.out.println("hello");
+        System.out.println("handle");
         if (nanoOfBegin == null) {
             nanoOfBegin = now;
             initial = dtb.getZonedDateTime();
