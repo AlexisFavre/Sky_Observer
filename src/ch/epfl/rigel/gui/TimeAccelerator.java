@@ -29,7 +29,17 @@ public interface TimeAccelerator {
     }
 
    static TimeAccelerator discrete(int frequence, ZonedDateTime step) {
-        return (initial, elapsed) -> step;
+        return (initial, elapsed) -> {
+            Long factor = (long) Math.floor(elapsed*frequence);
+            ZonedDateTime nv = initial
+                    .plusSeconds(step.getSecond()*factor)
+                    .plusMinutes(step.getMinute()*factor)
+                    .plusHours(step.getHour()*factor)
+                    .plusDays(step.getDayOfMonth()*factor)
+                    .plusMonths(step.getMonthValue()*factor)
+                    .plusYears(step.getYear()*factor);
+            return nv;
+        };
     }
 
     /*private static long toNano(ZonedDateTime converted) {
