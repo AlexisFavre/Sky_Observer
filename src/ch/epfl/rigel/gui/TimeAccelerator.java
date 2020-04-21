@@ -47,12 +47,10 @@ public interface TimeAccelerator {
      */
     static TimeAccelerator discrete(int frequency, Duration step) {
         return (initial, elapsed) -> {
-            long factor = (long)Math.floor(elapsed*frequency);
+            long factor = (long)Math.floor(elapsed*frequency*1e-9);
             return initial
-                    .plusSeconds(step.getSeconds()*factor)
-                    .plusMinutes(step.get(ChronoUnit.MINUTES)*factor)
-                    .plusHours(step.get(ChronoUnit.HOURS)*factor)
-                    .plusDays(step.get(ChronoUnit.DAYS)*factor);
+                    .plusNanos(step.getNano()*factor)
+                    .plusSeconds(step.getSeconds()*factor);
         };
     }
 }

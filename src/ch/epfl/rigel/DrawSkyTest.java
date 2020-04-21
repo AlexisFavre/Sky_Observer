@@ -39,7 +39,7 @@ public final class DrawSkyTest extends Application {
         //GeographicCoordinates observerCoord = GeographicCoordinates.ofDeg(-150, 20); // TODO Verify moon size
         // Coordinates for Sun
         //GeographicCoordinates observerCoord = GeographicCoordinates.ofDeg(-100, 35);
-        HorizontalCoordinates observerLook = HorizontalCoordinates.ofDeg(180, 22);
+        HorizontalCoordinates observerLook = HorizontalCoordinates.ofDeg(180, 45);
         
         //test frama : TODO check the following pictures when translation will be corrected
         // Sun : HorizontalCoordinates projCenter = HorizontalCoordinates.ofDeg(277, -23); 

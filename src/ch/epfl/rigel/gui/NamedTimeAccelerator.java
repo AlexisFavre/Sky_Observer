@@ -26,7 +26,6 @@ public enum NamedTimeAccelerator {
     }
 
     /**
-     *
      * @return the accelerator corresponding to the field
      */
     public TimeAccelerator getAccelerator() {
@@ -34,7 +33,6 @@ public enum NamedTimeAccelerator {
     }
 
     /**
-     *
      * @return the name of the accelerator corresponding to the field
      */
     public String getName() {
@@ -42,7 +40,6 @@ public enum NamedTimeAccelerator {
     }
 
     /**
-     *
      * {@inheritDoc}
      */
     @Override

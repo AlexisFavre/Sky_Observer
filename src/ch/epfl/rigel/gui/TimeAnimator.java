@@ -25,7 +25,6 @@ public final class TimeAnimator extends AnimationTimer {
     private ZonedDateTime initial;
 
     /**
-     *
      * @param dtb the {@code DateTimeBean} that will be periodically updated
      */
     public TimeAnimator(DateTimeBean dtb) {
@@ -33,14 +32,6 @@ public final class TimeAnimator extends AnimationTimer {
         accelerator = new SimpleObjectProperty<>(null);
         running = new SimpleBooleanProperty(false);
         nanoOfBegin = null;
-    }
-
-    /**
-     *
-     * @param accelerator the accelerator to set
-     */
-    public void setAccelerator(TimeAccelerator accelerator) {
-        this.accelerator.setValue(accelerator);
     }
 
     /**
@@ -53,13 +44,12 @@ public final class TimeAnimator extends AnimationTimer {
     }
 
     /**
-     * automatically called 60 time by seconds to make progress the animation
+     * automatically called around 60 time by seconds to make progress the animation
      * @param now the number of nanoseconds passed since the beginning
      * of the animation
      */
     @Override
     public void handle(long now) {
-        System.out.println("handle");
         if (nanoOfBegin == null) {
             nanoOfBegin = now;
             initial = dtb.getZonedDateTime();
@@ -81,11 +71,17 @@ public final class TimeAnimator extends AnimationTimer {
     }
     
     /**
-     *
      * @return running as a {@code ReadOnlyBooleanProperty}
      * to ban modifications from outside the class
      */
     public ReadOnlyBooleanProperty runningProperty() {
         return running;
+    }
+    
+    /**
+     * @param accelerator the accelerator to set
+     */
+    public void setAccelerator(TimeAccelerator accelerator) {
+        this.accelerator.setValue(accelerator);
     }
 }
