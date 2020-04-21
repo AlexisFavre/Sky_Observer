@@ -10,8 +10,9 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 /**
- * a JavaFx Bean which contains an Observation moment (date, time, zoneId)
+ * A JavaFx Bean which contains an Observation moment (date, time, zoneId)
  * with getter and setter for each of the 3 properties
+ *
  * @author Alexis FAVRE (310552)
  */
 public final class DateTimeBean {
@@ -19,17 +20,23 @@ public final class DateTimeBean {
     private ObjectProperty<LocalDate> date = new SimpleObjectProperty<>(null); 
     private ObjectProperty<LocalTime> time = new SimpleObjectProperty<>(null);
     private ObjectProperty<ZoneId>    zone = new SimpleObjectProperty<>(null);
+
+    public DateTimeBean() {}
+
+    public DateTimeBean(ZonedDateTime initial) {
+        setZonedDateTime(initial);
+    }
     
-    //date =================================================================
+    //Date =================================================================
     /**
-     * @return the date 
+     * @return the property of the date that can be visualized
      */
     public ObjectProperty<LocalDate> dateProperty() {
         return date;
     }
     
     /**
-     * @return the date
+     * @return the date stocked in the property
      */
     public LocalDate getDate() {
         return date.getValue();
@@ -42,16 +49,16 @@ public final class DateTimeBean {
         this.date.setValue(date);
     }
     
-    //time =================================================================
+    //Time =================================================================
     /**
-     * @return the time
+     * @return the property of the time that can be visualized
      */
     public ObjectProperty<LocalTime> timeProperty() {
         return time;
     }
     
     /**
-     * @return the time
+     * @return the time stocked in the property
      */
     public LocalTime getTime() {
         return time.getValue();
@@ -64,16 +71,16 @@ public final class DateTimeBean {
         this.time.setValue(time);
     }
     
-    //zone =================================================================
+    //Zone =================================================================
     /**
-     * @return the zone
+     * @return the property of the zone that can be visualized
      */
     public ObjectProperty<ZoneId> zoneProperty() {
         return zone;
     }
     
     /**
-     * @return the zone
+     * @return the zone stocked in the property
      */
     public ZoneId getZone() {
         return zone.getValue();
@@ -87,8 +94,8 @@ public final class DateTimeBean {
     }
     
     //ZoneDateTime ========================================================
-    
     /**
+     *
      * @return a {@code ZonedDateTime} with the currents characteristics of {@code this}
      */
     public ZonedDateTime getZonedDateTime() {
@@ -96,13 +103,13 @@ public final class DateTimeBean {
     }
     
     /**
-     * set the characteristics of {@code zdt} to {@code this}
-     * @param zdt 
+     * Set the characteristics of {@code zdt} to {@code this}
+     *
+     * @param zdt the {@code ZoneDateTime} to be added to the fields of {@code this}
      */
     public void setZonedDateTime(ZonedDateTime zdt) {
         setDate(zdt.toLocalDate());
         setTime(zdt.toLocalTime());
         setZone(zdt.getZone());
     }
-
 }

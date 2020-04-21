@@ -6,11 +6,13 @@ import ch.epfl.rigel.astronomy.ObservedSky;
 import ch.epfl.rigel.astronomy.StarCatalogue;
 import ch.epfl.rigel.coordinates.GeographicCoordinates;
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
-import ch.epfl.rigel.coordinates.StereographicProjection;
-import ch.epfl.rigel.gui.SkyCanvasPainter;
+import ch.epfl.rigel.gui.*;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.transform.Transform;
 import javafx.stage.Stage;
@@ -28,24 +30,41 @@ public class GraphismTest extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        ZonedDateTime observationTime = ZonedDateTime.parse("2020-02-17T20:15:00+01:00");
+
+        DateTimeBean observationTime = new DateTimeBean(ZonedDateTime.parse("2020-02-17T20:15:00+01:00"));
+        TimeAnimator timeAnimator = new TimeAnimator(observationTime);
+        timeAnimator.setAccelerator(NamedTimeAccelerator.TIMES_3000.getAccelerator());
         GeographicCoordinates observerCoordinates = GeographicCoordinates.ofDeg(6.57, 46.52);
+        HorizontalCoordinates observerLook = HorizontalCoordinates.ofDeg(180, 22);
+
+        Canvas canvas = new Canvas(800, 600);
+        SkyCanvasPainter skyPainter = new SkyCanvasPainter(canvas);
+        Transform planeToCanvas = Transform.affine(1300, 0, 0, -1300, 400, 300);
+
+        Scene scene = new Scene(new BorderPane(canvas));
+        primaryStage.setScene(scene);
+        primaryStage.show();
+        timeAnimator.start();
+
+        observationTime.timeProperty().addListener((p, o, n) -> {
+            ObservedSky sky = new ObservedSky(observationTime.getZonedDateTime(), observerCoordinates, observerLook, initCatalog());
+            skyPainter.clear();
+            skyPainter.drawSky(sky, planeToCanvas);
+        });
+
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.SPACE) {
+                if (timeAnimator.runningProperty().getValue())
+                    timeAnimator.stop();
+                else
+                    timeAnimator.start();
+            }
+        });
+
         // Coordinates for planet & moon OBS
         //GeographicCoordinates observerCoord = GeographicCoordinates.ofDeg(-150, 20); // TODO Verify moon size
         // Coordinates for Sun
         //GeographicCoordinates observerCoord = GeographicCoordinates.ofDeg(-100, 35);
-        HorizontalCoordinates observerLook = HorizontalCoordinates.ofDeg(180, 22);
-
-        ObservedSky sky = new ObservedSky(observationTime, observerCoordinates, observerLook, initCatalog());
-
-        Canvas canvas = new Canvas(800, 600);
-        SkyCanvasPainter skyPainter = new SkyCanvasPainter(canvas);
-
-        Transform planeToCanvas = Transform.affine(1300, 0, 0, -1300, 400, 300);
-        skyPainter.drawSky(sky, planeToCanvas);
-
-        primaryStage.setScene(new Scene(new BorderPane(canvas)));
-        primaryStage.show();
     }
 
     private StarCatalogue initCatalog() {

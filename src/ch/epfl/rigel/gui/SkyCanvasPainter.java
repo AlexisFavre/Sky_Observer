@@ -34,7 +34,6 @@ public class SkyCanvasPainter { // TODO Check if ok with removed projections
     public SkyCanvasPainter(Canvas canvas) {
         this.canvas = canvas;
         graph2D = canvas.getGraphicsContext2D();
-        clear();
     }
 
     /**
