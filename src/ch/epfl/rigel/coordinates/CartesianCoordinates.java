@@ -68,10 +68,10 @@ public final class CartesianCoordinates {
      *
      * @throws UnsupportedOperationException in all conditions
      */
-    /*@Override
-    public final int hashCode() throws UnsupportedOperationException { //TODO Hascode
+    @Override
+    public final int hashCode() throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
-    }*/
+    }
 
     /**
      * Always throw exception
