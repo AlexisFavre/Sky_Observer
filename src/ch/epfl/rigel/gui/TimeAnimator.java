@@ -1,13 +1,12 @@
 package ch.epfl.rigel.gui;
 
+import java.time.ZonedDateTime;
+
 import javafx.animation.AnimationTimer;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
 
 /**
  * Used to update periodically (60 times/second) the given {@code DateTimeBean} at the creation when running
@@ -50,7 +49,6 @@ public final class TimeAnimator extends AnimationTimer {
      */
     @Override
     public void handle(long now) {
-        System.out.println("handle");
         if (nanoOfBegin == null) {
             nanoOfBegin = now;
             initial = dtb.getZonedDateTime();

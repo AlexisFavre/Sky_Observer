@@ -1,11 +1,7 @@
 package ch.epfl.rigel.gui;
 
-import ch.epfl.rigel.math.Angle;
-
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 
 /**
  * Used to create discrete or continuous accelerator {@code TimeAccelerator} via static methods
