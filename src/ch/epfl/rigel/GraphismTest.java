@@ -33,7 +33,7 @@ public class GraphismTest extends Application {
 
         DateTimeBean observationTime = new DateTimeBean(ZonedDateTime.parse("2020-02-17T20:15:00+01:00"));
         TimeAnimator timeAnimator = new TimeAnimator(observationTime);
-        timeAnimator.setAccelerator(NamedTimeAccelerator.DAY.getAccelerator());
+        timeAnimator.setAccelerator(NamedTimeAccelerator.SIDEREAL_DAY.getAccelerator());
         GeographicCoordinates observerCoordinates = GeographicCoordinates.ofDeg(6.57, 46.52);
         HorizontalCoordinates observerLook = HorizontalCoordinates.ofDeg(80, 22);
 

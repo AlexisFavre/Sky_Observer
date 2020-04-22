@@ -22,7 +22,7 @@ import ch.epfl.rigel.coordinates.*;
 public final class ObservedSky { //TODO should be final ?
 
     private final StarCatalogue catalog;
-    private final Map<CartesianCoordinates, CelestialObject> skyObjects;
+    private final Map<CelestialObject, CartesianCoordinates> skyObjects;
     private final StereographicProjection projection;
 
     private Sun sun;
@@ -55,9 +55,10 @@ public final class ObservedSky { //TODO should be final ?
         extraterrestrialModels.remove(PlanetModel.EARTH); //TODO check that it's effective
 
         sun  = SunModel.SUN.at(moment, eclToEqu);
-        skyObjects.put(sunPoint = projection.apply(equToHor.apply(sun.equatorialPos())), sun);
+        skyObjects.put(sun, sunPoint = projection.apply(equToHor.apply(sun.equatorialPos())));
+        
         moon = MoonModel.MOON.at(moment, eclToEqu);
-        skyObjects.put(moonPoint = projection.apply(equToHor.apply(moon.equatorialPos())), moon);
+        skyObjects.put(moon, moonPoint = projection.apply(equToHor.apply(moon.equatorialPos())));
         
         // to construct planetPointsRefs and starPointsRefs
         List<Double> pprefs = new LinkedList<>(); // points coordinates of the planets
@@ -68,7 +69,7 @@ public final class ObservedSky { //TODO should be final ?
         // construct planetPointsRefs
         for(PlanetModel planetModel: extraterrestrialModels) {
             Planet planet = planetModel.at(moment, eclToEqu);
-            skyObjects.put(pPoint = projection.apply(equToHor.apply(planet.equatorialPos())), planet);
+            skyObjects.put(planet, pPoint = projection.apply(equToHor.apply(planet.equatorialPos())));
             planets.add(planet);
             pprefs.add(pPoint.x());
             pprefs.add(pPoint.y());
@@ -76,7 +77,7 @@ public final class ObservedSky { //TODO should be final ?
         
         //construct starPointsRefs
         for(Star star: catalog.stars()) {
-            skyObjects.put(sPoint = projection.apply(equToHor.apply(star.equatorialPos())), star);
+            skyObjects.put(star, sPoint = projection.apply(equToHor.apply(star.equatorialPos())));
             sprefs.add(sPoint.x());
             sprefs.add(sPoint.y());
         }
@@ -94,24 +95,25 @@ public final class ObservedSky { //TODO should be final ?
      * and {@code null} if no objects were found
      */
     public CelestialObject objectClosestTo(CartesianCoordinates point, double maximalDistance) {
-        CartesianCoordinates closestObjectPoint = null;
+        CelestialObject closestObject = null;
         double d2 = Double.MAX_VALUE;
-        for(CartesianCoordinates p: skyObjects.keySet()) {
-            if(        Math.abs(p.x()-point.x()) < maximalDistance*2         //make preliminary selection
-                    && Math.abs(p.y()-point.y()) < maximalDistance*2) {
-                double d = point.distance(p);
+        for(CelestialObject p: skyObjects.keySet()) {
+            CartesianCoordinates c = skyObjects.get(p);
+            if(        Math.abs(c.x()-point.x()) < maximalDistance*2         //make preliminary selection
+                    && Math.abs(c.y()-point.y()) < maximalDistance*2) {
+                double d = point.distance(c);
                 if(    d < maximalDistance
                     && d < d2
                     && d > 0)
-                closestObjectPoint = p;
-                d2 = point.distance(closestObjectPoint);
+                closestObject = p;
+                d2 = point.distance(c);
             }
         }
-        if(closestObjectPoint == null)
+        if(closestObject == null)
             return null;
         //System.out.println(sunPoint().distance(moonPoint()));
         //System.out.println(point.distance(closestObjectPoint));
-        return skyObjects.get(closestObjectPoint);
+        return closestObject;
     }
 
     /**
