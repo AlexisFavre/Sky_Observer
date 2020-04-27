@@ -95,7 +95,6 @@ public final class DateTimeBean {
     
     //ZoneDateTime ========================================================
     /**
-     *
      * @return a {@code ZonedDateTime} with the currents characteristics of {@code this}
      */
     public ZonedDateTime getZonedDateTime() {
@@ -104,7 +103,6 @@ public final class DateTimeBean {
     
     /**
      * Set the characteristics of {@code zdt} to {@code this}
-     *
      * @param zdt the {@code ZoneDateTime} to be added to the fields of {@code this}
      */
     public void setZonedDateTime(ZonedDateTime zdt) {

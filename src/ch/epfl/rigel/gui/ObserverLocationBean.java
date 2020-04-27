@@ -7,7 +7,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ObservableObjectValue;
 
 /**
- * contains the position of the observer as its longitude and its latitude in degrees,
+ * A javaFx bean which contains the position of the observer as its longitude and its latitude in degrees,
  * or a combination of both of them as {@code GeographicCoordinates}
  * and getters for all and setters for latitude and longitude (the {@code GeographicCoordinates}
  * will be automatically change
