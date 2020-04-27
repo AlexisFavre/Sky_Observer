@@ -84,4 +84,12 @@ public final class ObserverLocationBean {
     public GeographicCoordinates getCoordinates() {
         return coordinates.getValue();
     }
+    
+    /**
+     * @param latDeg the latDeg to set
+     */
+    public void setCoordinates(GeographicCoordinates coordinates) {
+        setLonDeg(coordinates.lonDeg());
+        setLatDeg(coordinates.latDeg());
+    }
 }
