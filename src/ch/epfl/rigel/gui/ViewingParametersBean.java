@@ -1,7 +1,9 @@
 package ch.epfl.rigel.gui;
 
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 /**
@@ -11,11 +13,16 @@ import javafx.beans.property.SimpleObjectProperty;
  * @author Augustin ALLARD (299918)
  */
 public class ViewingParametersBean {
-    ObjectProperty<Double> fieldOfViewDeg = new SimpleObjectProperty<>(null);
-    ObjectProperty<HorizontalCoordinates> center = new SimpleObjectProperty<>(null);
+    
+    private DoubleProperty fieldOfViewDeg = new SimpleDoubleProperty();
+    private ObjectProperty<HorizontalCoordinates> center = new SimpleObjectProperty<>(null);
 
     public ViewingParametersBean() {}
 
+    /**
+     * @param center of the projection
+     * @param fieldOfViewDeg field of view of the observer in degrees
+     */
     public ViewingParametersBean(HorizontalCoordinates center, double fieldOfViewDeg) {
         setCenter(center);
         setField(fieldOfViewDeg);
@@ -47,19 +54,19 @@ public class ViewingParametersBean {
     /**
      * @return the property of the field of view that can be visualized
      */
-    public ObjectProperty<Double> fieldProperty() {
+    public DoubleProperty fieldProperty() {
         return fieldOfViewDeg;
     }
 
     /**
-     * @return the field of view in degrees stocked in the property
+     * @return the field of view of the observer in degrees stocked in the property
      */
     public double getField() {
         return fieldOfViewDeg.getValue();
     }
 
     /**
-     * @param fieldOfViewDeg the field of view in degrees
+     * @param fieldOfViewDeg the field of view in degrees to set
      */
     public void setField(double fieldOfViewDeg) {
         this.fieldOfViewDeg.setValue(fieldOfViewDeg);

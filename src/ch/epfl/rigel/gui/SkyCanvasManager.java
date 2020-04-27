@@ -16,9 +16,9 @@ import javafx.scene.transform.Transform;
 
 public class SkyCanvasManager {
 
-    Canvas canvas;
-    SkyCanvasPainter painter;
-    ObjectProperty<ObservedSky> sky = new SimpleObjectProperty<>();
+    private Canvas canvas;
+    private SkyCanvasPainter painter;
+    private ObjectProperty<ObservedSky> sky = new SimpleObjectProperty<>();
 
     public SkyCanvasManager(StarCatalogue catalog, DateTimeBean dtb, ViewingParametersBean vpb) {
         canvas = new Canvas(800, 600);
@@ -30,10 +30,10 @@ public class SkyCanvasManager {
                 dtb.getTime(), dtb.getDate(), dtb.getZone(), vpb.getCenter(), vpb.getField());*/
 
         //KEY LISTENER ==============================================================================
-        canvas.setOnKeyPressed((event) -> {
+        canvas.setOnKeyPressed(e -> {
             double az = vpb.getCenter().azDeg();
             double alt = vpb.getCenter().altDeg();
-            switch (event.getCode()) {
+            switch (e.getCode()) {
                 case UP:
                     vpb.setCenter(HorizontalCoordinates.ofDeg(az, ClosedInterval.of(5, 90).clip( alt + 5)));
                     break;
@@ -55,18 +55,18 @@ public class SkyCanvasManager {
             painter.clear();
             painter.drawSky(sky, planeToCanvas);
             System.out.println("event");
-            event.consume();
+            e.consume();
         });
 
         // TODO Verify loop is normal
 
         //SCROLL LISTENER ===========================================================================
-        canvas.setOnScroll((event -> {
+        canvas.setOnScroll((e -> {
             double delta;
-            if(Math.abs(event.getDeltaX()) > Math.abs(event.getDeltaY())) {
-                delta = event.getDeltaX();
+            if(Math.abs(e.getDeltaX()) > Math.abs(e.getDeltaY())) {
+                delta = e.getDeltaX();
             } else {
-                delta = event.getDeltaY();
+                delta = e.getDeltaY();
             }
             vpb.setField(vpb.getField() + delta);
             GeographicCoordinates observerCoordinates = GeographicCoordinates.ofDeg(6.57, 46.52);
@@ -76,7 +76,7 @@ public class SkyCanvasManager {
             painter.clear();
             painter.drawSky(sky, planeToCanvas);
             System.out.println("event");
-            event.consume();
+            e.consume();
         }));
 
     }
