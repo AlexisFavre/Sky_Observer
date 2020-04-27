@@ -10,6 +10,8 @@ import ch.epfl.rigel.coordinates.GeographicCoordinates;
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
 import ch.epfl.rigel.gui.DateTimeBean;
 import ch.epfl.rigel.gui.ObserverLocationBean;
+import ch.epfl.rigel.gui.SkyCanvasManager;
+import ch.epfl.rigel.gui.ViewingParametersBean;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
