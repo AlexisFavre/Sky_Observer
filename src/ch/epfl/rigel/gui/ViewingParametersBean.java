@@ -25,7 +25,7 @@ public class ViewingParametersBean {
      */
     public ViewingParametersBean(HorizontalCoordinates center, double fieldOfViewDeg) {
         setCenter(center);
-        setField(fieldOfViewDeg);
+        setFieldOfViewDeg(fieldOfViewDeg);
     }
 
     //Center =================================================================
@@ -54,21 +54,21 @@ public class ViewingParametersBean {
     /**
      * @return the property of the field of view that can be visualized
      */
-    public DoubleProperty fieldProperty() {
+    public DoubleProperty fieldOfViewDegProperty() {
         return fieldOfViewDeg;
     }
 
     /**
      * @return the field of view of the observer in degrees stocked in the property
      */
-    public double getField() {
+    public double getFieldOfViewDeg() {
         return fieldOfViewDeg.getValue();
     }
 
     /**
      * @param fieldOfViewDeg the field of view in degrees to set
      */
-    public void setField(double fieldOfViewDeg) {
+    public void setFieldOfViewDeg(double fieldOfViewDeg) {
         this.fieldOfViewDeg.setValue(fieldOfViewDeg);
     }
 }

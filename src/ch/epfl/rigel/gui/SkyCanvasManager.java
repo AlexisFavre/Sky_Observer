@@ -31,9 +31,9 @@ public class SkyCanvasManager {
     
     public DoubleProperty mouseAzDeg = new SimpleDoubleProperty();
     public DoubleProperty mouseAltDeg = new SimpleDoubleProperty();
-    public ObjectProperty<CelestialObject> objectUnderMouse  = new SimpleObjectProperty<>(null);
+    public ObjectProperty<CelestialObject> objectUnderMouse  = new SimpleObjectProperty<>(null); //TODO mettre en private et faire getteurs
 
-    public SkyCanvasManager(StarCatalogue catalog, DateTimeBean dtb, ViewingParametersBean vpb, ObserverLocationBean olb) {
+    public SkyCanvasManager(StarCatalogue catalog, DateTimeBean dtb, ObserverLocationBean olb, ViewingParametersBean vpb) {
         canvas = new Canvas(800, 600);
         painter = new SkyCanvasPainter(canvas);
         //objectUnderMouse = Bindings.createObjectBinding(sky.get().objectClosestTo(mousePosition.get(), 10) , mousePosition);
@@ -66,8 +66,8 @@ public class SkyCanvasManager {
                     break;
             }
             GeographicCoordinates observerCoordinates = GeographicCoordinates.ofDeg(6.57, 46.52);
-            Transform planeToCanvas = Transform.affine(400/Math.tan(Angle.ofDeg(vpb.getField())/4),
-                    0, 0, -400/Math.tan(Angle.ofDeg(vpb.getField())/4), 400, 300);
+            Transform planeToCanvas = Transform.affine(400/Math.tan(Angle.ofDeg(vpb.getFieldOfViewDeg())/4),
+                    0, 0, -400/Math.tan(Angle.ofDeg(vpb.getFieldOfViewDeg())/4), 400, 300);
             ObservedSky sky = new ObservedSky(dtb.getZonedDateTime(), observerCoordinates, vpb.getCenter(), catalog);
             painter.clear();
             painter.drawSky(sky, planeToCanvas);
@@ -81,10 +81,10 @@ public class SkyCanvasManager {
         canvas.setOnScroll((e -> {
             double delta = Math.abs(e.getDeltaX()) > Math.abs(e.getDeltaY()) ? e.getDeltaX() : e.getDeltaY();
             
-            vpb.setField(vpb.getField() + delta);
+            vpb.setFieldOfViewDeg(vpb.getFieldOfViewDeg() + delta);
             GeographicCoordinates observerCoordinates = GeographicCoordinates.ofDeg(6.57, 46.52);
-            Transform planeToCanvas = Transform.affine(400/Math.tan(Angle.ofDeg(vpb.getField())/4),
-                    0, 0, -400/Math.tan(Angle.ofDeg(vpb.getField())/4), 400, 300);
+            Transform planeToCanvas = Transform.affine(400/Math.tan(Angle.ofDeg(vpb.getFieldOfViewDeg())/4),
+                    0, 0, -400/Math.tan(Angle.ofDeg(vpb.getFieldOfViewDeg())/4), 400, 300);
             ObservedSky sky = new ObservedSky(dtb.getZonedDateTime(), observerCoordinates, vpb.getCenter(), catalog);
             painter.clear();
             painter.drawSky(sky, planeToCanvas);
