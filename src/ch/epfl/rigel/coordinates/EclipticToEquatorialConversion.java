@@ -24,13 +24,15 @@ public final class EclipticToEquatorialConversion implements Function<EclipticCo
      */
     public EclipticToEquatorialConversion(ZonedDateTime when) {
         double jCentSinceJ2000 = Epoch.J2000.julianCenturiesUntil(when);
-        double seconds = 21.45 + Polynomial.of(0.00181, -0.0006, -46.815, 0).at(jCentSinceJ2000);
-        double correctedSeconds = RightOpenInterval.of(0, 60).reduce(seconds);
-        int minutes = (int) (26 + Math.floor(seconds / correctedSeconds));
-        int correctedMinutes = (int) RightOpenInterval.of(0, 60).reduce(minutes);
-        int degrees = (int) (23 + Math.floor(minutes / correctedMinutes));
-        
-        double epsilon = Angle.ofDMS(degrees, correctedMinutes, correctedSeconds);
+//        double seconds = 21.45 + Polynomial.of(0.00181, -0.0006, -46.815, 0).at(jCentSinceJ2000);
+//        double correctedSeconds = RightOpenInterval.of(0, 60).reduce(seconds);
+//        int minutes = (int) (26 + Math.floor(seconds / correctedSeconds));
+//        int correctedMinutes = (int) RightOpenInterval.of(0, 60).reduce(minutes);
+//        int degrees = (int) (23 + Math.floor(minutes / correctedMinutes));
+//        
+//        double epsilon = Angle.ofDMS(degrees, correctedMinutes, correctedSeconds);
+        //TODO epsilon
+        double epsilon = Angle.ofDMS(23, 26, 21.45 + Polynomial.of(0.00181, -0.0006, -46.815, 0).at(jCentSinceJ2000));
         sinOfEpsilon = Math.sin(epsilon);
         cosOfEpsilon = Math.cos(epsilon);
     };

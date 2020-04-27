@@ -62,21 +62,21 @@ public final class StarCatalogue {
      */
     public List<Integer> asterismIndices(Asterism asterism) throws IllegalArgumentException {
         checkArgument(asterismsStarIndexesMapping.containsKey(asterism));
-        return Collections.unmodifiableList(asterismsStarIndexesMapping.get(asterism)); //TODO need immutable ?
+        return asterismsStarIndexesMapping.get(asterism);
     }
 
     /**
      * @return stars of the catalog
      */
     public List<Star> stars() {
-        return Collections.unmodifiableList(stars); //TODO need immutable ?
+        return stars;
     }
 
     /**
      * @return asterisms of the catalog
      */
     public Set<Asterism> asterisms() {
-        return Collections.unmodifiableSet(asterismsStarIndexesMapping.keySet()); //TODO need immutable ?
+        return asterismsStarIndexesMapping.keySet();
     }
 
 
