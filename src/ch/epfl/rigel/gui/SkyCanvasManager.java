@@ -11,13 +11,16 @@ import ch.epfl.rigel.math.Angle;
 import ch.epfl.rigel.math.ClosedInterval;
 import ch.epfl.rigel.math.RightOpenInterval;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.DoubleBinding;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableObjectValue;
+import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Transform;
 
 import javax.script.SimpleBindings;
@@ -27,7 +30,9 @@ public class SkyCanvasManager {
 
     private Canvas canvas;
     private SkyCanvasPainter painter;
-    private ObjectProperty<CartesianCoordinates> mousePosition; //TODO must be in CartesianCoordinates ?
+    private ObjectProperty<CartesianCoordinates> mousePosition = new SimpleObjectProperty<>(CartesianCoordinates.of(0, 0));
+    /*private DoubleProperty mouseX = new SimpleDoubleProperty();
+    private DoubleProperty mouseY = new SimpleDoubleProperty();*/
 
     public DoubleProperty mouseAzDeg = new SimpleDoubleProperty();
     public DoubleProperty mouseAltDeg = new SimpleDoubleProperty();
@@ -52,13 +57,29 @@ public class SkyCanvasManager {
         ObjectBinding<StereographicProjection> projection = Bindings.createObjectBinding(
                 () -> new StereographicProjection(vpb.getCenter()), vpb.centerProperty());
 
-        ObjectBinding<HorizontalCoordinates> mouseHorizontalPosition = Bindings.createObjectBinding(
+        /*ObjectBinding<HorizontalCoordinates> mouseHorizontalPosition = Bindings.createObjectBinding(
                 () -> {
-                    HorizontalCoordinates h = projection.get().inverseApply(mousePosition.get());
-                    mouseAzDeg.setValue(h.azDeg());
-                    mouseAltDeg.setValue(h.altDeg());
+                    HorizontalCoordinates h = null;
+                    try {
+                        Point2D mp = planeToCanvas.get().createInverse().transform(mousePosition.get().x(), mousePosition.get().y());
+                        CartesianCoordinates mousePlanePosition = CartesianCoordinates.of(mp.getX(), mp.getY());
+                        h = projection.get().inverseApply(mousePlanePosition);
+                        //mouseAzDeg.setValue(h.azDeg());
+                        mouseAltDeg.setValue(h.altDeg());
+                    } catch (NonInvertibleTransformException e) {
+                        System.out.println("un-computable horizontal coordinates; cause: non invertible transformation");
+                    }
                     return h;
-                });
+                }, mousePosition);*/
+
+       // DoubleBinding mAz = Bindings.createDoubleBinding(() -> mouseHorizontalPosition.get().altDeg(), mouseHorizontalPosition);
+
+        //mouseHorizontalPosition.addListener((p, o, n)-> System.out.println("BINGO"));
+        //mouseX.addListener((p, o, n)-> System.out.println("hello"));
+
+        //mousePosition.addListener((p, o, n)-> System.out.println("move"));
+
+        mouseAltDeg.addListener((p, o, n) -> System.out.println("\n\n\n\n\n" + mouseAltDeg.get() + "\n\n\n\n\n"));
 
         ObjectBinding<ObservedSky> sky = Bindings.createObjectBinding(
                 () -> new ObservedSky(dtb.getZonedDateTime(), observerCoordinates, vpb.getCenter(), catalog), planeToCanvas, vpb.centerProperty());
@@ -94,7 +115,28 @@ public class SkyCanvasManager {
 
         //MOUSE MOVE LISTENER =======================================================================
         canvas.setOnMouseMoved((event -> {
+
             mousePosition.setValue(CartesianCoordinates.of(event.getX(), event.getY()));
+
+            HorizontalCoordinates mouseHorizontal = null;
+            try {
+                Point2D mp = planeToCanvas.get().createInverse().transform(mousePosition.get().x(), mousePosition.get().y());
+                CartesianCoordinates mousePlanePosition = CartesianCoordinates.of(mp.getX(), mp.getY());
+                mouseHorizontal = projection.get().inverseApply(mousePlanePosition);
+                //mouseAzDeg.setValue(h.azDeg());
+                mouseAltDeg.setValue(mouseHorizontal.altDeg());
+            } catch (NonInvertibleTransformException e) {
+                System.out.println("un-computable horizontal coordinates; cause: non invertible transformation");
+            }
+
+            System.out.println(mouseHorizontal);
+
+            /*mouseX.setValue(event.getX());
+            mouseY.setValue(event.getY());
+
+            System.out.println(mouseX.get());
+            System.out.println(mouseY.get());
+            System.out.print("\n");*/
             event.consume();
         }));
 
