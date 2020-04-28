@@ -5,7 +5,6 @@ import java.util.function.Function;
 
 import ch.epfl.rigel.astronomy.SiderealTime;
 import ch.epfl.rigel.math.Angle;
-import ch.epfl.rigel.math.RightOpenInterval;
 /**
  *  Function that enables the transformation of the EquatorialCoordinates to HorizontalCoordinates
  *  at a precise {@code ZonedDateTime} and place on the earth {@code GeographicCoordinates}
@@ -43,8 +42,7 @@ public final class EquatorialToHorizontalConversion implements Function<Equatori
         double alt = Math.asin(sinGamma*sinOfPhi + cosGamma*cosOfPhi*Math.cos(H));
         double az = Math.atan2(-cosGamma*cosOfPhi*Math.sin(H) , sinGamma - sinOfPhi*Math.sin(alt));
         
-        return HorizontalCoordinates.of(RightOpenInterval.of(0, Angle.TAU).reduce(az),
-                RightOpenInterval.of(-Angle.TAU/4, Angle.TAU/4).reduce(alt));
+        return HorizontalCoordinates.of(Angle.normalizePositive(az), alt);
     }
 
     /**

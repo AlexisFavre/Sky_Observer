@@ -1,5 +1,4 @@
 package ch.epfl.rigel.coordinates;
-
 import java.time.ZonedDateTime;
 import java.util.function.Function;
 
@@ -18,29 +17,30 @@ public final class EclipticToEquatorialConversion implements Function<EclipticCo
 
     private final double sinOfEpsilon;
     private final double cosOfEpsilon;
+    private final static Polynomial POLYNOMIAL = Polynomial.of(0.00181, -0.0006, -46.815, 0);
+    private final static RightOpenInterval INTER_0TO60 = RightOpenInterval.of(0, 60);
     
     /**
-     *
      * @param when {@code ZonedDateTime} at which the conversion and observation is made
      */
     public EclipticToEquatorialConversion(ZonedDateTime when) {
         double jCentSinceJ2000 = Epoch.J2000.julianCenturiesUntil(when);
-        double epsilon = Angle.ofDMS(23, 26, 21.45
-                + Polynomial.of(0.00181, -0.0006, -46.815, 0).at(jCentSinceJ2000));
+        double epsilon = Angle.ofDMS(23, 26, 
+               INTER_0TO60.reduce(21.45 + POLYNOMIAL.at(jCentSinceJ2000)));
         sinOfEpsilon = Math.sin(epsilon);
         cosOfEpsilon = Math.cos(epsilon);
     };
 
     /**
-     *
      * {@inheritDoc}
      */
     @Override
     public EquatorialCoordinates apply(EclipticCoordinates eclipticCoordinates) {
         double lambda = eclipticCoordinates.lon();
         double beta = eclipticCoordinates.lat();
-        double alpha = Math.atan2((Math.sin(lambda) * cosOfEpsilon  -  Math.tan(beta) * sinOfEpsilon) , Math.cos(lambda));
-        double gamma = Math.asin(Math.sin(beta) * cosOfEpsilon  +  Math.cos(beta) * sinOfEpsilon * Math.sin(lambda));
+        double sinLambda = Math.sin(lambda);
+        double alpha = Math.atan2((sinLambda * cosOfEpsilon  -  Math.tan(beta) * sinOfEpsilon) , Math.cos(lambda));
+        double gamma = Math.asin(Math.sin(beta) * cosOfEpsilon  +  Math.cos(beta) * sinOfEpsilon * sinLambda);
         return EquatorialCoordinates.of(Angle.normalizePositive(alpha), gamma);
     }
 

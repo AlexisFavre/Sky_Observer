@@ -16,7 +16,7 @@ public final class Angle {
     public static final double TAU = 2*Math.PI;
     private static final double DEG_PER_RAD  = 360.0 / TAU;
     private static final double RAD_PER_HOUR = TAU / 24;
-    private static final RightOpenInterval ROInter_0To60 = RightOpenInterval.of(0, TAU);
+    private static final RightOpenInterval ROInter_0To60 = RightOpenInterval.of(0, 60);
 
     
     private Angle() {}

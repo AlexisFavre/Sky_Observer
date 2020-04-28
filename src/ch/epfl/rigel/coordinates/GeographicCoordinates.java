@@ -7,6 +7,7 @@ import static ch.epfl.rigel.math.RightOpenInterval.ROInter_0To360;
 import java.util.Locale;
 
 import ch.epfl.rigel.math.Angle;
+import ch.epfl.rigel.math.RightOpenInterval;
 
 /**
  * Type of spherical coordinates that describe a point on the earth where
@@ -17,6 +18,8 @@ import ch.epfl.rigel.math.Angle;
  * @author Alexis FAVRE (310552)
  */
 public final class GeographicCoordinates extends SphericalCoordinates {
+    
+    private final static RightOpenInterval SymmetricROInterOfSize360 = RightOpenInterval.of(-180, 180);
 
     private GeographicCoordinates(double longitude, double latitude) {
         super(longitude, latitude);
@@ -46,7 +49,7 @@ public final class GeographicCoordinates extends SphericalCoordinates {
      * @return {@code True} if and only if {@code longDeg} belongs to [–180°, +180°[
      */
     public static boolean isValidLonDeg(double lonDeg) {
-        return ROInter_0To360.contains(lonDeg);
+        return SymmetricROInterOfSize360.contains(lonDeg);
     }
 
     /**

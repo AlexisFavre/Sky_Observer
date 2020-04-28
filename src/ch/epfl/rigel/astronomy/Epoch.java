@@ -1,6 +1,10 @@
 package ch.epfl.rigel.astronomy;
 
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.Month;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
 /**
@@ -22,7 +26,9 @@ public enum Epoch {
             ZoneOffset.UTC)
     );
 
-    private ZonedDateTime date;
+    private final static double MILI_SEC_PER_DAY = 8.64e+7;
+    private final static double NUMBER_OF_DAYS_PER_JULIAN_CENTURY = 36525;
+    private final ZonedDateTime date;
 
     Epoch(ZonedDateTime date) {
         this.date = date;
@@ -35,8 +41,7 @@ public enum Epoch {
      * @return exact days from the Epoch {@code this} until the given date (negative if anterior)
      */
     public double daysUntil(ZonedDateTime when) {
-        double millisInDays = 8.64e+7;
-        return date.until(when, ChronoUnit.MILLIS) / millisInDays;
+        return date.until(when, ChronoUnit.MILLIS) / MILI_SEC_PER_DAY;
     };
 
     /**
@@ -46,8 +51,6 @@ public enum Epoch {
      * @return exact julianCenturies from the Epoch {@code this} until the given date (negative if anterior)
      */
     public double julianCenturiesUntil(ZonedDateTime when) {
-        double millisInDays = 8.64e+7;
-        double daysInJCenturies = 36525;
-        return date.until(when, ChronoUnit.MILLIS) / (millisInDays * daysInJCenturies);
+        return date.until(when, ChronoUnit.MILLIS) / (MILI_SEC_PER_DAY * NUMBER_OF_DAYS_PER_JULIAN_CENTURY);
     };
 }
