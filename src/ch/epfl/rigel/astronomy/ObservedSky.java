@@ -25,13 +25,13 @@ public final class ObservedSky { //TODO should be final ?
     private final Map<CelestialObject, CartesianCoordinates> skyObjects;
     private final StereographicProjection projection;
 
-    private Sun sun;
-    private Moon moon;
-    private List<Planet> planets = new ArrayList<>();
-    private CartesianCoordinates sunPoint;
-    private CartesianCoordinates moonPoint;
-    private double[] planetPointsRefs;
-    private double[] starPointsRefs;
+    private final Sun sun;
+    private final Moon moon;
+    private final List<Planet> planets = new ArrayList<>();
+    private final CartesianCoordinates sunPoint;
+    private final CartesianCoordinates moonPoint;
+    private final double[] planetPointsRefs;
+    private final double[] starPointsRefs;
 
     /**
      * @param obsTime the time of the observation
@@ -42,47 +42,52 @@ public final class ObservedSky { //TODO should be final ?
     public ObservedSky(ZonedDateTime obsTime, GeographicCoordinates obsPlace,
                        HorizontalCoordinates observerLook, StarCatalogue catalog) {
 
-        skyObjects    = new HashMap<>();
-        this.catalog  = catalog;
-        projection = new StereographicProjection(observerLook);
-        double moment = Epoch.J2010.daysUntil(obsTime);
+        this.catalog    = catalog;
+        this.skyObjects = new HashMap<>();
+        this.projection = new StereographicProjection(observerLook);
+        double moment   = Epoch.J2010.daysUntil(obsTime);
         
         // create coordinates converters
         EclipticToEquatorialConversion eclToEqu   = new EclipticToEquatorialConversion(obsTime);
         EquatorialToHorizontalConversion equToHor = new EquatorialToHorizontalConversion(obsTime, obsPlace);
         
         List<PlanetModel> extraterrestrialModels = PlanetModel.ALL;
-        extraterrestrialModels.remove(PlanetModel.EARTH); //TODO check that it's effective
+        extraterrestrialModels.remove(PlanetModel.EARTH);
 
         sun  = SunModel.SUN.at(moment, eclToEqu);
-        skyObjects.put(sun, sunPoint = projection.apply(equToHor.apply(sun.equatorialPos())));
+        sunPoint = projection.apply(equToHor.apply(sun.equatorialPos()));
+        skyObjects.put(sun, sunPoint);
         
         moon = MoonModel.MOON.at(moment, eclToEqu);
-        skyObjects.put(moon, moonPoint = projection.apply(equToHor.apply(moon.equatorialPos())));
+        moonPoint = projection.apply(equToHor.apply(moon.equatorialPos()));
+        skyObjects.put(moon, moonPoint);
         
         // to construct planetPointsRefs and starPointsRefs
-        List<Double> pprefs = new LinkedList<>(); // points coordinates of the planets
-        List<Double> sprefs = new LinkedList<>(); // points coordinates of the stars
-        CartesianCoordinates pPoint;
-        CartesianCoordinates sPoint;
+        CartesianCoordinates point; //use to fulfill the lists and tabs with coordiantes of the celestialObjects
+        planetPointsRefs = new double[extraterrestrialModels.size()*2];
+        starPointsRefs   = new double[catalog.stars().size()*2];
+        int i = 0;
         
-        // construct planetPointsRefs
+        // construct planetPointsRefs and planets
         for(PlanetModel planetModel: extraterrestrialModels) {
             Planet planet = planetModel.at(moment, eclToEqu);
-            skyObjects.put(planet, pPoint = projection.apply(equToHor.apply(planet.equatorialPos())));
+            point = projection.apply(equToHor.apply(planet.equatorialPos()));
+            skyObjects.put(planet, point);
             planets.add(planet);
-            pprefs.add(pPoint.x());
-            pprefs.add(pPoint.y());
+            planetPointsRefs[i]   = point.x();
+            planetPointsRefs[++i] = point.y();
+            ++i;
         }
+        i = 0;
         
         //construct starPointsRefs
         for(Star star: catalog.stars()) {
-            skyObjects.put(star, sPoint = projection.apply(equToHor.apply(star.equatorialPos())));
-            sprefs.add(sPoint.x());
-            sprefs.add(sPoint.y());
+            point = projection.apply(equToHor.apply(star.equatorialPos()));
+            skyObjects.put(star, point);
+            starPointsRefs[i]   = point.x();
+            starPointsRefs[++i] = point.y();
+            ++i;
         }
-        planetPointsRefs = toArray(pprefs);
-        starPointsRefs = toArray(sprefs);
     }
 
     /**
@@ -99,7 +104,7 @@ public final class ObservedSky { //TODO should be final ?
         double d2 = Double.MAX_VALUE;
         for(CelestialObject p: skyObjects.keySet()) {
             CartesianCoordinates c = skyObjects.get(p);
-            if(        Math.abs(c.x()-point.x()) < maximalDistance*2         //make preliminary selection
+            if(        Math.abs(c.x()-point.x()) < maximalDistance*2    //make preliminary selection
                     && Math.abs(c.y()-point.y()) < maximalDistance*2) {
                 double d = point.distance(c);
                 if(    d < maximalDistance
@@ -109,18 +114,17 @@ public final class ObservedSky { //TODO should be final ?
                 d2 = point.distance(c);
             }
         }
-        if(closestObject == null)
-            return null;
         //System.out.println(sunPoint().distance(moonPoint()));
         //System.out.println(point.distance(closestObjectPoint));
         return closestObject;
     }
 
     /**
-     *
      * @return the projection used for observation
      */
-    public StereographicProjection projection() { return projection; }
+    public StereographicProjection projection() {
+        return projection; 
+    }
 
     /**
      * @return the point of the {@code StereographicProjection} plan
@@ -198,17 +202,5 @@ public final class ObservedSky { //TODO should be final ?
      */
     public List<Star> stars() {
         return catalog.stars();
-    }
-
-
-    // implementation stuff
-    private double[] toArray(List<Double> list) {
-        double[] array = new double[list.size()];
-        int j = 0; // TODO check linked list <-> array list
-        for (Iterator<Double> iterator = list.iterator(); iterator.hasNext();) {
-            array[j] = (Double) iterator.next();
-            ++j;
-        }
-        return array;
     }
 }
