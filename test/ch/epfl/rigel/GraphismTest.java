@@ -33,7 +33,7 @@ public class GraphismTest extends Application {
         ViewingParametersBean vpb = new ViewingParametersBean(HorizontalCoordinates.ofDeg(80, 22),
                 68.4);
 
-        SkyCanvasManager manager = new SkyCanvasManager(initCatalog(), observationTime, vpb);
+        SkyCanvasManager manager = new SkyCanvasManager(initCatalog(), observationTime,null, vpb);
 
         Scene scene = new Scene(new BorderPane(manager.canvas()));
         primaryStage.setScene(scene);

@@ -16,19 +16,19 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableObjectValue;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.transform.Transform;
+
+import javax.script.SimpleBindings;
+import java.time.LocalDateTime;
 
 public class SkyCanvasManager {
 
     private Canvas canvas;
     private SkyCanvasPainter painter;
-    private ObjectBinding<StereographicProjection> projection;
-    private ObjectBinding<Transform> planeToCanvas;
-    private ObjectBinding<ObservedSky> sky;
     private ObjectProperty<CartesianCoordinates> mousePosition; //TODO must be in CartesianCoordinates ?
-    private ObjectBinding<HorizontalCoordinates> mouseHorizonatlPosition;
-    
+
     public DoubleProperty mouseAzDeg = new SimpleDoubleProperty();
     public DoubleProperty mouseAltDeg = new SimpleDoubleProperty();
     public ObjectProperty<CelestialObject> objectUnderMouse  = new SimpleObjectProperty<>(null); //TODO mettre en private et faire getteurs
@@ -36,20 +36,44 @@ public class SkyCanvasManager {
     public SkyCanvasManager(StarCatalogue catalog, DateTimeBean dtb, ObserverLocationBean olb, ViewingParametersBean vpb) {
         canvas = new Canvas(800, 600);
         painter = new SkyCanvasPainter(canvas);
+
+        //LINKS =====================================================================================
+
         //objectUnderMouse = Bindings.createObjectBinding(sky.get().objectClosestTo(mousePosition.get(), 10) , mousePosition);
 //        ObjectProperty<StereographicProjection> str = new SimpleObjectProperty<StereographicProjection>(new StereographicProjection(vpb.getCenter()));
 //        projection = Bindings.createObjectBinding( () -> str, vpb);
 
-       /* GeographicCoordinates observerCoordinates = GeographicCoordinates.ofDeg(6.57, 46.52);
-        ObservableObjectValue<> = Bindings.createObjectBinding(
-                () -> new ObservedSky(dtb.getZonedDateTime(), observerCoordinates, vpb.getCenter(), catalog),
-                dtb.getTime(), dtb.getDate(), dtb.getZone(), vpb.getCenter(), vpb.getField());*/
+        GeographicCoordinates observerCoordinates = GeographicCoordinates.ofDeg(6.57, 46.52);
+
+        ObjectBinding<Transform> planeToCanvas = Bindings.createObjectBinding(
+                () -> Transform.affine(400/Math.tan(Angle.ofDeg(vpb.getFieldOfViewDeg())/4),
+                        0, 0, -400/Math.tan(Angle.ofDeg(vpb.getFieldOfViewDeg())/4), 400, 300), vpb.fieldOfViewDegProperty());
+
+        ObjectBinding<StereographicProjection> projection = Bindings.createObjectBinding(
+                () -> new StereographicProjection(vpb.getCenter()), vpb.centerProperty());
+
+        ObjectBinding<HorizontalCoordinates> mouseHorizontalPosition = Bindings.createObjectBinding(
+                () -> {
+                    HorizontalCoordinates h = projection.get().inverseApply(mousePosition.get());
+                    mouseAzDeg.setValue(h.azDeg());
+                    mouseAltDeg.setValue(h.altDeg());
+                    return h;
+                });
+
+        ObjectBinding<ObservedSky> sky = Bindings.createObjectBinding(
+                () -> new ObservedSky(dtb.getZonedDateTime(), observerCoordinates, vpb.getCenter(), catalog), planeToCanvas, vpb.centerProperty());
+
+        //RE_DRAW SKY VIA LISTENER ==================================================================
+        sky.addListener((p, o, n)-> {
+            painter.clear();
+            painter.drawSky(n, planeToCanvas.get());
+        });
 
         //KEY LISTENER ==============================================================================
-        canvas.setOnKeyPressed(e -> {
+        canvas.setOnKeyPressed(event -> {
             double az = vpb.getCenter().azDeg();
             double alt = vpb.getCenter().altDeg();
-            switch (e.getCode()) {
+            switch (event.getCode()) {
                 case UP:
                     vpb.setCenter(HorizontalCoordinates.ofDeg(az, ClosedInterval.of(5, 90).clip( alt + 5)));
                     break;
@@ -59,39 +83,30 @@ public class SkyCanvasManager {
                 case RIGHT:
                     vpb.setCenter(HorizontalCoordinates.ofDeg(RightOpenInterval.of(0, 360).reduce(az + 10), alt));
                     break;
-                case LEFT:
+                case LEFT: // TODO Reduce not working
                     vpb.setCenter(HorizontalCoordinates.ofDeg(RightOpenInterval.of(0, 360).reduce(az - 10), alt));
                     break;
                 default:
                     break;
             }
-            GeographicCoordinates observerCoordinates = GeographicCoordinates.ofDeg(6.57, 46.52);
-            Transform planeToCanvas = Transform.affine(400/Math.tan(Angle.ofDeg(vpb.getFieldOfViewDeg())/4),
-                    0, 0, -400/Math.tan(Angle.ofDeg(vpb.getFieldOfViewDeg())/4), 400, 300);
-            ObservedSky sky = new ObservedSky(dtb.getZonedDateTime(), observerCoordinates, vpb.getCenter(), catalog);
-            painter.clear();
-            painter.drawSky(sky, planeToCanvas);
-            System.out.println("event");
-            e.consume();
+            event.consume();
         });
 
-        // TODO Verify loop is normal
-
-        //SCROLL LISTENER ===========================================================================
-        canvas.setOnScroll((e -> {
-            double delta = Math.abs(e.getDeltaX()) > Math.abs(e.getDeltaY()) ? e.getDeltaX() : e.getDeltaY();
-            
-            vpb.setFieldOfViewDeg(vpb.getFieldOfViewDeg() + delta);
-            GeographicCoordinates observerCoordinates = GeographicCoordinates.ofDeg(6.57, 46.52);
-            Transform planeToCanvas = Transform.affine(400/Math.tan(Angle.ofDeg(vpb.getFieldOfViewDeg())/4),
-                    0, 0, -400/Math.tan(Angle.ofDeg(vpb.getFieldOfViewDeg())/4), 400, 300);
-            ObservedSky sky = new ObservedSky(dtb.getZonedDateTime(), observerCoordinates, vpb.getCenter(), catalog);
-            painter.clear();
-            painter.drawSky(sky, planeToCanvas);
-            System.out.println("event");
-            e.consume();
+        //MOUSE MOVE LISTENER =======================================================================
+        canvas.setOnMouseMoved((event -> {
+            mousePosition.setValue(CartesianCoordinates.of(event.getX(), event.getY()));
+            event.consume();
         }));
 
+        //SCROLL LISTENER ===========================================================================
+        canvas.setOnScroll((event -> {
+            double delta = Math.abs(event.getDeltaX()) > Math.abs(event.getDeltaY()) ? event.getDeltaX() : event.getDeltaY();
+            vpb.setFieldOfViewDeg(ClosedInterval.of(30, 150).clip(vpb.getFieldOfViewDeg() + delta));
+            event.consume();
+        }));
+
+        painter.clear();
+        painter.drawSky(sky.get(), planeToCanvas.get());
     }
 
     public Canvas canvas() {
