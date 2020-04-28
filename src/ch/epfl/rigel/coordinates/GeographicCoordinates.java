@@ -1,11 +1,12 @@
 package ch.epfl.rigel.coordinates;
 
 import static ch.epfl.rigel.Preconditions.checkArgument;
+import static ch.epfl.rigel.math.ClosedInterval.CSymmetricInterOfSize180;
+import static ch.epfl.rigel.math.RightOpenInterval.ROInter_0To360;
+
 import java.util.Locale;
 
 import ch.epfl.rigel.math.Angle;
-import ch.epfl.rigel.math.ClosedInterval;
-import ch.epfl.rigel.math.RightOpenInterval;
 
 /**
  * Type of spherical coordinates that describe a point on the earth where
@@ -45,7 +46,7 @@ public final class GeographicCoordinates extends SphericalCoordinates {
      * @return {@code True} if and only if {@code longDeg} belongs to [–180°, +180°[
      */
     public static boolean isValidLonDeg(double lonDeg) {
-        return RightOpenInterval.of(-180, 180).contains(lonDeg);
+        return ROInter_0To360.contains(lonDeg);
     }
 
     /**
@@ -55,21 +56,21 @@ public final class GeographicCoordinates extends SphericalCoordinates {
      * @return {@code True} if and only if {@code latDeg} belongs to [–180°, +180°[
      */
     public static boolean isValidLatDeg(double latDeg) {
-        return ClosedInterval.of(-90, 90).contains(latDeg);
+        return CSymmetricInterOfSize180.contains(latDeg);
     }
     
     /**
-     *
      * @return the longitude in radians
      */
+    @Override
     public double lon() {
         return super.lon();
     }
     
     /**
-     *
      * @return the latitude in radians
      */
+    @Override
     public double lat() {
         return super.lat();
     }
@@ -78,6 +79,7 @@ public final class GeographicCoordinates extends SphericalCoordinates {
      *
      * @return the longitude in degrees
      */
+    @Override
     public double lonDeg() {
         return Angle.toDeg(lon());
     }
@@ -86,6 +88,7 @@ public final class GeographicCoordinates extends SphericalCoordinates {
      *
      * @return the latitude in degrees
      */
+    @Override
     public double latDeg() {
         return Angle.toDeg(lat());
     }

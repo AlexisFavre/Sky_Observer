@@ -1,6 +1,8 @@
 package ch.epfl.rigel.coordinates;
 
-import static ch.epfl.rigel.Preconditions.checkArgument;
+import static ch.epfl.rigel.Preconditions.checkInInterval;
+import static ch.epfl.rigel.math.ClosedInterval.CSymmetricInterOfSizePi;
+import static ch.epfl.rigel.math.RightOpenInterval.ROInter_0To2Pi;
 
 import java.util.Locale;
 
@@ -34,13 +36,12 @@ public final class EquatorialCoordinates extends SphericalCoordinates {
      * respectively [0,2Pi[ and [-Pi/2,Pi/2]
      */
     public static EquatorialCoordinates of(double ra, double dec) throws IllegalArgumentException{
-        checkArgument(0<=ra && ra < Angle.TAU);
-        checkArgument(-Angle.TAU/4<= dec && dec<=Angle.TAU/4);
+        checkInInterval(ROInter_0To2Pi, ra);
+        checkInInterval(CSymmetricInterOfSizePi, dec);
         return new EquatorialCoordinates(ra, dec);
     }
 
     /**
-     *
      * @return right ascension in radians
      */
     public double ra() {
@@ -48,7 +49,6 @@ public final class EquatorialCoordinates extends SphericalCoordinates {
     }
     
     /**
-     *
      * @return declination in radians
      */
     public double dec() {
@@ -56,7 +56,6 @@ public final class EquatorialCoordinates extends SphericalCoordinates {
     }
     
     /**
-     *
      * @return right ascension in degrees
      */
     public double raDeg() {
@@ -64,7 +63,6 @@ public final class EquatorialCoordinates extends SphericalCoordinates {
     }
     
     /**
-     *
      * @return declination in degrees
      */
     public double decDeg() {
@@ -72,7 +70,6 @@ public final class EquatorialCoordinates extends SphericalCoordinates {
     }
     
     /**
-     * 
      * @return right ascension in hours
      */
     public double raHr() {
@@ -80,7 +77,6 @@ public final class EquatorialCoordinates extends SphericalCoordinates {
     }
 
     /**
-     *
      * @return a {@code String} view of {@code this} with the format
      * (ra= x, dec= y)
      */

@@ -9,8 +9,10 @@ import java.util.Locale;;
  * @author Alexis FAVRE (310552)
  */
 public final class RightOpenInterval extends Interval {
-    
+    /** [0, 2Pi]  (often used) */
     public static final RightOpenInterval ROInter_0To2Pi = new RightOpenInterval(0, Angle.TAU);
+    /** [0, 360] (often used) */
+    public static final RightOpenInterval ROInter_0To360 = new RightOpenInterval(0, 360);
     
     private RightOpenInterval(double low, double high) {
         super(low, high);

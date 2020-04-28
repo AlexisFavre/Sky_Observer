@@ -14,6 +14,11 @@ public final class ClosedInterval extends Interval {
      * [-Pi/2, Pi/2]    (often used)
      */
     public static final ClosedInterval CSymmetricInterOfSizePi = symmetric(Math.PI);
+    
+    /**
+     * [-90, 90]      (often used)
+     */
+    public static final ClosedInterval CSymmetricInterOfSize180 = symmetric(180);
 
     private ClosedInterval(double low, double high) {
         super(low, high);
