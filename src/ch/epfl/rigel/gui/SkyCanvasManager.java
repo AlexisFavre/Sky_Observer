@@ -70,6 +70,7 @@ public class SkyCanvasManager {
                             canvas.getWidth()/2, canvas.getHeight()/2);
                 }, vpb.fieldOfViewDegProperty());
 
+        // TODO Why projection depends of plane to canvas
         ObjectBinding<StereographicProjection> projection = Bindings.createObjectBinding(
                 () -> new StereographicProjection(vpb.getCenter()), vpb.centerProperty());
 

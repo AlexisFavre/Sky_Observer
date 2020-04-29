@@ -33,7 +33,7 @@ public class GraphismTest extends Application {
         ObserverLocationBean epfl = new ObserverLocationBean();
         epfl.setLonDeg(6.57);
         epfl.setLatDeg(46.52);
-        ViewingParametersBean view = new ViewingParametersBean(HorizontalCoordinates.ofDeg(180, 22),
+        ViewingParametersBean view = new ViewingParametersBean(HorizontalCoordinates.ofDeg(180 + 1.e-7, 22),
                 68.4);
 
         SkyCanvasManager manager = new SkyCanvasManager(initCatalog(), observationTime, epfl, view);
