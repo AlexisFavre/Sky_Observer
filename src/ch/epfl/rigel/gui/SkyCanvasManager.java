@@ -35,13 +35,21 @@ import java.time.LocalDateTime;
  * @author Augustin ALLARD (299918)
  */
 public class SkyCanvasManager {
-
+    
+    private final static ClosedInterval CINTER_5TO90   = ClosedInterval.of(5, 90);
+    private final static ClosedInterval CINTER_30TO150 = ClosedInterval.of(30, 150);
+    
     private Canvas canvas;
     private SkyCanvasPainter painter;
+<<<<<<< HEAD
     // coordinates of the mouse on the projection plane // TODO Be sure it is the good solution
     // TODO should be null
+=======
+    private GeographicCoordinates observerCoordinates = GeographicCoordinates.ofDeg(6.57, 46.52);
+    
+>>>>>>> aa10-viewing-parameter
     private ObjectProperty<CartesianCoordinates> mousePosition = new SimpleObjectProperty<>(CartesianCoordinates.of(0, 0));
-
+    
     public DoubleBinding mouseAzDeg;
     public DoubleBinding mouseAltDeg;
     public ObjectBinding<CelestialObject> objectUnderMouse; //TODO pourquoi en private?
@@ -59,6 +67,7 @@ public class SkyCanvasManager {
         painter = new SkyCanvasPainter(canvas);
 
         //LINKS =====================================================================================
+<<<<<<< HEAD
         // TODO Introduce multiple canva forms
         ObjectBinding<Transform> planeToCanvas = Bindings.createObjectBinding(
                 () -> {
@@ -66,6 +75,13 @@ public class SkyCanvasManager {
                     return Transform.affine(scaleOfView, 0, 0, -scaleOfView,
                             canvas.getWidth()/2, canvas.getHeight()/2);
                 }, vpb.fieldOfViewDegProperty());
+=======
+        
+
+        ObjectBinding<Transform> planeToCanvas = Bindings.createObjectBinding( 
+                () -> Transform.affine(400/Math.tan(Angle.ofDeg(vpb.getFieldOfViewDeg())/4),
+                        0, 0, -400/Math.tan(Angle.ofDeg(vpb.getFieldOfViewDeg())/4), 400, 300), vpb.fieldOfViewDegProperty());
+>>>>>>> aa10-viewing-parameter
 
         ObjectBinding<StereographicProjection> projection = Bindings.createObjectBinding(
                 () -> new StereographicProjection(vpb.getCenter()), vpb.centerProperty());
@@ -78,7 +94,7 @@ public class SkyCanvasManager {
                 // TODO work with center not with projection && how to do without plane to canva?
                 planeToCanvas, vpb.centerProperty(), olb.coordinatesProperty(), dtb.timeProperty(), dtb.dateProperty(), dtb.zoneProperty());
 
-        mouseAzDeg = Bindings.createDoubleBinding(() -> mouseHorizontalPosition.get().azDeg(), mouseHorizontalPosition);
+        mouseAzDeg  = Bindings.createDoubleBinding(() -> mouseHorizontalPosition.get().azDeg(), mouseHorizontalPosition);
         mouseAltDeg = Bindings.createDoubleBinding(() -> mouseHorizontalPosition.get().altDeg(), mouseHorizontalPosition);
 
         objectUnderMouse = Bindings.createObjectBinding(
@@ -104,10 +120,10 @@ public class SkyCanvasManager {
             double alt = vpb.getCenter().altDeg();
             switch (event.getCode()) {
                 case UP:
-                    vpb.setCenter(HorizontalCoordinates.ofDeg(az, ClosedInterval.of(5, 90).clip( alt + 5)));
+                    vpb.setCenter(HorizontalCoordinates.ofDeg(az, CINTER_5TO90.clip( alt + 5)));
                     break;
                 case DOWN:
-                    vpb.setCenter(HorizontalCoordinates.ofDeg(az, ClosedInterval.of(5, 90).clip(alt - 5)));
+                    vpb.setCenter(HorizontalCoordinates.ofDeg(az, CINTER_5TO90.clip(alt - 5)));
                     break;
                 case RIGHT:
                     vpb.setCenter(HorizontalCoordinates.ofDeg(RightOpenInterval.of(0, 360).reduce(az + 10), alt));
@@ -135,7 +151,7 @@ public class SkyCanvasManager {
         //SCROLL LISTENER ===========================================================================
         canvas.setOnScroll((event -> {
             double delta = Math.abs(event.getDeltaX()) > Math.abs(event.getDeltaY()) ? event.getDeltaX() : event.getDeltaY();
-            vpb.setFieldOfViewDeg(ClosedInterval.of(30, 150).clip(vpb.getFieldOfViewDeg() + delta));
+            vpb.setFieldOfViewDeg(CINTER_30TO150.clip(vpb.getFieldOfViewDeg() + delta));
             event.consume();
         }));
 
@@ -145,7 +161,6 @@ public class SkyCanvasManager {
     }
 
     /**
-     *
      * @return the canvas managed by {@code this}
      */
     public Canvas canvas() {
