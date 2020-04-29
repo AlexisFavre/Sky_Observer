@@ -31,23 +31,16 @@ public class SkyCanvasManager {
     private Canvas canvas;
     private SkyCanvasPainter painter;
     private ObjectProperty<CartesianCoordinates> mousePosition = new SimpleObjectProperty<>(CartesianCoordinates.of(0, 0));
-    /*private DoubleProperty mouseX = new SimpleDoubleProperty();
-    private DoubleProperty mouseY = new SimpleDoubleProperty();*/
 
-    public DoubleProperty mouseAzDeg = new SimpleDoubleProperty();
-    public DoubleProperty mouseAltDeg = new SimpleDoubleProperty();
-    public ObjectProperty<CelestialObject> objectUnderMouse  = new SimpleObjectProperty<>(null); //TODO mettre en private et faire getteurs
+    public DoubleBinding mouseAzDeg;
+    public DoubleBinding mouseAltDeg;
+    public ObjectBinding<CelestialObject> objectUnderMouse; //TODO pourquoi en private
 
     public SkyCanvasManager(StarCatalogue catalog, DateTimeBean dtb, ObserverLocationBean olb, ViewingParametersBean vpb) {
         canvas = new Canvas(800, 600);
         painter = new SkyCanvasPainter(canvas);
 
         //LINKS =====================================================================================
-
-        //objectUnderMouse = Bindings.createObjectBinding(sky.get().objectClosestTo(mousePosition.get(), 10) , mousePosition);
-//        ObjectProperty<StereographicProjection> str = new SimpleObjectProperty<StereographicProjection>(new StereographicProjection(vpb.getCenter()));
-//        projection = Bindings.createObjectBinding( () -> str, vpb);
-
         GeographicCoordinates observerCoordinates = GeographicCoordinates.ofDeg(6.57, 46.52);
 
         ObjectBinding<Transform> planeToCanvas = Bindings.createObjectBinding(
@@ -57,32 +50,39 @@ public class SkyCanvasManager {
         ObjectBinding<StereographicProjection> projection = Bindings.createObjectBinding(
                 () -> new StereographicProjection(vpb.getCenter()), vpb.centerProperty());
 
-        /*ObjectBinding<HorizontalCoordinates> mouseHorizontalPosition = Bindings.createObjectBinding(
+        ObjectBinding<HorizontalCoordinates> mouseHorizontalPosition = Bindings.createObjectBinding(
                 () -> {
                     HorizontalCoordinates h = null;
                     try {
                         Point2D mp = planeToCanvas.get().createInverse().transform(mousePosition.get().x(), mousePosition.get().y());
                         CartesianCoordinates mousePlanePosition = CartesianCoordinates.of(mp.getX(), mp.getY());
                         h = projection.get().inverseApply(mousePlanePosition);
-                        //mouseAzDeg.setValue(h.azDeg());
-                        mouseAltDeg.setValue(h.altDeg());
                     } catch (NonInvertibleTransformException e) {
                         System.out.println("un-computable horizontal coordinates; cause: non invertible transformation");
                     }
                     return h;
-                }, mousePosition);*/
-
-       // DoubleBinding mAz = Bindings.createDoubleBinding(() -> mouseHorizontalPosition.get().altDeg(), mouseHorizontalPosition);
-
-        //mouseHorizontalPosition.addListener((p, o, n)-> System.out.println("BINGO"));
-        //mouseX.addListener((p, o, n)-> System.out.println("hello"));
-
-        //mousePosition.addListener((p, o, n)-> System.out.println("move"));
-
-        mouseAltDeg.addListener((p, o, n) -> System.out.println("\n\n\n\n\n" + mouseAltDeg.get() + "\n\n\n\n\n"));
+                }, mousePosition);
 
         ObjectBinding<ObservedSky> sky = Bindings.createObjectBinding(
                 () -> new ObservedSky(dtb.getZonedDateTime(), observerCoordinates, vpb.getCenter(), catalog), planeToCanvas, vpb.centerProperty());
+
+        mouseAzDeg = Bindings.createDoubleBinding(() -> mouseHorizontalPosition.get().azDeg(), mouseHorizontalPosition);
+        mouseAltDeg = Bindings.createDoubleBinding(() -> mouseHorizontalPosition.get().altDeg(), mouseHorizontalPosition);
+
+        objectUnderMouse = Bindings.createObjectBinding(
+                () -> {
+                    CelestialObject object = null;
+                    try {
+                        Point2D mp = planeToCanvas.get().createInverse().transform(mousePosition.get().x(), mousePosition.get().y());
+                        CartesianCoordinates mousePlanePosition = CartesianCoordinates.of(mp.getX(), mp.getY());
+                        object = sky.get().objectClosestTo(mousePlanePosition, 0.05);
+                    } catch (NonInvertibleTransformException e) {
+                        System.out.println("un-computable horizontal coordinates; cause: non invertible transformation");
+                    }
+                    return object;
+                }, mousePosition);
+
+        objectUnderMouse.addListener((p, o, n) -> System.out.println(objectUnderMouse.get()));
 
         //RE_DRAW SKY VIA LISTENER ==================================================================
         sky.addListener((p, o, n)-> {
@@ -117,26 +117,6 @@ public class SkyCanvasManager {
         canvas.setOnMouseMoved((event -> {
 
             mousePosition.setValue(CartesianCoordinates.of(event.getX(), event.getY()));
-
-            HorizontalCoordinates mouseHorizontal = null;
-            try {
-                Point2D mp = planeToCanvas.get().createInverse().transform(mousePosition.get().x(), mousePosition.get().y());
-                CartesianCoordinates mousePlanePosition = CartesianCoordinates.of(mp.getX(), mp.getY());
-                mouseHorizontal = projection.get().inverseApply(mousePlanePosition);
-                //mouseAzDeg.setValue(h.azDeg());
-                mouseAltDeg.setValue(mouseHorizontal.altDeg());
-            } catch (NonInvertibleTransformException e) {
-                System.out.println("un-computable horizontal coordinates; cause: non invertible transformation");
-            }
-
-            System.out.println(mouseHorizontal);
-
-            /*mouseX.setValue(event.getX());
-            mouseY.setValue(event.getY());
-
-            System.out.println(mouseX.get());
-            System.out.println(mouseY.get());
-            System.out.print("\n");*/
             event.consume();
         }));
 
@@ -151,6 +131,10 @@ public class SkyCanvasManager {
         painter.drawSky(sky.get(), planeToCanvas.get());
     }
 
+    /**
+     *
+     * @return the canvas managed by {@code this}
+     */
     public Canvas canvas() {
         return canvas;
     }
