@@ -125,6 +125,14 @@ public class SkyCanvasManager {
             event.consume();
         });
 
+        //MOUSE CLICK LISTENER ======================================================================
+        canvas.setOnMouseClicked((event -> {
+            if(objectUnderMouse.get() != null) {
+                vpb.centerProperty().setValue(mouseHorizontalPosition.get());
+            }
+            event.consume();
+        }));
+
         //MOUSE MOVE LISTENER =======================================================================
         canvas.setOnMouseMoved((event -> {
             try {
