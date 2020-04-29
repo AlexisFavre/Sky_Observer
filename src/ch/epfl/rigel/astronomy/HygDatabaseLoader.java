@@ -3,6 +3,7 @@ package ch.epfl.rigel.astronomy;
 import ch.epfl.rigel.coordinates.EquatorialCoordinates;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Used to load {@code Star} objects from a hyg_data stream to a {@code StarCatalogue.Builder}
@@ -24,7 +25,7 @@ public enum HygDatabaseLoader implements StarCatalogue.Loader {
     @Override
     public void load(InputStream inputStream, StarCatalogue.Builder builder) throws IOException {
 
-        try(BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+        try(BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream , StandardCharsets.US_ASCII))) {
             String currentLine;
             reader.readLine();
             while((currentLine = reader.readLine()) != null) {

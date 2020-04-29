@@ -16,15 +16,15 @@ public enum MoonModel implements CelestialObjectModel<Moon>{
 
     // CONSTANTS FOR MOON AT J2010
     // mean longitude
-    private final double l0 = Angle.ofDeg(91.929336);
+    private final static double l0 = Angle.ofDeg(91.929336);
     // mean longitude at perigee
-    private final double P0 = Angle.ofDeg(130.143076);
+    private final static double P0 = Angle.ofDeg(130.143076);
     // longitude at ascendant node
-    private final double N0 = Angle.ofDeg(291.682547);
+    private final static double N0 = Angle.ofDeg(291.682547);
     // orbit eccentricity no unity
-    private final double e = 0.0549;
+    private final static double e = 0.0549;
     // orbit inclination
-    private final double i  = Angle.ofDeg(5.145396);
+    private final static double i  = Angle.ofDeg(5.145396);
 
     /**
      *

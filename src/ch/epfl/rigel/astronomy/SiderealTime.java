@@ -15,11 +15,13 @@ import java.time.temporal.ChronoUnit;
  *
  * @author Augustin ALLARD (299918)
  */
-public abstract class SiderealTime {
+public final class SiderealTime {
     
     private final static Polynomial POLYNOMIAL = Polynomial.of(0.000025862, 2400.051336, 6.697374558);
     private final static double MILI_SECONDS_PER_HOUR = 3.6e+6;
     private final static double CONST_FOR_S1 = 1.002737909;
+    
+    private SiderealTime() {}
     
     /**
      * This calculates the sidereal time at the greenwich time zone
