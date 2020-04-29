@@ -7,17 +7,15 @@ import java.time.ZonedDateTime;
 
 import ch.epfl.rigel.astronomy.AsterismLoader;
 import ch.epfl.rigel.astronomy.HygDatabaseLoader;
-import ch.epfl.rigel.astronomy.ObservedSky;
 import ch.epfl.rigel.astronomy.StarCatalogue;
-import ch.epfl.rigel.coordinates.GeographicCoordinates;
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
-import ch.epfl.rigel.gui.*;
+import ch.epfl.rigel.gui.DateTimeBean;
+import ch.epfl.rigel.gui.ObserverLocationBean;
+import ch.epfl.rigel.gui.SkyCanvasManager;
+import ch.epfl.rigel.gui.ViewingParametersBean;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.transform.Transform;
 import javafx.stage.Stage;
 
 public class GraphismTest extends Application {
@@ -38,10 +36,17 @@ public class GraphismTest extends Application {
 
         SkyCanvasManager manager = new SkyCanvasManager(initCatalog(), observationTime, epfl, view);
 
-        Scene scene = new Scene(new BorderPane(manager.canvas()));
+        BorderPane bp = new BorderPane(manager.canvas());
+        bp.setMinSize(800, 600);
+        manager.canvas().widthProperty().bind(bp.widthProperty());
+        manager.canvas().heightProperty().bind(bp.heightProperty());
+        Scene scene = new Scene(bp);
         primaryStage.setScene(scene);
+        primaryStage.setY(100);
         primaryStage.show();
         manager.canvas().requestFocus();
+        manager.resetSky();
+        
     }
 
     private StarCatalogue initCatalog() {

@@ -49,6 +49,10 @@ public class SkyCanvasManager {
     public DoubleBinding mouseAltDeg;
     public ObjectBinding<CelestialObject> objectUnderMouse; //TODO pourquoi en private?
 
+    ObjectBinding<ObservedSky> sky;
+    ObjectBinding<Transform> planeToCanvas;
+    DoubleBinding scaleOfView;
+    
     /**
      *
      * @param catalog the catalog of stars that will be painted on the canvas
@@ -60,15 +64,16 @@ public class SkyCanvasManager {
 
         canvas = new Canvas(800, 600);
         painter = new SkyCanvasPainter(canvas);
+        scaleOfView = Bindings.createDoubleBinding(() -> canvas.getWidth()/ (2*Math.tan(Angle.ofDeg(vpb.getFieldOfViewDeg())/4)), canvas.widthProperty(), vpb.fieldOfViewDegProperty());
 
         //LINKS =====================================================================================
-        // TODO Introduce multiple canva forms
-        ObjectBinding<Transform> planeToCanvas = Bindings.createObjectBinding(
+        // TODO Introduce multiple canva forms ????
+        planeToCanvas = Bindings.createObjectBinding(
                 () -> {
-                    double scaleOfView = canvas.getWidth()/Math.tan(Angle.ofDeg(vpb.getFieldOfViewDeg())/4)/2;
+                    double scaleOfView = canvas.getWidth()/ (2*Math.tan(Angle.ofDeg(vpb.getFieldOfViewDeg())/4));
                     return Transform.affine(scaleOfView, 0, 0, -scaleOfView,
                             canvas.getWidth()/2, canvas.getHeight()/2);
-                }, vpb.fieldOfViewDegProperty());
+                }, vpb.fieldOfViewDegProperty(), canvas.heightProperty(), canvas.widthProperty()); //TODO /!\ changement projection par rapport zoom
 
         // TODO Why projection depends of plane to canvas
         ObjectBinding<StereographicProjection> projection = Bindings.createObjectBinding(
@@ -77,7 +82,7 @@ public class SkyCanvasManager {
         ObjectBinding<HorizontalCoordinates> mouseHorizontalPosition = Bindings.createObjectBinding(
                 () -> projection.get().inverseApply(mousePosition.get()), mousePosition, projection, planeToCanvas);
 
-        ObjectBinding<ObservedSky> sky = Bindings.createObjectBinding(
+        sky = Bindings.createObjectBinding(
                 () -> new ObservedSky(dtb.getZonedDateTime(), olb.getCoordinates(), vpb.getCenter(), catalog),
                 // TODO work with center not with projection && how to do without plane to canva?
                 planeToCanvas, vpb.centerProperty(), olb.coordinatesProperty(), dtb.timeProperty(), dtb.dateProperty(), dtb.zoneProperty());
@@ -87,22 +92,20 @@ public class SkyCanvasManager {
 
         objectUnderMouse = Bindings.createObjectBinding(
                 () ->  {
-                    double scaleOfView = canvas.getWidth()/Math.tan(Angle.ofDeg(vpb.getFieldOfViewDeg())/4)/2;
+                    double scaleOfView = canvas.getWidth()/Math.tan(Angle.ofDeg(vpb.getFieldOfViewDeg())/4)/2; //TODO faire property pour le calc que 1fois
                     return sky.get().objectClosestTo(mousePosition.get(), 10/scaleOfView);
                 }, mousePosition, planeToCanvas, sky);
 
         //PRINT CLOSEST OBJECT VIA LISTENER =========================================================
-        // TODO Verify horizontal coordinates with zoom of planeToCanva
+        // TODO Verify horizontal coordinates with zoom of planeToCanva ??
         //mouseAltDeg.addListener((p, o, n) -> System.out.println(mouseAzDeg.get() + "   " + mouseAltDeg.get()));
-        objectUnderMouse.addListener((p, o, n) -> System.out.println(objectUnderMouse.get()));
+        objectUnderMouse.addListener((p, o, n) -> {if(objectUnderMouse.get() != null) 
+            System.out.println(objectUnderMouse.get());});
 
         //RE_DRAW SKY VIA LISTENER ==================================================================
-        sky.addListener((p, o, n)-> {
-            painter.clear();
-            painter.drawSky(n, planeToCanvas.get());
-        });
+        sky.addListener((p, o, n)-> resetSky());
 
-        //KEY LISTENER ==============================================================================
+        //KEYBOARD LISTENER ==============================================================================
         canvas.setOnKeyPressed(event -> {
             double az = vpb.getCenter().azDeg();
             double alt = vpb.getCenter().altDeg();
@@ -111,13 +114,13 @@ public class SkyCanvasManager {
                     vpb.setCenter(HorizontalCoordinates.ofDeg(az, CINTER_5TO90.clip( alt + 5)));
                     break;
                 case DOWN:
-                    vpb.setCenter(HorizontalCoordinates.ofDeg(az, CINTER_5TO90.clip(alt - 5)));
+                    vpb.setCenter(HorizontalCoordinates.ofDeg(az, CINTER_5TO90.clip( alt - 5)));
                     break;
                 case RIGHT:
-                    vpb.setCenter(HorizontalCoordinates.ofDeg(RightOpenInterval.of(0, 360).reduce(az + 10), alt));
+                    vpb.setCenter(HorizontalCoordinates.ofDeg(RightOpenInterval.of(0, 360).reduce( az + 10), alt));
                     break;
                 case LEFT: // TODO Reduce not working
-                    vpb.setCenter(HorizontalCoordinates.ofDeg(RightOpenInterval.of(0, 360).reduce(az - 10), alt));
+                    vpb.setCenter(HorizontalCoordinates.ofDeg(RightOpenInterval.of(0, 360).reduce( az - 10), alt));
                     break;
                 default:
                     break;
@@ -142,10 +145,13 @@ public class SkyCanvasManager {
             vpb.setFieldOfViewDeg(CINTER_30TO150.clip(vpb.getFieldOfViewDeg() + delta));
             event.consume();
         }));
-
-        // TODO should work without painting the first time
-        painter.clear();
-        painter.drawSky(sky.get(), planeToCanvas.get());
+        
+        //ADAPTATION OF SKY WHEN SIZE OF STAGE CHANGE
+        canvas.widthProperty().addListener(e-> resetSky());
+        canvas.heightProperty().addListener(e-> resetSky());
+            
+        // TODO I already reset it in graphism test
+       //resetSky();
     }
 
     /**
@@ -153,5 +159,10 @@ public class SkyCanvasManager {
      */
     public Canvas canvas() {
         return canvas;
+    }
+    
+    public void resetSky() {
+        painter.clear();
+        painter.drawSky(sky.get(), planeToCanvas.get());
     }
 }
