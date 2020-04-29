@@ -35,9 +35,12 @@ import java.time.LocalDateTime;
  * @author Augustin ALLARD (299918)
  */
 public class SkyCanvasManager {
+
+    private ViewAnimator centerAnimator;
     
     private final static ClosedInterval CINTER_5TO90   = ClosedInterval.of(5, 90);
     private final static ClosedInterval CINTER_30TO150 = ClosedInterval.of(30, 150);
+    private final static RightOpenInterval CINTER_0TO360 = RightOpenInterval.of(0, 360);
     
     private Canvas canvas;
     private SkyCanvasPainter painter;
@@ -57,6 +60,8 @@ public class SkyCanvasManager {
      * @param vpb the {@code ViewingParametersBean} corresponding to the observer view (zoom and look orientation)
      */
     public SkyCanvasManager(StarCatalogue catalog, DateTimeBean dtb, ObserverLocationBean olb, ViewingParametersBean vpb) {
+
+        centerAnimator = new ViewAnimator(vpb);
 
         canvas = new Canvas(800, 600);
         painter = new SkyCanvasPainter(canvas);
@@ -114,10 +119,10 @@ public class SkyCanvasManager {
                     vpb.setCenter(HorizontalCoordinates.ofDeg(az, CINTER_5TO90.clip(alt - 5)));
                     break;
                 case RIGHT:
-                    vpb.setCenter(HorizontalCoordinates.ofDeg(RightOpenInterval.of(0, 360).reduce(az + 10), alt));
+                    vpb.setCenter(HorizontalCoordinates.ofDeg(CINTER_0TO360.reduce(az + 10), alt));
                     break;
                 case LEFT: // TODO Reduce not working
-                    vpb.setCenter(HorizontalCoordinates.ofDeg(RightOpenInterval.of(0, 360).reduce(az - 10), alt));
+                    vpb.setCenter(HorizontalCoordinates.ofDeg(CINTER_0TO360.reduce(az - 10), alt));
                     break;
                 default:
                     break;
@@ -128,7 +133,10 @@ public class SkyCanvasManager {
         //MOUSE CLICK LISTENER ======================================================================
         canvas.setOnMouseClicked((event -> {
             if(objectUnderMouse.get() != null) {
-                vpb.centerProperty().setValue(mouseHorizontalPosition.get());
+                HorizontalCoordinates mh = mouseHorizontalPosition.get();
+                // TODO Verify north passage
+                centerAnimator.setDestination(CINTER_0TO360.reduce(mh.azDeg()), CINTER_5TO90.clip(mh.altDeg()));
+                centerAnimator.start();
             }
             event.consume();
         }));
