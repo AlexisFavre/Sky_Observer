@@ -29,6 +29,8 @@ public class GraphismTest extends Application {
         launch(args);
     }
 
+    final StarCatalogue CATALOG = initCatalog();
+
     @Override
     public void start(Stage primaryStage) {
 
@@ -48,13 +50,13 @@ public class GraphismTest extends Application {
         timeAnimator.start();
 
         observationTime.timeProperty().addListener((p, o, n) -> {
-            ObservedSky sky = new ObservedSky(observationTime.getZonedDateTime(), observerCoordinates, observerLook, initCatalog());
+            ObservedSky sky = new ObservedSky(observationTime.getZonedDateTime(), observerCoordinates, observerLook, CATALOG);
             skyPainter.clear();
             skyPainter.drawSky(sky, planeToCanvas);
         });
 
         observationTime.dateProperty().addListener((p, o, n) -> {
-            ObservedSky sky = new ObservedSky(observationTime.getZonedDateTime(), observerCoordinates, observerLook, initCatalog());
+            ObservedSky sky = new ObservedSky(observationTime.getZonedDateTime(), observerCoordinates, observerLook, CATALOG);
             skyPainter.clear();
             skyPainter.drawSky(sky, planeToCanvas);
         });
