@@ -30,10 +30,13 @@ public class GraphismTest extends Application {
     public void start(Stage primaryStage) {
 
         DateTimeBean observationTime = new DateTimeBean(ZonedDateTime.parse("2020-02-17T20:15:00+01:00"));
-        ViewingParametersBean vpb = new ViewingParametersBean(HorizontalCoordinates.ofDeg(80, 22),
+        ObserverLocationBean epfl = new ObserverLocationBean();
+        epfl.setLonDeg(6.57);
+        epfl.setLatDeg(46.52);
+        ViewingParametersBean view = new ViewingParametersBean(HorizontalCoordinates.ofDeg(180, 22),
                 68.4);
 
-        SkyCanvasManager manager = new SkyCanvasManager(initCatalog(), observationTime,null, vpb);
+        SkyCanvasManager manager = new SkyCanvasManager(initCatalog(), observationTime, epfl, view);
 
         Scene scene = new Scene(new BorderPane(manager.canvas()));
         primaryStage.setScene(scene);
