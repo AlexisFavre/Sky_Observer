@@ -41,13 +41,8 @@ public class SkyCanvasManager {
     
     private Canvas canvas;
     private SkyCanvasPainter painter;
-<<<<<<< HEAD
     // coordinates of the mouse on the projection plane // TODO Be sure it is the good solution
     // TODO should be null
-=======
-    private GeographicCoordinates observerCoordinates = GeographicCoordinates.ofDeg(6.57, 46.52);
-    
->>>>>>> aa10-viewing-parameter
     private ObjectProperty<CartesianCoordinates> mousePosition = new SimpleObjectProperty<>(CartesianCoordinates.of(0, 0));
     
     public DoubleBinding mouseAzDeg;
@@ -67,7 +62,6 @@ public class SkyCanvasManager {
         painter = new SkyCanvasPainter(canvas);
 
         //LINKS =====================================================================================
-<<<<<<< HEAD
         // TODO Introduce multiple canva forms
         ObjectBinding<Transform> planeToCanvas = Bindings.createObjectBinding(
                 () -> {
@@ -75,13 +69,6 @@ public class SkyCanvasManager {
                     return Transform.affine(scaleOfView, 0, 0, -scaleOfView,
                             canvas.getWidth()/2, canvas.getHeight()/2);
                 }, vpb.fieldOfViewDegProperty());
-=======
-        
-
-        ObjectBinding<Transform> planeToCanvas = Bindings.createObjectBinding( 
-                () -> Transform.affine(400/Math.tan(Angle.ofDeg(vpb.getFieldOfViewDeg())/4),
-                        0, 0, -400/Math.tan(Angle.ofDeg(vpb.getFieldOfViewDeg())/4), 400, 300), vpb.fieldOfViewDegProperty());
->>>>>>> aa10-viewing-parameter
 
         ObjectBinding<StereographicProjection> projection = Bindings.createObjectBinding(
                 () -> new StereographicProjection(vpb.getCenter()), vpb.centerProperty());
