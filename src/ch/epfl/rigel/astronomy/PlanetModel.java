@@ -36,7 +36,7 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
     /**
      * List of all the planet instances of the model with their characteristics
      */
-    public static List<PlanetModel> ALL = new ArrayList<>(List.copyOf(Arrays.asList(PlanetModel.values())));
+    public static List<PlanetModel> ALL = List.of(values());
 
     private final String name;
     private final double t;
@@ -119,7 +119,7 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
         
         // PLANET INFO DEPENDING ON THE TIME
         // ecliptic heliocentric latitude
-        double phi = Math.asin(Math.sin((l(daysSinceJ2010)- omega))*Math.sin(i));
+        double phi = Math.asin(Math.sin(l(daysSinceJ2010)- omega)*Math.sin(i));
         // projection of the radius on ecliptic plan
         double r_ = r(daysSinceJ2010)*Math.cos(phi);
         // heliocentric longitude projected on ecliptic plan
