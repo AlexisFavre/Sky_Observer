@@ -1,5 +1,9 @@
 package ch.epfl.rigel.astronomy;
 
+import ch.epfl.rigel.GeneralBuilder;
+import ch.epfl.rigel.Loader;
+import ch.epfl.rigel.coordinates.CityCatalog;
+
 import static ch.epfl.rigel.Preconditions.checkArgument;
 
 import java.io.IOException;
@@ -87,7 +91,7 @@ public final class StarCatalogue {
      * Used to load asterisms and stars
      * via a file name and {@code Loader} with {@code loadFrom()}
      */
-    public final static class Builder {
+    public final static class Builder implements GeneralBuilder {
 
         private List<Star> stars;
         private List<Asterism> asterisms;
@@ -151,24 +155,5 @@ public final class StarCatalogue {
         public List<Asterism> asterisms(){
             return Collections.unmodifiableList(asterisms);
         }
-    }
-
-
-    //================================================================================================
-    /**
-     * Represents a generic loader that loads data from a stream to a {@code Builder}
-     * The load manner is specific to the type of file and data that is loaded
-     */
-    public interface Loader {
-
-        /**
-         * Load the objects where the type corresponds to the stream content
-         * and add them to the given {@code StarCatalogue.Builder}
-         *
-         * @param inputStream the stream containing data to create the objects
-         * @param builder receiving the objects
-         * @throws IOException if the loader could not load the data from the stream correctly
-         */
-        void load(InputStream inputStream, Builder builder) throws IOException;
     }
 }

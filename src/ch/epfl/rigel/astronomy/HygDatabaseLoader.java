@@ -1,5 +1,6 @@
 package ch.epfl.rigel.astronomy;
 
+import ch.epfl.rigel.Loader;
 import ch.epfl.rigel.coordinates.EquatorialCoordinates;
 
 import java.io.*;
@@ -9,7 +10,7 @@ import java.io.*;
  *
  * @author Augustin ALLARD (299918)
  */
-public enum HygDatabaseLoader implements StarCatalogue.Loader {
+public enum HygDatabaseLoader implements Loader {
 
     INSTANCE;
 
