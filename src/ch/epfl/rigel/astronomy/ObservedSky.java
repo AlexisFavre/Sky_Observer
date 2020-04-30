@@ -91,18 +91,18 @@ public final class ObservedSky { //TODO should be final ?
     }
 
     public CartesianCoordinates pointForObjectWithName(String name) {
-        if(name == "Soleil")
+        if(name.equals("Soleil"))
             return sunPoint;
-        if(name == "Lune")
+        if(name.equals("Lune"))
             return moonPoint;
         for(Planet p: planets) {
-            if(p.name().equals(name)) {
+            if(p.name().equalsIgnoreCase(name)) {
                 int i = planets.indexOf(p);
                 return CartesianCoordinates.of(planetPointsRefs[2*i], planetPointsRefs[2*i + 1]);
             }
         }
         for(Star s: stars()) {
-            if(s.name().equals(name)) {
+            if(s.name().equalsIgnoreCase(name)) {
                 int i = stars().indexOf(s);
                 return CartesianCoordinates.of(starPointsRefs[2*i], starPointsRefs[2*i + 1]);
             }
@@ -134,10 +134,10 @@ public final class ObservedSky { //TODO should be final ?
                 d2 = point.distance(c);
             }
         }
-        //System.out.println(sunPoint().distance(moonPoint()));
-        //System.out.println(point.distance(closestObjectPoint));
         return closestObject;
     }
+    
+    //getters================================================================================================
 
     /**
      * @return the projection used for observation

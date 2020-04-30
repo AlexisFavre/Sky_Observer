@@ -79,7 +79,6 @@ public class SkyCanvasManager {
                             canvas.getWidth()/2, canvas.getHeight()/2);
                 }, vpb.fieldOfViewDegProperty());
 
-        // TODO Why projection depends of plane to canvas
         projection = Bindings.createObjectBinding(
                 () -> new StereographicProjection(vpb.getCenter()), vpb.centerProperty());
 
@@ -88,7 +87,6 @@ public class SkyCanvasManager {
 
         sky = Bindings.createObjectBinding(
                 () -> new ObservedSky(dtb.getZonedDateTime(), olb.getCoordinates(), vpb.getCenter(), catalog),
-                // TODO work with center not with projection && how to do without plane to canva?
                 planeToCanvas, vpb.centerProperty(), olb.coordinatesProperty(), dtb.timeProperty(), dtb.dateProperty(), dtb.zoneProperty());
 
         mouseAzDeg  = Bindings.createDoubleBinding(() -> mouseHorizontalPosition.get().azDeg(), mouseHorizontalPosition);
@@ -153,6 +151,7 @@ public class SkyCanvasManager {
         //MOUSE MOVE LISTENER =======================================================================
         canvas.setOnMouseMoved((event -> {
             try {
+                
                 Point2D mp = planeToCanvas.get().createInverse().transform(event.getX(), event.getY());
                 mousePosition.setValue(CartesianCoordinates.of(mp.getX(), mp.getY()));
             } catch (NonInvertibleTransformException e) {
@@ -184,11 +183,14 @@ public class SkyCanvasManager {
         return centerAnimator;
     }
 
-    // TODO encapsulation
-    public void goToDestinationWithName(String destination) {
+    protected void goToDestinationWithName(String destination) {
         CartesianCoordinates destinationOnPlane = sky.get().pointForObjectWithName(destination);
-        HorizontalCoordinates coordinates = projection.get().inverseApply(destinationOnPlane);
-        centerAnimator.setDestination(coordinates.azDeg(), coordinates.altDeg());
-        centerAnimator.start();
+        if(destinationOnPlane != null) {
+            HorizontalCoordinates coordinates = projection.get().inverseApply(destinationOnPlane);
+            centerAnimator.setDestination(coordinates.azDeg(), coordinates.altDeg());
+            centerAnimator.start();
+        }
+        else
+            System.out.println("Un tel astre n'est pas référencé ici");
     }
 }

@@ -1,8 +1,7 @@
 package ch.epfl.rigel.gui;
 
-import ch.epfl.rigel.coordinates.CartesianCoordinates;
-import ch.epfl.rigel.coordinates.HorizontalCoordinates;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
 
 public class MenuManager {
@@ -21,14 +20,10 @@ public class MenuManager {
 
 
         menuPane.setOnKeyPressed(event -> {
-            switch (event.getCode()) {
-                case ENTER:
+            if(event.getCode().equals(KeyCode.ENTER)) {
                     String destination = starSearchBar.getText();
                     System.out.println(destination);
                     manager.goToDestinationWithName(destination);
-                    break;
-                default:
-                    break;
             }
             event.consume();
         });
