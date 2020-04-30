@@ -1,6 +1,7 @@
 package ch.epfl.rigel.gui;
 
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
+import ch.epfl.rigel.math.RightOpenInterval;
 import javafx.animation.AnimationTimer;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -11,7 +12,8 @@ import java.time.ZonedDateTime;
 // TODO Rise between north edge without making tour
 public class ViewAnimator extends AnimationTimer {
 
-    private final static double  HANDLES_PER_RISING = 40;
+    private final static double HANDLES_PER_RISING = 40;
+    private final static RightOpenInterval CINTER_M180TO180 = RightOpenInterval.of(-180, 180);
     private ViewingParametersBean vpb;
     private SimpleBooleanProperty running;
     private Double azDegDest = null;
@@ -30,8 +32,8 @@ public class ViewAnimator extends AnimationTimer {
     public void setDestination(double az, double alt) {
         azDegDest = az;
         altDegDest = alt;
-        azDegStep = (azDegDest - vpb.getCenter().azDeg()) / HANDLES_PER_RISING;
-        altDegStep = (altDegDest - vpb.getCenter().altDeg()) / HANDLES_PER_RISING;
+        azDegStep = CINTER_M180TO180.reduce(azDegDest - vpb.getCenter().azDeg()) / HANDLES_PER_RISING;
+        altDegStep = CINTER_M180TO180.reduce(altDegDest - vpb.getCenter().altDeg()) / HANDLES_PER_RISING;
     }
 
     /**

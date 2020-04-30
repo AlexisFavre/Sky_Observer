@@ -90,6 +90,26 @@ public final class ObservedSky { //TODO should be final ?
         }
     }
 
+    public CartesianCoordinates pointForObjectWithName(String name) {
+        if(name == "Soleil")
+            return sunPoint;
+        if(name == "Lune")
+            return moonPoint;
+        for(Planet p: planets) {
+            if(p.name().equals(name)) {
+                int i = planets.indexOf(p);
+                return CartesianCoordinates.of(planetPointsRefs[2*i], planetPointsRefs[2*i + 1]);
+            }
+        }
+        for(Star s: stars()) {
+            if(s.name().equals(name)) {
+                int i = stars().indexOf(s);
+                return CartesianCoordinates.of(starPointsRefs[2*i], starPointsRefs[2*i + 1]);
+            }
+        }
+        return null;
+    }
+
     /**
      * Gives the closest sky object from the place corresponding to the given plan point
      * if there exists one that is closer to the given maximal distance

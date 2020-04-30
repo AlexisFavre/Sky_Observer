@@ -13,10 +13,15 @@ import ch.epfl.rigel.coordinates.GeographicCoordinates;
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
 import ch.epfl.rigel.gui.*;
 import javafx.application.Application;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.scene.transform.Transform;
 import javafx.stage.Stage;
 
@@ -38,12 +43,19 @@ public class GraphismTest extends Application {
         ViewingParametersBean view = new ViewingParametersBean(HorizontalCoordinates.ofDeg(180 + 1.e-7, 22),
                 68.4);
 
-        SkyCanvasManager manager = new SkyCanvasManager(initCatalog(), observationTime, epfl, view);
+        SkyCanvasManager canvasManager = new SkyCanvasManager(initCatalog(), observationTime, epfl, view);
+        MenuManager menuManager = new MenuManager(view, canvasManager);
 
-        Scene scene = new Scene(new BorderPane(manager.canvas()));
+        GridPane root = new GridPane();
+        root.getChildren().addAll(new BorderPane(canvasManager.canvas()), menuManager.menuPane());
+        Scene scene = new Scene(root);
+
         primaryStage.setScene(scene);
         primaryStage.show();
-        manager.canvas().requestFocus();
+        canvasManager.canvas().setFocusTraversable(true);
+        System.out.println(menuManager.menuPane().focusTraversableProperty());
+        canvasManager.canvas().requestFocus();
+        //root.requestFocus();
     }
 
     private StarCatalogue initCatalog() {

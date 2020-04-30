@@ -19,6 +19,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableObjectValue;
 import javafx.geometry.Point2D;
+import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Transform;
@@ -47,6 +48,8 @@ public class SkyCanvasManager {
     // coordinates of the mouse on the projection plane // TODO Be sure it is the good solution
     // TODO should be null
     private ObjectProperty<CartesianCoordinates> mousePosition = new SimpleObjectProperty<>(CartesianCoordinates.of(0, 0));
+    private ObjectBinding<StereographicProjection> projection;
+    private ObjectBinding<ObservedSky> sky;
     
     public DoubleBinding mouseAzDeg;
     public DoubleBinding mouseAltDeg;
@@ -65,6 +68,7 @@ public class SkyCanvasManager {
 
         canvas = new Canvas(800, 600);
         painter = new SkyCanvasPainter(canvas);
+        //Node test;
 
         //LINKS =====================================================================================
         // TODO Introduce multiple canva forms
@@ -76,13 +80,13 @@ public class SkyCanvasManager {
                 }, vpb.fieldOfViewDegProperty());
 
         // TODO Why projection depends of plane to canvas
-        ObjectBinding<StereographicProjection> projection = Bindings.createObjectBinding(
+        projection = Bindings.createObjectBinding(
                 () -> new StereographicProjection(vpb.getCenter()), vpb.centerProperty());
 
         ObjectBinding<HorizontalCoordinates> mouseHorizontalPosition = Bindings.createObjectBinding(
                 () -> projection.get().inverseApply(mousePosition.get()), mousePosition, projection, planeToCanvas);
 
-        ObjectBinding<ObservedSky> sky = Bindings.createObjectBinding(
+        sky = Bindings.createObjectBinding(
                 () -> new ObservedSky(dtb.getZonedDateTime(), olb.getCoordinates(), vpb.getCenter(), catalog),
                 // TODO work with center not with projection && how to do without plane to canva?
                 planeToCanvas, vpb.centerProperty(), olb.coordinatesProperty(), dtb.timeProperty(), dtb.dateProperty(), dtb.zoneProperty());
@@ -124,6 +128,11 @@ public class SkyCanvasManager {
                 case LEFT: // TODO Reduce not working
                     vpb.setCenter(HorizontalCoordinates.ofDeg(CINTER_0TO360.reduce(az - 10), alt));
                     break;
+                case R:
+                    CartesianCoordinates rigelOnPlane = sky.get().pointForObjectWithName("Rigel");
+                    HorizontalCoordinates rigelCoord = projection.get().inverseApply(rigelOnPlane);
+                    centerAnimator.setDestination(rigelCoord.azDeg(), rigelCoord.altDeg());
+                    centerAnimator.start();
                 default:
                     break;
             }
@@ -169,5 +178,17 @@ public class SkyCanvasManager {
      */
     public Canvas canvas() {
         return canvas;
+    }
+
+    public ViewAnimator centerAnimator() {
+        return centerAnimator;
+    }
+
+    // TODO encapsulation
+    public void goToDestinationWithName(String destination) {
+        CartesianCoordinates destinationOnPlane = sky.get().pointForObjectWithName(destination);
+        HorizontalCoordinates coordinates = projection.get().inverseApply(destinationOnPlane);
+        centerAnimator.setDestination(coordinates.azDeg(), coordinates.altDeg());
+        centerAnimator.start();
     }
 }
