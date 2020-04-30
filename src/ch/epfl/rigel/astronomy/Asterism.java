@@ -1,9 +1,8 @@
 package ch.epfl.rigel.astronomy;
 
-import java.util.List;
-import java.util.Locale;
-
 import static ch.epfl.rigel.Preconditions.checkArgument;
+
+import java.util.List;
 
 /**
  * Describe an asterism which is a group of stars

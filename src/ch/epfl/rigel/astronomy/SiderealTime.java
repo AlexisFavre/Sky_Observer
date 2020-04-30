@@ -1,13 +1,12 @@
 package ch.epfl.rigel.astronomy;
 
-import ch.epfl.rigel.coordinates.GeographicCoordinates;
-import ch.epfl.rigel.math.Angle;
-import ch.epfl.rigel.math.Polynomial;
-import ch.epfl.rigel.math.RightOpenInterval;
-
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+
+import ch.epfl.rigel.coordinates.GeographicCoordinates;
+import ch.epfl.rigel.math.Angle;
+import ch.epfl.rigel.math.Polynomial;
 
 /**
  * Non instantiable class containing only {@code static} methods

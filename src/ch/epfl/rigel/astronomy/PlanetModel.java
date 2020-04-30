@@ -1,7 +1,5 @@
 package ch.epfl.rigel.astronomy;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import ch.epfl.rigel.coordinates.EclipticCoordinates;

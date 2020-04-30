@@ -2,7 +2,6 @@ package ch.epfl.rigel.coordinates;
 
 import static ch.epfl.rigel.Preconditions.checkArgument;
 import static ch.epfl.rigel.math.ClosedInterval.CSymmetricInterOfSize180;
-import static ch.epfl.rigel.math.RightOpenInterval.ROInter_0To360;
 
 import java.util.Locale;
 
