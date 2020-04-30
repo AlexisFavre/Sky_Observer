@@ -38,7 +38,8 @@ public class SkyCanvasManager {
     
     private final static ClosedInterval CINTER_5TO90   = ClosedInterval.of(5, 90);
     private final static ClosedInterval CINTER_30TO150 = ClosedInterval.of(30, 150);
-    
+
+    // TODO Replace
     private Canvas canvas;
     private SkyCanvasPainter painter;
     // coordinates of the mouse on the projection plane // TODO Be sure it is the good solution
@@ -64,7 +65,8 @@ public class SkyCanvasManager {
 
         canvas = new Canvas(800, 600);
         painter = new SkyCanvasPainter(canvas);
-        scaleOfView = Bindings.createDoubleBinding(() -> canvas.getWidth()/ (2*Math.tan(Angle.ofDeg(vpb.getFieldOfViewDeg())/4)), canvas.widthProperty(), vpb.fieldOfViewDegProperty());
+        scaleOfView = Bindings.createDoubleBinding(() -> canvas.getWidth()/ (2*Math.tan(Angle.ofDeg(vpb.getFieldOfViewDeg())/4)),
+                canvas.widthProperty(), vpb.fieldOfViewDegProperty());
 
         //LINKS =====================================================================================
         // TODO Introduce multiple canva forms ????
@@ -73,7 +75,7 @@ public class SkyCanvasManager {
                     double scaleOfView = canvas.getWidth()/ (2*Math.tan(Angle.ofDeg(vpb.getFieldOfViewDeg())/4));
                     return Transform.affine(scaleOfView, 0, 0, -scaleOfView,
                             canvas.getWidth()/2, canvas.getHeight()/2);
-                }, vpb.fieldOfViewDegProperty(), canvas.heightProperty(), canvas.widthProperty()); //TODO /!\ changement projection par rapport zoom
+                }, vpb.fieldOfViewDegProperty(), canvas.heightProperty(), canvas.widthProperty());
 
         // TODO Why projection depends of plane to canvas
         ObjectBinding<StereographicProjection> projection = Bindings.createObjectBinding(
@@ -103,6 +105,7 @@ public class SkyCanvasManager {
             System.out.println(objectUnderMouse.get());});
 
         //RE_DRAW SKY VIA LISTENER ==================================================================
+        // TODO Plane redessine
         sky.addListener((p, o, n)-> resetSky());
 
         //KEYBOARD LISTENER ==============================================================================
@@ -149,18 +152,18 @@ public class SkyCanvasManager {
         //ADAPTATION OF SKY WHEN SIZE OF STAGE CHANGE
         canvas.widthProperty().addListener(e-> resetSky());
         canvas.heightProperty().addListener(e-> resetSky());
-            
-        // TODO I already reset it in graphism test
-       //resetSky();
+        canvas.requestFocus();
     }
 
+    // TODO Border pane
     /**
      * @return the canvas managed by {@code this}
      */
     public Canvas canvas() {
         return canvas;
     }
-    
+
+    // TODO check
     public void resetSky() {
         painter.clear();
         painter.drawSky(sky.get(), planeToCanvas.get());
