@@ -1,7 +1,5 @@
 package ch.epfl.rigel.astronomy;
 
-import ch.epfl.rigel.Loader;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,7 +12,7 @@ import java.util.List;
  *
  * @author Augustin ALLARD (299918)
  */
-public enum AsterismLoader implements Loader {
+public enum AsterismLoader implements StarCatalogue.Loader {
 
     INSTANCE;
 
