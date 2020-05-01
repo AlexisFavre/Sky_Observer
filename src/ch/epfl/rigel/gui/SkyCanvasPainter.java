@@ -37,6 +37,17 @@ public class SkyCanvasPainter { // TODO Check if ok with removed projections
     }
 
     /**
+     * Clear the previous sky and draw the new one actualize
+     *
+     * @param sky the new actual sky to draw
+     * @param planeToCanvas the new actual transformation to use
+     */
+    public void actualize(ObservedSky sky, Transform planeToCanvas) {
+        clear();
+        drawSky(sky, planeToCanvas);
+    }
+
+    /**
      * Clear what has been drawn on the {@code Canvas} and reset it as a black board
      */
     public void clear() {
