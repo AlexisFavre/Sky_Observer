@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -18,14 +19,7 @@ public enum AsterismLoader implements StarCatalogue.Loader {
 
     INSTANCE;
 
-    private Star starOf(int hipId, StarCatalogue.Builder builder) {
-        for(Star s : builder.stars()) {
-            if(s.hipparcosId() == hipId) {
-                return s;
-            }
-        }
-        return null;
-    }
+    private final HashMap<Integer, Star> hipparcosIdOfStar = new HashMap<>();
 
     /**
      * Load {@code Asterism} objects created using the the stream content
@@ -37,6 +31,10 @@ public enum AsterismLoader implements StarCatalogue.Loader {
      */
     @Override
     public void load(InputStream inputStream, StarCatalogue.Builder builder) throws IOException {
+        
+        for (Star star : builder.stars()) {
+            hipparcosIdOfStar.put(star.hipparcosId(), star);
+        }
 
         try(BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.US_ASCII))) {
             String currentLine;
@@ -47,10 +45,10 @@ public enum AsterismLoader implements StarCatalogue.Loader {
 
                 // containing verification
                 for (String h : lineHips) {
-                    Star s;
-                    if ((s = starOf(Integer.parseInt(h), builder)) != null) {
-                        lineStarsContainedInBuilder.add(s);
-                    } else {
+                    Star star = hipparcosIdOfStar.get(Integer.parseInt(h));
+                        if(star != null) {
+                        lineStarsContainedInBuilder.add(star);
+                        } else {
                         builderContainsAllAsterismStars = false;
                     }
                 }
