@@ -1,12 +1,14 @@
 package ch.epfl.rigel.coordinates;
 
 import static ch.epfl.rigel.Preconditions.checkInInterval;
+import static ch.epfl.rigel.math.ClosedInterval.CSymmetricInterOfSize180;
+import static ch.epfl.rigel.math.ClosedInterval.CSymmetricInterOfSizePi;
+import static ch.epfl.rigel.math.RightOpenInterval.ROInter_0To2Pi;
+import static ch.epfl.rigel.math.RightOpenInterval.ROInter_0To360;
 
 import java.util.Locale;
 
 import ch.epfl.rigel.math.Angle;
-import ch.epfl.rigel.math.ClosedInterval;
-import ch.epfl.rigel.math.RightOpenInterval;
 
 /**
  * Type of spherical coordinates that describe the position of an object where
@@ -41,8 +43,8 @@ public final class HorizontalCoordinates extends SphericalCoordinates {
      * respectively [0,2Pi[ and [-Pi/2,Pi/2]
      */
     public static HorizontalCoordinates of(double az, double alt) throws IllegalArgumentException{
-        checkInInterval(RightOpenInterval.of(0, Angle.TAU), az);
-        checkInInterval(ClosedInterval.of(-Angle.TAU/4, Angle.TAU/4), alt);
+        checkInInterval(ROInter_0To2Pi, az);
+        checkInInterval(CSymmetricInterOfSizePi, alt);
         return new HorizontalCoordinates(az, alt);
     }
     
@@ -58,8 +60,8 @@ public final class HorizontalCoordinates extends SphericalCoordinates {
      * @throws IllegalArgumentException if az or alt does not belong to respectively [0,360°[ and [-90°,90°]
      */
     public static HorizontalCoordinates ofDeg(double azDeg, double altDeg) throws IllegalArgumentException {
-        checkInInterval(RightOpenInterval.of(0, 360), azDeg);
-        checkInInterval(ClosedInterval.of(-90, 90), altDeg);
+        checkInInterval(ROInter_0To360, azDeg);
+        checkInInterval(CSymmetricInterOfSize180, altDeg);
         
         return new HorizontalCoordinates(Angle.ofDeg(azDeg), Angle.ofDeg(altDeg));
     }

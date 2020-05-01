@@ -1,6 +1,7 @@
 package ch.epfl.rigel.math;
 
 import static ch.epfl.rigel.Preconditions.checkInInterval;
+import static ch.epfl.rigel.math.RightOpenInterval.ROInter_0To2Pi;;
 
 /**
  * Non instantiable class containing only {@code static} methods
@@ -13,9 +14,11 @@ import static ch.epfl.rigel.Preconditions.checkInInterval;
 public final class Angle {
 
     public static final double TAU = 2*Math.PI;
-    private static final double DEG_PER_RAD = 360.0 / TAU;
+    private static final double DEG_PER_RAD  = 360.0 / TAU;
     private static final double RAD_PER_HOUR = TAU / 24;
+    private static final RightOpenInterval ROInter_0To60 = RightOpenInterval.of(0, 60);
 
+    
     private Angle() {}
     
     /**
@@ -24,7 +27,7 @@ public final class Angle {
      * @return normalized angle value
      */
     public static double normalizePositive(double rad) {
-        return (rad%TAU + TAU)%TAU;
+        return ROInter_0To2Pi.reduce(rad);
     }
     
     /**
@@ -44,8 +47,8 @@ public final class Angle {
      * @return corresponding angle value in radians
      */
     public static double ofDMS(int deg, int min, double sec) {
-        checkInInterval(RightOpenInterval.of(0,60), sec);
-        checkInInterval(RightOpenInterval.of(0,60), min);
+        checkInInterval(ROInter_0To60, sec);
+        checkInInterval(ROInter_0To60, min);
         return ofDeg(deg + min/60.0 + sec/3600.0);
     }
     

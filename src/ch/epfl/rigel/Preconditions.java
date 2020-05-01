@@ -25,7 +25,7 @@ public final class Preconditions {
      */
     public static void checkArgument(boolean isTrue) throws IllegalArgumentException {
         if(!isTrue) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("the given argument is false");
         }
     }
     
@@ -42,7 +42,7 @@ public final class Preconditions {
             return value;
         }
         else {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("the given value does not belongs in this interval");
         }
     }
 

@@ -71,8 +71,9 @@ public final class StereographicProjection implements Function<HorizontalCoordin
         double x = xy.x();
         double y = xy.y();
         double p = Math.sqrt(x*x + y*y);
-        double sinC = 2*p/(p*p +1);
-        double cosC = (1 - p*p)/(p*p +1);
+        double pSquare = p*p;
+        double sinC = 2*p/(pSquare +1);
+        double cosC = (1 - pSquare)/(pSquare +1);
         
         double lamda = Math.atan2(x*sinC,(p*cosCenterAlt*cosC - y*sinCenterAlt*sinC)) + this.centerAzimuth;
         double phi   = Math.asin(cosC*sinCenterAlt + y*sinC*cosCenterAlt/p);

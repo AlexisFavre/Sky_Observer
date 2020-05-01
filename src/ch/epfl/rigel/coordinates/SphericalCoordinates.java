@@ -18,7 +18,6 @@ abstract class SphericalCoordinates {
     private final double latitude;
 
     /**
-     *
      * @param longitude in radians
      * @param latitude in radians
      */
@@ -28,7 +27,6 @@ abstract class SphericalCoordinates {
     }
 
     /**
-     * 
      * @return the longitude in radians
      */
     double lon() {
@@ -36,7 +34,6 @@ abstract class SphericalCoordinates {
     }
     
     /**
-     * 
      * @return the latitude in radians
      */
     double lat() {
@@ -44,7 +41,6 @@ abstract class SphericalCoordinates {
     }
     
     /**
-     * 
      * @return the longitude in degrees
      */
     double lonDeg() {
@@ -52,7 +48,6 @@ abstract class SphericalCoordinates {
     }
     
     /**
-     * 
      * @return the latitude in degrees
      */
     double latDeg() {
