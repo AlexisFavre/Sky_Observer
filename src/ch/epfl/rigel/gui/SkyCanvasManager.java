@@ -78,7 +78,7 @@ public class SkyCanvasManager {
 
         //LINKS =====================================================================================
         // TODO Why projection depends of plane to canvas
-        ObjectBinding<StereographicProjection> projection = Bindings.createObjectBinding(
+        projection = Bindings.createObjectBinding(
                 () -> new StereographicProjection(vpb.getCenter()), vpb.centerProperty());
         
         DoubleBinding scaleOfView = Bindings.createDoubleBinding(() ->
@@ -120,26 +120,23 @@ public class SkyCanvasManager {
         canvas.setOnKeyPressed(event -> {
             double az = vpb.getCenter().azDeg();
             double alt = vpb.getCenter().altDeg();
-            switch (event.getCode()) {
-                case UP:
-                    vpb.setCenter(HorizontalCoordinates.ofDeg(az, CINTER_5TO90.clip( alt + 5)));
-                    break;
-                case DOWN:
-                    vpb.setCenter(HorizontalCoordinates.ofDeg(az, CINTER_5TO90.clip( alt - 5)));
-                    break;
-                case RIGHT:
-                    vpb.setCenter(HorizontalCoordinates.ofDeg(CINTER_0TO360.reduce(az + 10), alt));
-                    break;
-                case LEFT: // TODO Reduce not working
-                    vpb.setCenter(HorizontalCoordinates.ofDeg(CINTER_0TO360.reduce(az - 10), alt));
-                    break;
-                case R:
-                    CartesianCoordinates rigelOnPlane = sky.get().pointForObjectWithName("Rigel");
-                    HorizontalCoordinates rigelCoord = projection.get().inverseApply(rigelOnPlane);
-                    centerAnimator.setDestination(rigelCoord.azDeg(), rigelCoord.altDeg());
-                    centerAnimator.start();
-                default:
-                    break;
+            if(!centerAnimator.runningProperty().getValue()) {
+                switch (event.getCode()) {
+                    case UP:
+                        vpb.setCenter(HorizontalCoordinates.ofDeg(az, CINTER_5TO90.clip(alt + 1)));
+                        break;
+                    case DOWN:
+                        vpb.setCenter(HorizontalCoordinates.ofDeg(az, CINTER_5TO90.clip(alt - 1)));
+                        break;
+                    case RIGHT:
+                        vpb.setCenter(HorizontalCoordinates.ofDeg(CINTER_0TO360.reduce(az + 2), alt));
+                        break;
+                    case LEFT: // TODO Reduce not working
+                        vpb.setCenter(HorizontalCoordinates.ofDeg(CINTER_0TO360.reduce(az - 2), alt));
+                        break;
+                    default:
+                        break;
+                }
             }
             event.consume();
         });
@@ -192,6 +189,7 @@ public class SkyCanvasManager {
      * To use after scene integration of the pane
      */
     public void focusOnCanvas() {
+        //pane.getChildren().get(0).isFocusTraversable();
         pane.getChildren().get(0).requestFocus();
     }
 
@@ -202,12 +200,11 @@ public class SkyCanvasManager {
     protected void goToDestinationWithName(String destination) {
         CartesianCoordinates destinationOnPlane = sky.get().pointForObjectWithName(destination);
         if(destinationOnPlane != null) {
-            System.out.println(projection.get());
             HorizontalCoordinates coordinates = projection.get().inverseApply(destinationOnPlane);
             centerAnimator.setDestination(coordinates.azDeg(), coordinates.altDeg());
             centerAnimator.start();
         }
         else
-            System.out.println("Un tel astre n'est pas référencé ici");
+            System.out.println("Astre introuvable");
     }
 }

@@ -24,7 +24,7 @@ public class Test extends Application {
 //Defining the Name text field
         final TextField name = new TextField();
         name.setPromptText("Enter your first name.");
-        name.setPrefColumnCount(40);
+        name.setPrefColumnCount(1);
         name.getText();
         GridPane.setConstraints(name, 0, 0);
         grid.getChildren().add(name);
