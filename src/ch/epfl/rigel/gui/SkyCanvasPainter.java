@@ -1,5 +1,7 @@
 package ch.epfl.rigel.gui;
 
+import java.util.Iterator;
+
 import ch.epfl.rigel.astronomy.Asterism;
 import ch.epfl.rigel.astronomy.ObservedSky;
 import ch.epfl.rigel.astronomy.Planet;
@@ -24,8 +26,12 @@ import javafx.scene.transform.Transform;
  */
 public class SkyCanvasPainter { // TODO Check if ok with removed projections
 
-    Canvas canvas;
-    GraphicsContext graph2D;
+    private final static double ALTITUDE_OF_OCTANTS = -1.5;
+    private final static int ANGLE_IN_DEGREES_BETWEEN_OCTANTS = 45;
+    private final static ClosedInterval RANGE_OF_MAGNITUDE = ClosedInterval.of(-2, 5);
+    
+    private Canvas canvas;
+    private GraphicsContext graph2D;
 
     /**
      *
@@ -103,9 +109,10 @@ public class SkyCanvasPainter { // TODO Check if ok with removed projections
         graph2D.beginPath();
         graph2D.setStroke(Color.BLUE);
         for(Asterism a: sky.asterisms()) {
-            for(int j = 0; j < sky.asterismIndices(a).size() - 1; ++j) {
-                int idOfStarFrom = sky.asterismIndices(a).get(j);
-                int idOfStarTo = sky.asterismIndices(a).get(j + 1);
+            Iterator<Integer> iteratorOverID = sky.asterismIndices(a).iterator();
+            int idOfStarFrom = iteratorOverID.next();
+            while(iteratorOverID.hasNext()) {
+                int idOfStarTo = iteratorOverID.next();
                 double xFr = screenPoints[2*idOfStarFrom];
                 double yFr = screenPoints[2*idOfStarFrom+1];
                 double xTo = screenPoints[2*idOfStarTo];
@@ -114,6 +121,7 @@ public class SkyCanvasPainter { // TODO Check if ok with removed projections
                     graph2D.moveTo(xFr, yFr);
                     graph2D.lineTo(xTo, yTo);
                 }
+                idOfStarFrom = idOfStarTo;
             }
         }
         graph2D.stroke();
@@ -160,12 +168,11 @@ public class SkyCanvasPainter { // TODO Check if ok with removed projections
         graph2D.strokeOval(screenPointForCenter.getX() - r, screenPointForCenter.getY() - r, 2*r, 2*r);
 
         // TODO Search for 0.5 instead of 1.5
-        double alt = -1.5;
         double az = 0;
         for(int i = 0; i < 8; ++i) {
-            HorizontalCoordinates c = HorizontalCoordinates.ofDeg(az, alt);
+            HorizontalCoordinates c = HorizontalCoordinates.ofDeg(az, ALTITUDE_OF_OCTANTS);
             drawCardinal(c, c.azOctantName(), projection, planeToCanvas);
-            az += 45;
+            az += ANGLE_IN_DEGREES_BETWEEN_OCTANTS;
         }
     }
 
@@ -182,7 +189,7 @@ public class SkyCanvasPainter { // TODO Check if ok with removed projections
     }
 
     private void drawEllipseOf(Color color, double planeX, double planeY, double magnitude, Transform planeToCanvas) {
-        double m = ClosedInterval.of(-2, 5).clip(magnitude);
+        double m = RANGE_OF_MAGNITUDE.clip(magnitude);
         double f = (99 - 17*m)/140;
         double d = f*2*Math.tan(Angle.ofDeg(0.5)/4.0)*planeToCanvas.getMxx();
         graph2D.setFill(color);
