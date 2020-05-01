@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,7 +30,8 @@ import java.util.Set;
 public final class StarCatalogue {
 
     private final List<Star> stars;
-    private final Map<Asterism, List<Integer>> asterismsStarIndexesMapping;
+    private final Map<Asterism, List<Integer>> starsIndexesOfAsterisms = new HashMap<>();
+    private final Map<Star, Integer> indexOfStars = new HashMap<>();
 
     /**
      * @param my_stars {@code List} of the stars to be added
@@ -39,17 +41,26 @@ public final class StarCatalogue {
     public StarCatalogue(List<Star> my_stars, List<Asterism> my_asterisms) throws IllegalArgumentException {
         stars = List.copyOf(my_stars);
         List<Asterism> immutablesAsterisms = List.copyOf(my_asterisms);
-        asterismsStarIndexesMapping = new HashMap<>();
+        
+        //build map indexOfStars
+        Iterator<Star> starIterators = stars.iterator();
+        int indexOfStarInList = 0;
+        while(starIterators.hasNext()) {
+            indexOfStars.put(starIterators.next(), indexOfStarInList);
+            ++indexOfStarInList;
+        }
+        
+        // build asterismsStarIndexesMapping
         for (Asterism a : immutablesAsterisms) {
             // verify that a contains only stars in the catalog
             checkArgument(stars.containsAll(a.stars()));
 
-            // map the star indexes of a to a
+            // map the asterism to its list of stars indexes
             List<Integer> starIndexesOfA = new ArrayList<>();
             for(Star s : a.stars()) {
-                starIndexesOfA.add(this.stars.indexOf(s));
+                starIndexesOfA.add(indexOfStars.get(s));
             }
-            asterismsStarIndexesMapping.put(a, starIndexesOfA);
+            starsIndexesOfAsterisms.put(a, starIndexesOfA);
         }
     }
 
@@ -61,8 +72,8 @@ public final class StarCatalogue {
      * @throws IllegalArgumentException if the given asterism does not belongs to {@code this}
      */
     public List<Integer> asterismIndices(Asterism asterism) throws IllegalArgumentException {
-        checkArgument(asterismsStarIndexesMapping.containsKey(asterism));
-        return asterismsStarIndexesMapping.get(asterism);
+        checkArgument(starsIndexesOfAsterisms.containsKey(asterism));
+        return starsIndexesOfAsterisms.get(asterism);
     }
 
     /**
@@ -78,7 +89,7 @@ public final class StarCatalogue {
      * @return asterisms of the catalog
      */
     public Set<Asterism> asterisms() {
-        return asterismsStarIndexesMapping.keySet();
+        return starsIndexesOfAsterisms.keySet();
     }
 
 
