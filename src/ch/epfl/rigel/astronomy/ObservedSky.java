@@ -4,13 +4,16 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ch.epfl.rigel.coordinates.*;
+import ch.epfl.rigel.coordinates.CartesianCoordinates;
+import ch.epfl.rigel.coordinates.EclipticToEquatorialConversion;
+import ch.epfl.rigel.coordinates.EquatorialToHorizontalConversion;
+import ch.epfl.rigel.coordinates.GeographicCoordinates;
+import ch.epfl.rigel.coordinates.HorizontalCoordinates;
+import ch.epfl.rigel.coordinates.StereographicProjection;
 
 /**
  * Represents a set of {@code CelestialObjects} projected on a plan
