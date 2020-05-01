@@ -70,18 +70,18 @@ public class SkyCanvasManager {
         painter = new SkyCanvasPainter(canvas);
 
         //LINKS =====================================================================================
+        // TODO Why projection depends of plane to canvas
+        ObjectBinding<StereographicProjection> projection = Bindings.createObjectBinding(
+                () -> new StereographicProjection(vpb.getCenter()), vpb.centerProperty());
+        
         DoubleBinding scaleOfView = Bindings.createDoubleBinding(() ->
-                        Math.max(canvas.getWidth(), canvas.getHeight())/ (2*Math.tan(Angle.ofDeg(vpb.getFieldOfViewDeg())/4)),
-                canvas.widthProperty(), canvas.heightProperty(), vpb.fieldOfViewDegProperty());
+                        Math.max(canvas.getWidth(), canvas.getHeight())/ projection.get().applyToAngle(Angle.ofDeg(vpb.getFieldOfViewDeg())),
+                canvas.widthProperty(), canvas.heightProperty(), vpb.fieldOfViewDegProperty(), projection);
 
         ObjectBinding<Transform> planeToCanvas = Bindings.createObjectBinding(
                 () -> Transform.affine(scaleOfView.get(), 0, 0, -scaleOfView.get(),
                             canvas.getWidth()/2, canvas.getHeight()/2)
                 , scaleOfView);
-
-        // TODO Why projection depends of plane to canvas
-        ObjectBinding<StereographicProjection> projection = Bindings.createObjectBinding(
-                () -> new StereographicProjection(vpb.getCenter()), vpb.centerProperty());
 
         ObjectBinding<HorizontalCoordinates> mouseHorizontalPosition = Bindings.createObjectBinding(
                 () -> projection.get().inverseApply(mousePosition.get()), mousePosition, projection, planeToCanvas);
