@@ -30,7 +30,7 @@ import java.util.Set;
 public final class StarCatalogue {
 
     private final List<Star> stars;
-    private final Map<Asterism, List<Integer>> starsIndexesOfAsterisms = new HashMap<>();
+    private final Map<Asterism, List<Integer>> starsIndexesOfAsterisms;
     private final Map<Star, Integer> indexOfStars = new HashMap<>();
 
     /**
@@ -41,6 +41,8 @@ public final class StarCatalogue {
     public StarCatalogue(List<Star> my_stars, List<Asterism> my_asterisms) throws IllegalArgumentException {
         stars = List.copyOf(my_stars);
         List<Asterism> immutablesAsterisms = List.copyOf(my_asterisms);
+        
+        Map<Asterism, List<Integer>> starsIndexesOfAsterismsNotImmutable = new HashMap<>();
         
         //build map indexOfStars
         Iterator<Star> starIterators = stars.iterator();
@@ -60,8 +62,9 @@ public final class StarCatalogue {
             for(Star s : a.stars()) {
                 starIndexesOfA.add(indexOfStars.get(s));
             }
-            starsIndexesOfAsterisms.put(a, starIndexesOfA);
+            starsIndexesOfAsterismsNotImmutable.put(a, List.copyOf(starIndexesOfA));
         }
+        starsIndexesOfAsterisms = Map.copyOf(starsIndexesOfAsterismsNotImmutable);
     }
 
     /**
