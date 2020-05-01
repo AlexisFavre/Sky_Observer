@@ -9,6 +9,16 @@ import java.util.Locale;
  * @author Alexis FAVRE (310552)
  */
 public final class ClosedInterval extends Interval {
+    
+    /**
+     * [-Pi/2, Pi/2]    (often used)
+     */
+    public static final ClosedInterval CSymmetricInterOfSizePi = symmetric(Math.PI);
+    
+    /**
+     * [-90, 90]      (often used)
+     */
+    public static final ClosedInterval CSymmetricInterOfSize180 = symmetric(180);
 
     private ClosedInterval(double low, double high) {
         super(low, high);
@@ -32,7 +42,8 @@ public final class ClosedInterval extends Interval {
      * @return the corresponding new instance of {@code ClosedInterval}
      */
     public static ClosedInterval symmetric(double size) {
-        return new ClosedInterval(-size/2, size/2);
+        double demiSize = size/2d;
+        return new ClosedInterval(-demiSize, demiSize);
     }
 
     
@@ -68,6 +79,6 @@ public final class ClosedInterval extends Interval {
      */
     @Override
     public String toString() {
-        return String.format(Locale.ROOT, "[%s,%s]", low(), high());
+        return String.format(Locale.ROOT, "[%f,%f]", low(), high());
     }
 }

@@ -13,6 +13,7 @@ import ch.epfl.rigel.math.ClosedInterval;
 public final class Moon extends CelestialObject {
 
     private final float phase;
+    private final static ClosedInterval CINTER_0TO1 = ClosedInterval.of(0,1);
     
     /**
      * @param equatorialPos of the Moon
@@ -24,8 +25,7 @@ public final class Moon extends CelestialObject {
     public Moon(EquatorialCoordinates equatorialPos,
             float angularSize, float magnitude, float phase) throws IllegalArgumentException{
         super("Lune", equatorialPos, angularSize, magnitude);
-        checkInInterval(ClosedInterval.of(0,1), phase);
-        this.phase = phase;
+        this.phase = (float) checkInInterval(CINTER_0TO1, phase);
     }
 
     /**
