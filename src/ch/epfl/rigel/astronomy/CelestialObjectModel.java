@@ -8,7 +8,7 @@ import ch.epfl.rigel.coordinates.EclipticToEquatorialConversion;
  *
  * @author Augustin ALLARD (299918)
  */
-public interface CelestialObjectModel <O> {
+public interface CelestialObjectModel<O> {
 
     /**
      * This gives the object O in the state corresponding to the given time

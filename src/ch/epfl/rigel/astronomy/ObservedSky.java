@@ -51,7 +51,8 @@ public final class ObservedSky { //TODO should be final ?
         EclipticToEquatorialConversion eclToEqu   = new EclipticToEquatorialConversion(obsTime);
         EquatorialToHorizontalConversion equToHor = new EquatorialToHorizontalConversion(obsTime, obsPlace);
         
-        List<PlanetModel> extraterrestrialModels = PlanetModel.ALL;
+        List<PlanetModel> extraterrestrialModels = new ArrayList<>();
+        extraterrestrialModels.addAll(PlanetModel.ALL);
         extraterrestrialModels.remove(PlanetModel.EARTH);
 
         sun  = SunModel.SUN.at(moment, eclToEqu);
@@ -114,8 +115,6 @@ public final class ObservedSky { //TODO should be final ?
                 d2 = point.distance(c);
             }
         }
-        //System.out.println(sunPoint().distance(moonPoint()));
-        //System.out.println(point.distance(closestObjectPoint));
         return closestObject;
     }
 

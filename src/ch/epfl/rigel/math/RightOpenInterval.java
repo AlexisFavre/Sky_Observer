@@ -1,6 +1,6 @@
 package ch.epfl.rigel.math;
 
-import java.util.Locale;
+import java.util.Locale;;
 
 /**
  * Represents a mathematical right open interval as
@@ -9,6 +9,10 @@ import java.util.Locale;
  * @author Alexis FAVRE (310552)
  */
 public final class RightOpenInterval extends Interval {
+    /** [0, 2Pi]  (often used) */
+    public static final RightOpenInterval ROInter_0To2Pi = new RightOpenInterval(0, Angle.TAU);
+    /** [0, 360] (often used) */
+    public static final RightOpenInterval ROInter_0To360 = new RightOpenInterval(0, 360);
     
     private RightOpenInterval(double low, double high) {
         super(low, high);
@@ -32,7 +36,8 @@ public final class RightOpenInterval extends Interval {
      * @return the corresponding new instance of {@code ClosedInterval}
      */
     public static RightOpenInterval symmetric(double size) {
-        return new RightOpenInterval(-size/2, size/2);
+        double demiSize = size/2d;
+        return new RightOpenInterval(-demiSize, demiSize);
     }
 
     /**
@@ -44,8 +49,10 @@ public final class RightOpenInterval extends Interval {
      * the result of the reduce function if not (see the graph of the function for more info)
      */
     public double reduce(double v) {
+        if(this.contains(v))
+            return v;
         double a = v - low();
-        double b = high() - low();
+        double b = size();
         return low() + a - b*Math.floor(a/b);
     }
 
@@ -63,7 +70,7 @@ public final class RightOpenInterval extends Interval {
      */
     @Override
     public String toString() {
-        return String.format(Locale.ROOT, "[%s, %s[", low(), high());
+        return String.format(Locale.ROOT, "[%f, %f[", low(), high());
     }
 
 }
