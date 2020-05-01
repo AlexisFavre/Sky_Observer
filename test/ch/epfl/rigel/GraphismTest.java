@@ -36,14 +36,11 @@ public class GraphismTest extends Application {
 
         SkyCanvasManager manager = new SkyCanvasManager(initCatalog(), observationTime, epfl, view);
 
-        BorderPane bp = new BorderPane(manager.canvas());
-        bp.setPrefSize(800, 600);
-        manager.canvas().widthProperty().bind(bp.widthProperty());
-        manager.canvas().heightProperty().bind(bp.heightProperty());
-        Scene scene = new Scene(bp);
+        Scene scene = new Scene(manager.pane());
         primaryStage.setScene(scene);
         primaryStage.setY(100);
         primaryStage.show();
+        manager.focusOnCanvas();
     }
 
     private StarCatalogue initCatalog() {

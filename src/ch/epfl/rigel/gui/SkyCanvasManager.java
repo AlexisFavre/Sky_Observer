@@ -20,6 +20,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableObjectValue;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Transform;
 
@@ -40,7 +41,7 @@ public class SkyCanvasManager {
     private final static ClosedInterval CINTER_30TO150 = ClosedInterval.of(30, 150);
 
     // TODO Replace
-    private Canvas canvas;
+    private BorderPane pane;
     private SkyCanvasPainter painter;
     // coordinates of the mouse on the projection plane // TODO Be sure it is the good solution
     // TODO should be null
@@ -51,8 +52,6 @@ public class SkyCanvasManager {
     public ObjectBinding<CelestialObject> objectUnderMouse; //TODO pourquoi en private?
 
     ObjectBinding<ObservedSky> sky;
-    ObjectBinding<Transform> planeToCanvas;
-    DoubleBinding scaleOfView;
     
     /**
      *
@@ -63,19 +62,22 @@ public class SkyCanvasManager {
      */
     public SkyCanvasManager(StarCatalogue catalog, DateTimeBean dtb, ObserverLocationBean olb, ViewingParametersBean vpb) {
 
-        canvas = new Canvas(800, 600);
+        Canvas canvas = new Canvas();
+        pane = new BorderPane(canvas);
+        pane.setPrefSize(800, 600);
+        canvas.widthProperty().bind(pane.widthProperty());
+        canvas.heightProperty().bind(pane.heightProperty());
         painter = new SkyCanvasPainter(canvas);
-        scaleOfView = Bindings.createDoubleBinding(() -> canvas.getWidth()/ (2*Math.tan(Angle.ofDeg(vpb.getFieldOfViewDeg())/4)),
-                canvas.widthProperty(), vpb.fieldOfViewDegProperty());
 
         //LINKS =====================================================================================
-        // TODO Introduce multiple canva forms ????
-        planeToCanvas = Bindings.createObjectBinding(
-                () -> {
-                    double scaleOfView = canvas.getWidth()/ (2*Math.tan(Angle.ofDeg(vpb.getFieldOfViewDeg())/4));
-                    return Transform.affine(scaleOfView, 0, 0, -scaleOfView,
-                            canvas.getWidth()/2, canvas.getHeight()/2);
-                }, vpb.fieldOfViewDegProperty(), canvas.heightProperty(), canvas.widthProperty());
+        DoubleBinding scaleOfView = Bindings.createDoubleBinding(() ->
+                        Math.max(canvas.getWidth(), canvas.getHeight())/ (2*Math.tan(Angle.ofDeg(vpb.getFieldOfViewDeg())/4)),
+                canvas.widthProperty(), canvas.heightProperty(), vpb.fieldOfViewDegProperty());
+
+        ObjectBinding<Transform> planeToCanvas = Bindings.createObjectBinding(
+                () -> Transform.affine(scaleOfView.get(), 0, 0, -scaleOfView.get(),
+                            canvas.getWidth()/2, canvas.getHeight()/2)
+                , scaleOfView);
 
         // TODO Why projection depends of plane to canvas
         ObjectBinding<StereographicProjection> projection = Bindings.createObjectBinding(
@@ -86,27 +88,26 @@ public class SkyCanvasManager {
 
         sky = Bindings.createObjectBinding(
                 () -> new ObservedSky(dtb.getZonedDateTime(), olb.getCoordinates(), vpb.getCenter(), catalog),
-                // TODO work with center not with projection && how to do without plane to canva?
-                planeToCanvas, vpb.centerProperty(), olb.coordinatesProperty(), dtb.timeProperty(), dtb.dateProperty(), dtb.zoneProperty());
+                vpb.centerProperty(), olb.coordinatesProperty(), dtb.timeProperty(), dtb.dateProperty(), dtb.zoneProperty());
 
         mouseAzDeg  = Bindings.createDoubleBinding(() -> mouseHorizontalPosition.get().azDeg(), mouseHorizontalPosition);
         mouseAltDeg = Bindings.createDoubleBinding(() -> mouseHorizontalPosition.get().altDeg(), mouseHorizontalPosition);
 
         objectUnderMouse = Bindings.createObjectBinding(
-                () ->  {
-                    double scaleOfView = canvas.getWidth()/Math.tan(Angle.ofDeg(vpb.getFieldOfViewDeg())/4)/2; //TODO faire property pour le calc que 1fois
-                    return sky.get().objectClosestTo(mousePosition.get(), 10/scaleOfView);
-                }, mousePosition, planeToCanvas, sky);
+                () -> sky.get().objectClosestTo(mousePosition.get(), 10/scaleOfView.get()),
+                mousePosition, planeToCanvas, sky);
 
         //PRINT CLOSEST OBJECT VIA LISTENER =========================================================
         // TODO Verify horizontal coordinates with zoom of planeToCanva ??
-        //mouseAltDeg.addListener((p, o, n) -> System.out.println(mouseAzDeg.get() + "   " + mouseAltDeg.get()));
-        objectUnderMouse.addListener((p, o, n) -> {if(objectUnderMouse.get() != null) 
-            System.out.println(objectUnderMouse.get());});
+        objectUnderMouse.addListener((p, o, n) -> {
+            if(objectUnderMouse.get() != null && n != o)
+                System.out.println(objectUnderMouse.get());
+        });
 
         //RE_DRAW SKY VIA LISTENER ==================================================================
         // TODO Plane redessine
-        sky.addListener((p, o, n)-> resetSky());
+        sky.addListener(e-> painter.actualize(sky.get(), planeToCanvas.get()));
+        planeToCanvas.addListener(e -> painter.actualize(sky.get(), planeToCanvas.get()));
 
         //KEYBOARD LISTENER ==============================================================================
         canvas.setOnKeyPressed(event -> {
@@ -150,22 +151,23 @@ public class SkyCanvasManager {
         }));
         
         //ADAPTATION OF SKY WHEN SIZE OF STAGE CHANGE
-        canvas.widthProperty().addListener(e-> resetSky());
-        canvas.heightProperty().addListener(e-> resetSky());
-        canvas.requestFocus();
+        canvas.widthProperty().addListener(e-> painter.actualize(sky.get(), planeToCanvas.get()));
+        canvas.heightProperty().addListener(e-> painter.actualize(sky.get(), planeToCanvas.get()));
     }
 
     // TODO Border pane
     /**
-     * @return the canvas managed by {@code this}
+     * @return the pane containing the managed canvas
      */
-    public Canvas canvas() {
-        return canvas;
+    public BorderPane pane() {
+        return pane;
     }
 
-    // TODO check
-    public void resetSky() {
-        painter.clear();
-        painter.drawSky(sky.get(), planeToCanvas.get());
+    /**
+     * Request the focus directly on the canvas and not on the pane
+     * To use after scene integration of the pane
+     */
+    public void focusOnCanvas() {
+        pane.getChildren().get(0).requestFocus();
     }
 }

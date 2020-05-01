@@ -57,11 +57,8 @@ public final class UseSkyCanvasManager extends Application {
         /*canvasManager.objectUnderMouseProperty().addListener(
       (p, o, n) -> {if (n != null) System.out.println(n);});*/
 
-        Canvas sky = canvasManager.canvas();
-        BorderPane root = new BorderPane(sky);
-
-        sky.widthProperty().bind(root.widthProperty());
-        sky.heightProperty().bind(root.heightProperty());
+        //Canvas sky = canvasManager.canvas();
+        BorderPane root = new BorderPane(canvasManager.pane());
 
         primaryStage.setMinWidth(800);
         primaryStage.setMinHeight(600);
@@ -71,7 +68,7 @@ public final class UseSkyCanvasManager extends Application {
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
 
-        sky.requestFocus();
+        root.requestFocus();
       }
     }
   }
