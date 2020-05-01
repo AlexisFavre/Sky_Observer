@@ -7,6 +7,7 @@ import java.util.Map;
 import org.junit.Test;
 
 import ch.epfl.rigel.coordinates.GeographicCoordinates;
+import ch.epfl.rigel.math.Angle;
 
 public class CityCatalogueTest {
     
@@ -19,15 +20,30 @@ public class CityCatalogueTest {
     }
     
     @Test
-    public void printMap() throws Exception {
+    public void printKeys() throws Exception {
         for (String s : map.keySet()) {
             System.out.println(s);
         }
     }
     
     @Test
-    public void testTokyoLat() throws Exception {
-        assertEquals(map.get("Tokyo (Japan)").lat(), 35.6852);
+    public void testClairtonLat() throws Exception {
+        assertEquals( Angle.ofDeg(40.291165502), map.get("Clairton (United States)").lat(), 1e-1);
+    }
+    
+    @Test
+    public void testClairtonLong() throws Exception {
+        assertEquals( Angle.ofDeg(-79.88), map.get("Clairton (United States)").lon(), 1e-1);
+    }
+    
+    @Test
+    public void testPenolaLat() throws Exception {
+        assertEquals( Angle.ofDeg(-37.36), map.get("Penola (Australia)").lat(), 1e-1);
+    }
+    
+    @Test
+    public void testPenolaLong() throws Exception {
+        assertEquals( Angle.ofDeg(140), map.get("Penola (Australia)").lon(), 1e-1);
     }
 
 }

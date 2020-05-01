@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -20,7 +19,7 @@ import ch.epfl.rigel.coordinates.GeographicCoordinates;
  *  returns a {@code CityCatalogue} containing all the objects corresponding to file data)
  * @author Alexis FAVRE (310552)
  */
-public final class CityCatalogue extends Catalogue{
+public final class CityCatalogue{
     
     private final static String FILE_OF_CITIES = "/worldcities.csv";
     private final Map<String, GeographicCoordinates> coordinatesOfTheCity;
@@ -36,28 +35,23 @@ public final class CityCatalogue extends Catalogue{
         try(BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(FILE_OF_CITIES), StandardCharsets.US_ASCII))){
             String currentLine;
             TreeMap<String, GeographicCoordinates> coordinatesOfTheCity = new TreeMap<>();
-            int i = 0;
             reader.readLine();
             while((currentLine = reader.readLine()) != null) {
                 try {
                 String[] lineInfos = currentLine.split(",");
-                String name = (! lineInfos[1].equals("")) ? lineInfos[1] : null;
-                double latitude = (! lineInfos[2].equals("")) ? Double.parseDouble(lineInfos[2].substring(1, lineInfos[2].length()-2)) : 0;
-                //double latitude = (! lineInfos[2].equals("")) ? Double.parseDouble(lineInfos[2]) : 0;
-                double longitude = (! lineInfos[3].equals("")) ? Double.parseDouble(lineInfos[3].substring(1, lineInfos[3].length()-2)) : 0;
-                //double longitude = (! lineInfos[3].equals("")) ? Double.parseDouble(lineInfos[3]) : 0;
-                String country = (! lineInfos[4].equals("")) ? lineInfos[4] : null;
+                String name = (! lineInfos[1].equals("")) ? lineInfos[1].substring(1, lineInfos[1].length()-1) : null;
+                double latitude = (! lineInfos[2].equals("")) ? Double.parseDouble(lineInfos[2].substring(1, lineInfos[2].length()-1)) : 0;
+                double longitude = (! lineInfos[3].equals("")) ? Double.parseDouble(lineInfos[3].substring(1, lineInfos[3].length()-1)) : 0;
+                String country = (! lineInfos[4].equals("")) ? lineInfos[4].substring(1, lineInfos[4].length()-1) : null;
                 if(name != null && country != null) {
                     StringBuilder sb = new StringBuilder();
                     sb.append(name).append(" (").append(country).append(")");
                     GeographicCoordinates coordinates = GeographicCoordinates.ofDeg(longitude, latitude);
                     coordinatesOfTheCity.put(sb.toString(), coordinates);
-//                    ++i;
-//                    System.out.println(i);
                 }
                 } catch(Exception e) {
-//                    
-                } finally {}
+                    // many differents types of errors can occurs
+                }
             }
             return Map.copyOf(coordinatesOfTheCity);
         } catch (IOException e) {
@@ -70,39 +64,5 @@ public final class CityCatalogue extends Catalogue{
      */
     public Map<String, GeographicCoordinates> coordinatesOfTheCity() {
         return coordinatesOfTheCity;
-    }
-    
-    //========================================================================================================
-    
-    public final static class Builder extends Catalogue.Builder{
-        private TreeMap<String, GeographicCoordinates> coordinatesOfTheCity;
-
-        /**
-         * @param coordinatesOfTheCity
-         */
-        public Builder() {this.coordinatesOfTheCity = new TreeMap<>();}
-
-        /**
-         * @return the coordinatesOfTheCity
-         */
-        public TreeMap<String, GeographicCoordinates> getCoordinatesOfTheCity() {
-            return (TreeMap<String, GeographicCoordinates>) Collections.unmodifiableMap(coordinatesOfTheCity);
-        }
-        
-        /**
-         * 
-         * @param city to add to the builder of the catalogue
-         */
-        public void addCity(City city) {
-            coordinatesOfTheCity.put(city.getName(), city.getCoordinates());
-        }
-        
-        /**
-         * @return a new CityCatalogue with the properties of the builder
-         */
-        @Override
-        public CityCatalogue build() {
-            return new CityCatalogue();
-        }
     }
 }
