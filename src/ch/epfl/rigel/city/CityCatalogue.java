@@ -42,22 +42,22 @@ public final class CityCatalogue extends Catalogue{
                 try {
                 String[] lineInfos = currentLine.split(",");
                 String name = (! lineInfos[1].equals("")) ? lineInfos[1] : null;
-                //double latitude = (! lineInfos[2].equals("")) ? Double.parseDouble(lineInfos[2].substring(1, lineInfos[2].length()-2)) : 0;
-                double latitude = (! lineInfos[2].equals("")) ? Double.parseDouble(lineInfos[2]) : 0;
-                //double longitude = (! lineInfos[3].equals("")) ? Double.parseDouble(lineInfos[3].substring(1, lineInfos[3].length()-2)) : 0;
-                double longitude = (! lineInfos[3].equals("")) ? Double.parseDouble(lineInfos[3]) : 0;
+                double latitude = (! lineInfos[2].equals("")) ? Double.parseDouble(lineInfos[2].substring(1, lineInfos[2].length()-2)) : 0;
+                //double latitude = (! lineInfos[2].equals("")) ? Double.parseDouble(lineInfos[2]) : 0;
+                double longitude = (! lineInfos[3].equals("")) ? Double.parseDouble(lineInfos[3].substring(1, lineInfos[3].length()-2)) : 0;
+                //double longitude = (! lineInfos[3].equals("")) ? Double.parseDouble(lineInfos[3]) : 0;
                 String country = (! lineInfos[4].equals("")) ? lineInfos[4] : null;
                 if(name != null && country != null) {
                     StringBuilder sb = new StringBuilder();
-                    sb.append(name).append("  (").append(country).append(")");
+                    sb.append(name).append(" (").append(country).append(")");
                     GeographicCoordinates coordinates = GeographicCoordinates.ofDeg(longitude, latitude);
                     coordinatesOfTheCity.put(sb.toString(), coordinates);
-                    ++i;
-                    System.out.println(i);
+//                    ++i;
+//                    System.out.println(i);
                 }
                 } catch(Exception e) {
-                    e.getSuppressed();
-                }
+//                    
+                } finally {}
             }
             return Map.copyOf(coordinatesOfTheCity);
         } catch (IOException e) {

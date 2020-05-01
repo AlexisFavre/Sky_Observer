@@ -15,7 +15,7 @@ public class CityCatalogueTest {
 
     @Test
     public void testSizeOfMap() throws Exception {
-        assertEquals(12310, map.size());
+        assertEquals(13878, map.size());
     }
     
     @Test
@@ -23,6 +23,11 @@ public class CityCatalogueTest {
         for (String s : map.keySet()) {
             System.out.println(s);
         }
+    }
+    
+    @Test
+    public void testTokyoLat() throws Exception {
+        assertEquals(map.get("Tokyo (Japan)").lat(), 35.6852);
     }
 
 }
