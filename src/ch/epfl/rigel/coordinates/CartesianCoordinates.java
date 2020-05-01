@@ -27,6 +27,18 @@ public final class CartesianCoordinates {
         }
 
     /**
+     * Gives the distance between the given point and {@code this}
+     *
+     * @param other the other point
+     * @return the distance between the two points, infinite if other is null
+     */
+    public double distance(CartesianCoordinates other) {
+        if(other == null)
+            return Double.POSITIVE_INFINITY;
+        return Math.hypot(x() - other.x(), y() - other.y());
+    }
+
+    /**
      *
      * @return the abscissa
      */
@@ -35,11 +47,19 @@ public final class CartesianCoordinates {
     }
 
     /**
-     *
      * @return the ordinate
      */
     public double y() {
         return ordinate;
+    }
+    
+    /**
+     * @return a {@code String} view of {@code this} with the format
+     * (x= a, y= b)
+     */
+    @Override
+    public String toString() {
+        return String.format(Locale.ROOT, "(x=%.4f, y=%.4f)", x(), y());
     }
 
     /**
@@ -62,15 +82,5 @@ public final class CartesianCoordinates {
     @Override
     public final boolean equals(Object o) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
-    }
-
-    /**
-     *
-     * @return a {@code String} view of {@code this} with the format
-     * (x= a, y= b)
-     */
-    @Override
-    public String toString() {
-        return String.format(Locale.ROOT, "(x=%.4f, y=%.4f)", x(), y());
     }
 }

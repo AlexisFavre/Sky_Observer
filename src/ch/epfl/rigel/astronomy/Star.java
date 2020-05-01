@@ -54,7 +54,6 @@ public final class Star extends CelestialObject {
     }
 
     /**
-     *
      * @return a {@code String} view of {@code this} with the format
      * Star : name, hipId : index
      */

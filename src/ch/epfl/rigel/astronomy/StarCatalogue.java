@@ -30,7 +30,7 @@ import java.util.Set;
 public final class StarCatalogue {
 
     private final List<Star> stars;
-    private final Map<Asterism, List<Integer>> starsIndexesOfAsterisms = new HashMap<>();
+    private final Map<Asterism, List<Integer>> starsIndexesOfAsterisms;
     private final Map<Star, Integer> indexOfStars = new HashMap<>();
 
     /**
@@ -41,6 +41,8 @@ public final class StarCatalogue {
     public StarCatalogue(List<Star> my_stars, List<Asterism> my_asterisms) throws IllegalArgumentException {
         stars = List.copyOf(my_stars);
         List<Asterism> immutablesAsterisms = List.copyOf(my_asterisms);
+        
+        Map<Asterism, List<Integer>> starsIndexesOfAsterismsNotImmutable = new HashMap<>();
         
         //build map indexOfStars
         Iterator<Star> starIterators = stars.iterator();
@@ -60,15 +62,16 @@ public final class StarCatalogue {
             for(Star s : a.stars()) {
                 starIndexesOfA.add(indexOfStars.get(s));
             }
-            starsIndexesOfAsterisms.put(a, starIndexesOfA);
+            starsIndexesOfAsterismsNotImmutable.put(a, List.copyOf(starIndexesOfA));
         }
+        starsIndexesOfAsterisms = Map.copyOf(starsIndexesOfAsterismsNotImmutable);
     }
 
     /**
      * Gives the star indexes forming the given asterism
      *
      * @param asterism of which we want the indexes
-     * @return {@code List} of the star indexes
+     * @return {@code List} of the star indexes in the stored {@code List}
      * @throws IllegalArgumentException if the given asterism does not belongs to {@code this}
      */
     public List<Integer> asterismIndices(Asterism asterism) throws IllegalArgumentException {
@@ -77,7 +80,6 @@ public final class StarCatalogue {
     }
 
     /**
-     *
      * @return stars of the catalog
      */
     public List<Star> stars() {
@@ -85,7 +87,6 @@ public final class StarCatalogue {
     }
 
     /**
-     *
      * @return asterisms of the catalog
      */
     public Set<Asterism> asterisms() {
@@ -125,7 +126,6 @@ public final class StarCatalogue {
         }
 
         /**
-         *
          * @return a new StarCatalogue with the properties of the builder {@code this}
          */
         public StarCatalogue build() {
@@ -143,7 +143,6 @@ public final class StarCatalogue {
         }
 
         /**
-         *
          * Add the given asterism to {@code this} (catalog in construction)
          * @param asterism to be added
          * @return {@code this} the builder

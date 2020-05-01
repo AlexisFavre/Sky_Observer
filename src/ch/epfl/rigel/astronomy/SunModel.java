@@ -32,7 +32,6 @@ public enum SunModel implements CelestialObjectModel<Sun> {
     }
 
     /**
-     *
      * {@inheritDoc}
      */
     @Override

@@ -24,7 +24,6 @@ public abstract class Interval {
     }
     
     /**
-     *
      * @return low bound of the interval
      */
     public double low() {
@@ -32,7 +31,6 @@ public abstract class Interval {
     }
     
     /**
-     *
      * @return high bound of the interval
      */
     public double high() {
@@ -40,7 +38,6 @@ public abstract class Interval {
     }
     
     /**
-     *
      * @return the size of the interval
      */
     public double size() {
@@ -48,7 +45,6 @@ public abstract class Interval {
     }
     
     /**
-     *
      * @return the boolean value {@code True} if and only if {@code value}
      * belongs to the interval {@code this}
      */

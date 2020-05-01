@@ -32,7 +32,6 @@ public final class Polynomial {
     }
 
     /**
-     *
      * @return the degree of the polynomial
      */
     public int degree(){
@@ -48,16 +47,14 @@ public final class Polynomial {
     public double at(double x) {
         double result = 0;
         for(int i = 0; i < coefs.length - 1; ++i) {
-            result = x*(result + coefs[i]);
+           result = x*(result + coefs[i]);
         }
         result += coefs[coefs.length - 1];
         return result;
     }
 
     /**
-     *
      * @return a {@code String} view of {@code this} with the format
-     *
      */
     @Override
     public String toString() {

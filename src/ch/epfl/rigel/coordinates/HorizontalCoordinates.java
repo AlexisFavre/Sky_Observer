@@ -82,6 +82,16 @@ public final class HorizontalCoordinates extends SphericalCoordinates {
      * Gives the octant (piece of earth) in which {@code this} is
      * The name is composed of at most a combination of two cardinal initials
      *
+     * @return the correspond octant of the coordinates
+     */
+    public String azOctantName() {
+        return azOctantName("N", "E", "S", "W");
+    }
+
+    /**
+     * Gives the octant (piece of earth) in which {@code this} is
+     * The name is composed of at most a combination of two cardinal initials
+     *
      * @param n must be "N"
      * @param e must be "E"
      * @param s must be "S"
@@ -103,7 +113,6 @@ public final class HorizontalCoordinates extends SphericalCoordinates {
     }
     
     /**
-     *
      * @return the azimuth in radians
      */
     public double az() {
@@ -111,7 +120,6 @@ public final class HorizontalCoordinates extends SphericalCoordinates {
     }
     
     /**
-     *
      * @return the altitude in radians
      */
     public double alt() {
@@ -119,7 +127,6 @@ public final class HorizontalCoordinates extends SphericalCoordinates {
     }
 
     /**
-     *
      * @return the azimuth in degrees
      */
     public double azDeg() {
@@ -127,7 +134,6 @@ public final class HorizontalCoordinates extends SphericalCoordinates {
     }
     
     /**
-     *
      * @return the altitude in degrees
      */
     public double altDeg() {
@@ -135,7 +141,6 @@ public final class HorizontalCoordinates extends SphericalCoordinates {
     }
 
     /**
-     *
      * @return a {@code String} view of {@code this} with the format
      * (az= x, alt= y)
      */

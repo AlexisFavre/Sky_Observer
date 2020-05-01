@@ -78,7 +78,6 @@ public final class GeographicCoordinates extends SphericalCoordinates {
     }
     
     /**
-     *
      * @return the longitude in degrees
      */
     @Override
@@ -87,7 +86,6 @@ public final class GeographicCoordinates extends SphericalCoordinates {
     }
     
     /**
-     *
      * @return the latitude in degrees
      */
     @Override
@@ -96,7 +94,6 @@ public final class GeographicCoordinates extends SphericalCoordinates {
     }
 
     /**
-     *
      * @return a {@code String} view of {@code this} with the format
      * (lon= x, lat= y)
      */

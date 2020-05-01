@@ -33,7 +33,6 @@ public abstract class CelestialObject {
     }
 
     /**
-     *
      * @return the name
      */
     public String name() {
@@ -41,7 +40,6 @@ public abstract class CelestialObject {
     }
 
     /**
-     *
      * @return the equatorialPos
      */
     public EquatorialCoordinates equatorialPos() {
@@ -49,7 +47,6 @@ public abstract class CelestialObject {
     }
 
     /**
-     *
      * @return the angularSize in radians
      */
     public double angularSize() {
@@ -57,15 +54,13 @@ public abstract class CelestialObject {
     }
 
     /**
-     *
-     * @return the magnitude in [-30,6] the main part of the time
+     * @return the magnitude, in [-30,6] the main part of the time
      */
     public double magnitude() {
         return magnitude;
     }
     
     /**
-     *
      * @return object information as String for user
      */
     public String info() {
@@ -73,7 +68,6 @@ public abstract class CelestialObject {
     }
 
     /**
-     *
      * @return a {@code String} view of {@code this} giving the object information
      */
     @Override

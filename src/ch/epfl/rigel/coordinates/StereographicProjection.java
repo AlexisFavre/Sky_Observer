@@ -17,6 +17,9 @@ public final class StereographicProjection implements Function<HorizontalCoordin
     private final double sinCenterAlt;
     private final double cosCenterAlt;
 
+    /**
+     * @param center of the Stereographic projection
+     */
     public StereographicProjection(HorizontalCoordinates center) {
         this.centerAlt = center.alt();
         this.centerAzimuth = center.az();
@@ -70,20 +73,25 @@ public final class StereographicProjection implements Function<HorizontalCoordin
     public HorizontalCoordinates inverseApply(CartesianCoordinates xy) {
         double x = xy.x();
         double y = xy.y();
+        
+        if(x == 0 && y ==0)
+            return HorizontalCoordinates.of(Angle.normalizePositive(this.centerAzimuth), this.centerAlt);
+        
         double p = Math.sqrt(x*x + y*y);
         double pSquare = p*p;
         double sinC = 2*p/(pSquare +1);
         double cosC = (1 - pSquare)/(pSquare +1);
         
-        double lamda = Math.atan2(x*sinC,(p*cosCenterAlt*cosC - y*sinCenterAlt*sinC)) + this.centerAzimuth;
+        double lambda = Math.atan2(x*sinC,(p*cosCenterAlt*cosC - y*sinCenterAlt*sinC)) + this.centerAzimuth;
         double phi   = Math.asin(cosC*sinCenterAlt + y*sinC*cosCenterAlt/p);
-        
-        return HorizontalCoordinates.of(Angle.normalizePositive(lamda), phi);
+        return HorizontalCoordinates.of(Angle.normalizePositive(lambda), phi);
     }
 
     /**
-     *
-     * {@inheritDoc}
+     * to make a {@code StereographicProjection} of {@code HorizontalCoordinates}
+     * @param azAlt which is the {@code HorizontalCoordinates} that 
+     * we want project
+     * @return the projection of azAlt
      */
     @Override
     public CartesianCoordinates apply(HorizontalCoordinates azAlt) {
@@ -125,7 +133,6 @@ public final class StereographicProjection implements Function<HorizontalCoordin
     }
 
     /**
-     *
      * @return a {@code String} view of {@code this} with the format
      * StereographicProjection with parameter(HorizontalCoordinates) : (x= a, y= b)
      */

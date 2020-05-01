@@ -2,8 +2,13 @@ package ch.epfl.rigel.coordinates;
 
 import ch.epfl.rigel.math.Angle;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.DynamicContainer.*;
+import static org.junit.jupiter.api.DynamicTest.*;
+
+import org.junit.jupiter.api.DynamicNode;
 
 class MyStereographicProjectionTest {
 
@@ -11,6 +16,7 @@ class MyStereographicProjectionTest {
     final StereographicProjection CENTER_BIS = new StereographicProjection(HorizontalCoordinates.of(Math.PI/4,Math.PI/4));
     final StereographicProjection TRIVIAL = new StereographicProjection(HorizontalCoordinates.ofDeg(45,45));
 
+    
     @Test
     void circleCenterForParallelBis() {
         assertEquals(0, CENTER0.circleCenterForParallel(HorizontalCoordinates.of(Math.PI/4,Math.PI/6)).x(),

@@ -11,9 +11,9 @@ import org.junit.jupiter.api.Test;
 import ch.epfl.rigel.astronomy.StarCatalogue.Builder;
 import ch.epfl.rigel.coordinates.EquatorialCoordinates;
 
-class MyStarCatalogueTest {
+public class MyStarCatalogueTest {
 
-    protected final StarCatalogue CATALOG = initCatalog();
+    public static final StarCatalogue CATALOG = initCatalog();
 
     private static final String HYG_CATALOGUE_NAME =
             "/hygdata_v3.csv";
@@ -21,9 +21,9 @@ class MyStarCatalogueTest {
     private static final String ASTERISM_CATALOGUE_NAME =
             "/asterisms.txt";
 
-    private StarCatalogue initCatalog() {
-        try (InputStream hygStream = getClass().getResourceAsStream(MyStarCatalogueTest.HYG_CATALOGUE_NAME);
-             InputStream aStream = getClass().getResourceAsStream(MyStarCatalogueTest.ASTERISM_CATALOGUE_NAME)) {
+    private static StarCatalogue initCatalog() {
+        try (InputStream hygStream = MyStarCatalogueTest.class.getResourceAsStream(MyStarCatalogueTest.HYG_CATALOGUE_NAME);
+             InputStream aStream = MyStarCatalogueTest.class.getResourceAsStream(MyStarCatalogueTest.ASTERISM_CATALOGUE_NAME)) {
             return new StarCatalogue.Builder()
                     .loadFrom(hygStream, HygDatabaseLoader.INSTANCE)
                     .loadFrom(aStream, AsterismLoader.INSTANCE).build();

@@ -27,14 +27,13 @@ public enum MoonModel implements CelestialObjectModel<Moon>{
     private final static double i  = Angle.ofDeg(5.145396);
 
     /**
-     *
      * {@inheritDoc}
      */
     @Override
     public Moon at(double daysSinceJ2010, EclipticToEquatorialConversion eclipticToEquatorialConversion) {
 
         // mean orbital longitude without correction
-        double l  = Angle.ofDeg(13.1763966)*daysSinceJ2010 + l0;
+        double l = Angle.ofDeg(13.1763966)*daysSinceJ2010 + l0;
         // mean anomaly without correction
         double M = l - Angle.ofDeg(0.1114041)*daysSinceJ2010 - P0;
         // mean ascendant node longitude without corrections
@@ -53,7 +52,7 @@ public enum MoonModel implements CelestialObjectModel<Moon>{
         double Ec = Angle.ofDeg(6.2886)*Math.sin(meanAnomaly);
         double A4 = Angle.ofDeg(0.214)*Math.sin(2*meanAnomaly);
         // adjusted longitude
-        double l_   = l + Ev + Ec - Ae + A4;
+        double l_ = l + Ev + Ec - Ae + A4;
         // correction term depending on adjusted longitude
         double V  = Angle.ofDeg(0.6583)*Math.sin(2*(l_-SunModel.SUN.longEcliptic(daysSinceJ2010)));
 
