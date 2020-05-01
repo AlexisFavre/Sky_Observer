@@ -12,6 +12,8 @@ import java.time.ZonedDateTime;
  */
 @FunctionalInterface
 public interface TimeAccelerator {
+    
+    final static double FREQUENCE_OF_REFRESHING_OF_JAVAFX = 1e-9; // all nanoseconds
 
     /**
      * Gives the simulation time (that elapses faster than the real time)
@@ -43,7 +45,7 @@ public interface TimeAccelerator {
      */
     static TimeAccelerator discrete(int frequency, Duration step) {
         return (initial, elapsed) -> {
-            long factor = (long)Math.floor(elapsed*frequency*1e-9);
+            long factor = (long)Math.floor(elapsed*frequency*FREQUENCE_OF_REFRESHING_OF_JAVAFX);
             return initial
                     .plusNanos(step.getNano()*factor)
                     .plusSeconds(step.getSeconds()*factor);

@@ -29,7 +29,7 @@ import javafx.scene.transform.Transform;
  *
  * @author Augustin ALLARD (299918)
  */
-public class SkyCanvasManager {
+public final class SkyCanvasManager {
     
     private final static ClosedInterval CINTER_5TO90   = ClosedInterval.of(5, 90);
     private final static ClosedInterval CINTER_30TO150 = ClosedInterval.of(30, 150);

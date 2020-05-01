@@ -22,8 +22,7 @@ import ch.epfl.rigel.coordinates.StereographicProjection;
  *
  * @author Augustin Allard (299918)
  */
-public final class ObservedSky { //TODO should be final ?
-
+public final class ObservedSky {
     private final StarCatalogue catalog;
     private final Map<CelestialObject, CartesianCoordinates> skyObjects;
     private final StereographicProjection projection;
@@ -109,7 +108,7 @@ public final class ObservedSky { //TODO should be final ?
         for(CelestialObject p: skyObjects.keySet()) {
             CartesianCoordinates c = skyObjects.get(p);
             if(        Math.abs(c.x()-point.x()) < maximalDistance*2    //make preliminary selection
-                    && Math.abs(c.y()-point.y()) < maximalDistance*2) {
+                    && Math.abs(c.y()-point.y()) < maximalDistance*2) { // TODO better solution ?
                 double d = point.distance(c);
                 if(    d < maximalDistance
                     && d < d2
