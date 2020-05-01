@@ -33,20 +33,6 @@ class ObservedSkyTest {
     }
 
     @Test
-    void objectClosestToMercury() {
-        MyStarCatalogueTest test = new MyStarCatalogueTest();
-        ObservedSky sky = new ObservedSky(ZonedDateTime.of(LocalDate.of(1980, Month.APRIL, 22),
-                LocalTime.of(14, 36, 51),
-                ZoneOffset.UTC),
-                GeographicCoordinates.ofDeg(6.57, 46.52),
-                HorizontalCoordinates.ofDeg(45, 45),
-                MyStarCatalogueTest.CATALOG);
-        for(int i = 0; i < 1; ++i) {
-            assertEquals(PlanetModel.MERCURY.name(), sky.objectClosestTo(sky.sunPoint(), 1.0e+3).name());
-        }
-    }
-    
-    @Test
     void starsAndTheirPosition() {
         EquatorialToHorizontalConversion convEquToHor = new EquatorialToHorizontalConversion(OBSERVATION_TIME, OBSERVER_COORD);
         int i = 0;

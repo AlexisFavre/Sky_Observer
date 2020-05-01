@@ -115,8 +115,6 @@ public final class ObservedSky { //TODO should be final ?
                 d2 = point.distance(c);
             }
         }
-        //System.out.println(sunPoint().distance(moonPoint()));
-        //System.out.println(point.distance(closestObjectPoint));
         return closestObject;
     }
 
