@@ -7,9 +7,7 @@ import java.time.ZonedDateTime;
 
 import ch.epfl.rigel.astronomy.AsterismLoader;
 import ch.epfl.rigel.astronomy.HygDatabaseLoader;
-import ch.epfl.rigel.astronomy.ObservedSky;
 import ch.epfl.rigel.astronomy.StarCatalogue;
-import ch.epfl.rigel.coordinates.GeographicCoordinates;
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
 import ch.epfl.rigel.gui.*;
 import javafx.application.Application;
@@ -46,16 +44,13 @@ public class GraphismTest extends Application {
         SkyCanvasManager canvasManager = new SkyCanvasManager(initCatalog(), observationTime, epfl, view);
         MenuManager menuManager = new MenuManager(view, canvasManager);
 
-        GridPane root = new GridPane();
-        root.getChildren().addAll(new BorderPane(canvasManager.canvas()), menuManager.menuPane());
-        Scene scene = new Scene(root);
+        canvasManager.pane().getChildren().add(menuManager.menuPane());
+        Scene scene = new Scene(canvasManager.pane());
 
         primaryStage.setScene(scene);
+        primaryStage.setY(100);
         primaryStage.show();
-        canvasManager.canvas().setFocusTraversable(true);
-        System.out.println(menuManager.menuPane().focusTraversableProperty());
-        canvasManager.canvas().requestFocus();
-        //root.requestFocus();
+        canvasManager.focusOnCanvas();
     }
 
     private StarCatalogue initCatalog() {

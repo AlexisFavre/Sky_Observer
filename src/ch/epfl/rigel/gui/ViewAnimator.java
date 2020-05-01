@@ -10,7 +10,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 public class ViewAnimator extends AnimationTimer {
 
     private final static double HANDLES_PER_RISING = 40;
-    private final static RightOpenInterval ROINTER_M180TO180 = RightOpenInterval.of(-180, 180);
     private ViewingParametersBean vpb;
     private SimpleBooleanProperty running;
     private Double azDegDest = null;
@@ -29,8 +28,8 @@ public class ViewAnimator extends AnimationTimer {
     public void setDestination(double az, double alt) {
         azDegDest = az;
         altDegDest = alt;
-        azDegStep = ROINTER_M180TO180.reduce(azDegDest - vpb.getCenter().azDeg()) / HANDLES_PER_RISING;
-        altDegStep = ROINTER_M180TO180.reduce(altDegDest - vpb.getCenter().altDeg()) / HANDLES_PER_RISING;
+        azDegStep = (azDegDest - vpb.getCenter().azDeg()) / HANDLES_PER_RISING;
+        altDegStep = (altDegDest - vpb.getCenter().altDeg()) / HANDLES_PER_RISING;
     }
 
     /**
@@ -56,7 +55,7 @@ public class ViewAnimator extends AnimationTimer {
      */
     @Override
     public void handle(long now) {
-        vpb.setCenter(HorizontalCoordinates.ofDeg(Angle.normalizePositive(vpb.getCenter().azDeg() + azDegStep),
+        vpb.setCenter(HorizontalCoordinates.ofDeg(vpb.getCenter().azDeg() + azDegStep,
                 vpb.getCenter().altDeg() + altDegStep)); //TODO normalizer a [-90,90]
         if(destinationIsReached())
             stop();

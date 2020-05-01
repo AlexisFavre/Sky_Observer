@@ -21,6 +21,7 @@ import javafx.beans.value.ObservableObjectValue;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Transform;
 
@@ -42,8 +43,9 @@ public class SkyCanvasManager {
     private final static ClosedInterval CINTER_5TO90   = ClosedInterval.of(5, 90);
     private final static ClosedInterval CINTER_30TO150 = ClosedInterval.of(30, 150);
     private final static RightOpenInterval CINTER_0TO360 = RightOpenInterval.of(0, 360);
-    
-    private Canvas canvas;
+
+    // TODO Replace
+    private BorderPane pane;
     private SkyCanvasPainter painter;
     // coordinates of the mouse on the projection plane // TODO Be sure it is the good solution
     // TODO should be null
@@ -54,7 +56,7 @@ public class SkyCanvasManager {
     public DoubleBinding mouseAzDeg;
     public DoubleBinding mouseAltDeg;
     public ObjectBinding<CelestialObject> objectUnderMouse; //TODO pourquoi en private?
-
+    
     /**
      *
      * @param catalog the catalog of stars that will be painted on the canvas
@@ -66,50 +68,55 @@ public class SkyCanvasManager {
 
         centerAnimator = new ViewAnimator(vpb);
 
-        canvas = new Canvas(800, 600);
+        Canvas canvas = new Canvas();
+        pane = new BorderPane(canvas);
+        pane.setPrefSize(800, 600);
+        canvas.widthProperty().bind(pane.widthProperty());
+        canvas.heightProperty().bind(pane.heightProperty());
         painter = new SkyCanvasPainter(canvas);
         //Node test;
 
         //LINKS =====================================================================================
-        // TODO Introduce multiple canva forms
-        ObjectBinding<Transform> planeToCanvas = Bindings.createObjectBinding(
-                () -> {
-                    double scaleOfView = canvas.getWidth()/Math.tan(Angle.ofDeg(vpb.getFieldOfViewDeg())/4)/2;
-                    return Transform.affine(scaleOfView, 0, 0, -scaleOfView,
-                            canvas.getWidth()/2, canvas.getHeight()/2);
-                }, vpb.fieldOfViewDegProperty());
-
-        projection = Bindings.createObjectBinding(
+        // TODO Why projection depends of plane to canvas
+        ObjectBinding<StereographicProjection> projection = Bindings.createObjectBinding(
                 () -> new StereographicProjection(vpb.getCenter()), vpb.centerProperty());
+        
+        DoubleBinding scaleOfView = Bindings.createDoubleBinding(() ->
+                        Math.max(canvas.getWidth(), canvas.getHeight())/ projection.get().applyToAngle(Angle.ofDeg(vpb.getFieldOfViewDeg())),
+                canvas.widthProperty(), canvas.heightProperty(), vpb.fieldOfViewDegProperty(), projection);
+
+        ObjectBinding<Transform> planeToCanvas = Bindings.createObjectBinding(
+                () -> Transform.affine(scaleOfView.get(), 0, 0, -scaleOfView.get(),
+                            canvas.getWidth()/2, canvas.getHeight()/2)
+                , scaleOfView);
 
         ObjectBinding<HorizontalCoordinates> mouseHorizontalPosition = Bindings.createObjectBinding(
                 () -> projection.get().inverseApply(mousePosition.get()), mousePosition, projection, planeToCanvas);
 
         sky = Bindings.createObjectBinding(
                 () -> new ObservedSky(dtb.getZonedDateTime(), olb.getCoordinates(), vpb.getCenter(), catalog),
-                planeToCanvas, vpb.centerProperty(), olb.coordinatesProperty(), dtb.timeProperty(), dtb.dateProperty(), dtb.zoneProperty());
+                vpb.centerProperty(), olb.coordinatesProperty(), dtb.timeProperty(), dtb.dateProperty(), dtb.zoneProperty());
 
         mouseAzDeg  = Bindings.createDoubleBinding(() -> mouseHorizontalPosition.get().azDeg(), mouseHorizontalPosition);
         mouseAltDeg = Bindings.createDoubleBinding(() -> mouseHorizontalPosition.get().altDeg(), mouseHorizontalPosition);
 
         objectUnderMouse = Bindings.createObjectBinding(
-                () ->  {
-                    double scaleOfView = canvas.getWidth()/Math.tan(Angle.ofDeg(vpb.getFieldOfViewDeg())/4)/2;
-                    return sky.get().objectClosestTo(mousePosition.get(), 10/scaleOfView);
-                }, mousePosition, planeToCanvas, sky);
+                () -> sky.get().objectClosestTo(mousePosition.get(), 10/scaleOfView.get()),
+                mousePosition, planeToCanvas, sky);
 
         //PRINT CLOSEST OBJECT VIA LISTENER =========================================================
-        // TODO Verify horizontal coordinates with zoom of planeToCanva
-        //mouseAltDeg.addListener((p, o, n) -> System.out.println(mouseAzDeg.get() + "   " + mouseAltDeg.get()));
-        objectUnderMouse.addListener((p, o, n) -> System.out.println(objectUnderMouse.get()));
-
-        //RE_DRAW SKY VIA LISTENER ==================================================================
-        sky.addListener((p, o, n)-> {
-            painter.clear();
-            painter.drawSky(n, planeToCanvas.get());
+        // TODO Verify horizontal coordinates with zoom of planeToCanva ??
+        objectUnderMouse.addListener((p, o, n) -> {
+            if(objectUnderMouse.get() != null && n != o)
+                System.out.println(objectUnderMouse.get());
         });
 
-        //KEY LISTENER ==============================================================================
+        //RE_DRAW SKY VIA LISTENER ==================================================================
+        // TODO Plane redessine
+        sky.addListener(e-> painter.actualize(sky.get(), planeToCanvas.get()));
+        planeToCanvas.addListener(e -> painter.actualize(sky.get(), planeToCanvas.get()));
+
+        //KEYBOARD LISTENER ==============================================================================
         canvas.setOnKeyPressed(event -> {
             double az = vpb.getCenter().azDeg();
             double alt = vpb.getCenter().altDeg();
@@ -118,7 +125,7 @@ public class SkyCanvasManager {
                     vpb.setCenter(HorizontalCoordinates.ofDeg(az, CINTER_5TO90.clip( alt + 5)));
                     break;
                 case DOWN:
-                    vpb.setCenter(HorizontalCoordinates.ofDeg(az, CINTER_5TO90.clip(alt - 5)));
+                    vpb.setCenter(HorizontalCoordinates.ofDeg(az, CINTER_5TO90.clip( alt - 5)));
                     break;
                 case RIGHT:
                     vpb.setCenter(HorizontalCoordinates.ofDeg(CINTER_0TO360.reduce(az + 10), alt));
@@ -166,17 +173,26 @@ public class SkyCanvasManager {
             vpb.setFieldOfViewDeg(CINTER_30TO150.clip(vpb.getFieldOfViewDeg() + delta));
             event.consume();
         }));
+        
+        //ADAPTATION OF SKY WHEN SIZE OF STAGE CHANGE
+        canvas.widthProperty().addListener(e-> painter.actualize(sky.get(), planeToCanvas.get()));
+        canvas.heightProperty().addListener(e-> painter.actualize(sky.get(), planeToCanvas.get()));
+    }
 
-        // TODO should work without painting the first time
-        painter.clear();
-        painter.drawSky(sky.get(), planeToCanvas.get());
+    // TODO Border pane
+    /**
+     * @return the pane containing the managed canvas
+     */
+    public BorderPane pane() {
+        return pane;
     }
 
     /**
-     * @return the canvas managed by {@code this}
+     * Request the focus directly on the canvas and not on the pane
+     * To use after scene integration of the pane
      */
-    public Canvas canvas() {
-        return canvas;
+    public void focusOnCanvas() {
+        pane.getChildren().get(0).requestFocus();
     }
 
     public ViewAnimator centerAnimator() {
@@ -186,6 +202,7 @@ public class SkyCanvasManager {
     protected void goToDestinationWithName(String destination) {
         CartesianCoordinates destinationOnPlane = sky.get().pointForObjectWithName(destination);
         if(destinationOnPlane != null) {
+            System.out.println(projection.get());
             HorizontalCoordinates coordinates = projection.get().inverseApply(destinationOnPlane);
             centerAnimator.setDestination(coordinates.azDeg(), coordinates.altDeg());
             centerAnimator.start();
