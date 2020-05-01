@@ -99,14 +99,12 @@ public final class SkyCanvasManager {
                 mousePosition, planeToCanvas, sky);
 
         //PRINT CLOSEST OBJECT VIA LISTENER =========================================================
-        // TODO Verify horizontal coordinates with zoom of planeToCanva ??
         objectUnderMouse.addListener((p, o, n) -> {
             if(objectUnderMouse.get() != null && n != o)
                 System.out.println(objectUnderMouse.get()); //TODO will be printed in a special case in step 11
         });
 
         //RE_DRAW SKY VIA LISTENER ==================================================================
-        // TODO Plane always redessine ?
         sky.addListener(e-> painter.actualize(sky.get(), planeToCanvas.get()));
         planeToCanvas.addListener(e -> painter.actualize(sky.get(), planeToCanvas.get()));
 
@@ -145,11 +143,11 @@ public final class SkyCanvasManager {
         }));
 
         //SCROLL LISTENER ===========================================================================
-        canvas.setOnScroll((e -> {
+        canvas.setOnScroll(e -> {
             double delta = (Math.abs(e.getDeltaX()) > Math.abs(e.getDeltaY())) ? e.getDeltaX() : e.getDeltaY();
             vpb.setFieldOfViewDeg(CINTER_30TO150.clip(vpb.getFieldOfViewDeg() + delta));
             e.consume();
-        }));
+        });
         
         // MOUSE CLICKED LISTENER
         canvas.setOnMouseClicked(e -> canvas.requestFocus());
