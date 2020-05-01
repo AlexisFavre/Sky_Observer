@@ -10,6 +10,7 @@ import ch.epfl.rigel.astronomy.HygDatabaseLoader;
 import ch.epfl.rigel.astronomy.StarCatalogue;
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
 import ch.epfl.rigel.gui.DateTimeBean;
+import ch.epfl.rigel.gui.MenuManager;
 import ch.epfl.rigel.gui.ObserverLocationBean;
 import ch.epfl.rigel.gui.SkyCanvasManager;
 import ch.epfl.rigel.gui.ViewingParametersBean;
