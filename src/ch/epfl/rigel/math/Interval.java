@@ -17,7 +17,7 @@ public abstract class Interval {
     private final double low;
     private final double high;
 
-    protected Interval(double low, double high) throws IllegalArgumentException {
+    protected Interval(double low, double high) {
         checkArgument(low<high);
         this.low = low;
         this.high = high;
@@ -41,7 +41,7 @@ public abstract class Interval {
      * @return the size of the interval
      */
     public double size() {
-        return Math.abs(high-low);
+        return high-low;
     }
     
     /**

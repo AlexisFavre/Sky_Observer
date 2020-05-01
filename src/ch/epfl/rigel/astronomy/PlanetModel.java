@@ -1,7 +1,5 @@
 package ch.epfl.rigel.astronomy;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import ch.epfl.rigel.coordinates.EclipticCoordinates;
@@ -36,7 +34,7 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
     /**
      * List of all the planet instances of the model with their characteristics
      */
-    public final static List<PlanetModel> ALL = new ArrayList<>(List.copyOf(Arrays.asList(PlanetModel.values())));
+    public static List<PlanetModel> ALL = List.of(values());
 
     private final String name;
     private final double t;
@@ -116,7 +114,7 @@ public enum PlanetModel implements  CelestialObjectModel<Planet> {
         
         // PLANET INFO DEPENDING ON THE TIME
         // ecliptic heliocentric latitude
-        double eclHelioLat = Math.asin(Math.sin((l(daysSinceJ2010)- omega))*Math.sin(i));
+        double eclHelioLat = Math.asin(Math.sin(l(daysSinceJ2010)- omega)*Math.sin(i));
         // projection of the radius on ecliptic plan
         double eclRadius = r(daysSinceJ2010)*Math.cos(eclHelioLat);
         // heliocentric longitude projected on ecliptic plan

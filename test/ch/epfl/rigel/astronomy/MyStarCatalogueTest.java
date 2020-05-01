@@ -126,6 +126,29 @@ public class MyStarCatalogueTest {
         return null;
     }
     
+    protected Asterism Asterism1OfBetelgeuseserachWithName() {
+        for (Asterism ast : CATALOG.asterisms()) {
+            for(Star star : ast.stars()) {
+                if (star.name().equalsIgnoreCase("Betelgeuse")) {
+                    return ast;
+                }
+            }
+        }
+        return null;
+    }
+    
+    
+    protected Asterism Asterism2OfBetelgeuseserachWithName() {
+        for (Asterism ast : CATALOG.asterisms()) {
+            for(Star star : ast.stars()) {
+                if (star.name().equalsIgnoreCase("Betelgeuse") && ast != Asterism1OfBetelgeuseserachWithName()) {
+                    return ast;
+                }
+            }
+        }
+        return null;
+    }
+    
     protected Asterism asterismOfSirius() {
         for (Asterism ast : CATALOG.asterisms()) {
             if(ast.stars().contains(loadedSirius())) {
@@ -138,11 +161,12 @@ public class MyStarCatalogueTest {
     
   //============================================================================
     // check index of the asterisms
-//    @Test
-//    void checkIndexInListStarsOfCatalogOfBetelgeuse() throws IllegalArgumentException {
-//        List<Integer> list = CATALOG.asterismIndices(asterismOfBetelgeuse());
-//        assertEquals(1213, list.get(0));
-//    }
+    @Test
+    void checkIndexInListStarsOfCatalogOfBetelgeuse() throws IllegalArgumentException {
+        List<Integer> list = CATALOG.asterismIndices(Asterism1OfBetelgeuseserachWithName());
+        List<Integer> list2 = CATALOG.asterismIndices(Asterism2OfBetelgeuseserachWithName());
+        assertTrue(1213 == list.get(0) || 1213 == list.get(3));
+    }
     
     @Test
     void checkIndexInListStarsOfCatalogOfSirius() throws IllegalArgumentException {
@@ -150,11 +174,12 @@ public class MyStarCatalogueTest {
         assertEquals(1419, list.get(2));
     }
     
-//    @Test
-//    void checkIndexInListStarsOfCatalogOfRigel() throws IllegalArgumentException {
-//        List<Integer> list = CATALOG.asterismIndices(Asterism1OfRigelserachWithName());
-//        assertEquals(1019, list.get(0));
-//    }
+    @Test
+    void checkIndexInListStarsOfCatalogOfRigel() throws IllegalArgumentException {
+        List<Integer> list = CATALOG.asterismIndices(Asterism1OfRigelserachWithName());
+        List<Integer> list2 = CATALOG.asterismIndices(Asterism2OfRigelserachWithName());
+        assertTrue(1019 == list.get(0) || 1019 == list.get(2) || 1019 == list2.get(0) || 1019 == list2.get(2));
+    }
     
   //============================================================================
     //check HippocId to check loading ok
