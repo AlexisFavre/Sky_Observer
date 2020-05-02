@@ -39,19 +39,19 @@ public final class CityCatalogue{
             reader.readLine();
             while((currentLine = reader.readLine()) != null) {
                 try {
-                String[] lineInfos = currentLine.split(",");
-                String name = (! lineInfos[1].equals("")) ? lineInfos[1].substring(1, lineInfos[1].length()-1) : null;
-                double latitude = (! lineInfos[2].equals("")) ? Double.parseDouble(lineInfos[2].substring(1, lineInfos[2].length()-1)) : 0;
-                double longitude = (! lineInfos[3].equals("")) ? Double.parseDouble(lineInfos[3].substring(1, lineInfos[3].length()-1)) : 0;
-                String country = (! lineInfos[4].equals("")) ? lineInfos[4].substring(1, lineInfos[4].length()-1) : null;
-                if(name != null && country != null) {
-                    City c = new City(name, country, GeographicCoordinates.ofDeg(longitude, latitude));
-                    coordinatesOfTheCity.add(c);
-                }
-                } catch(Exception e) {
-                    // many differents types of errors can occurs due to the name of cities
-                    // which can contains commas
-                }
+                    String[] lineInfos = currentLine.split(",");
+                    String name = (! lineInfos[1].equals("")) ? lineInfos[1].substring(1, lineInfos[1].length()-1) : null;
+                    double latitude = (! lineInfos[2].equals("")) ? Double.parseDouble(lineInfos[2].substring(1, lineInfos[2].length()-1)) : 0;
+                    double longitude = (! lineInfos[3].equals("")) ? Double.parseDouble(lineInfos[3].substring(1, lineInfos[3].length()-1)) : 0;
+                    String country = (! lineInfos[4].equals("")) ? lineInfos[4].substring(1, lineInfos[4].length()-1) : null;
+                    if(name != null && country != null) {
+                        City c = new City(name, country, GeographicCoordinates.ofDeg(longitude, latitude));
+                        coordinatesOfTheCity.add(c);
+                    }
+                } catch(NumberFormatException e) {
+                    //some names of cities contain comma so the line is not correctly split
+                    // and Double.ParseDouble try to read words but can't and throws NumberFormatException
+                    }
             }
             return Set.copyOf(coordinatesOfTheCity);
         } catch (IOException e) {
