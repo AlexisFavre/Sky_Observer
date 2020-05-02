@@ -10,6 +10,7 @@ import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.epfl.rigel.coordinates.HorizontalCoordinates;
 import ch.epfl.rigel.math.ClosedInterval;
 import javafx.scene.paint.Color;
 
@@ -28,6 +29,13 @@ public final class BlackBodyColor {
     
     private BlackBodyColor() {}
 
+    public static Color colorForPath(HorizontalCoordinates from, HorizontalCoordinates to) {
+        double opacity = 1;
+        if(from.altDeg() < 0 || to.altDeg() < 0)
+            opacity = 0.2;
+        return Color.BLUE.deriveColor(0, 1, 1, opacity);
+    }
+
     /**
      * Gives the associated {@code Color} of the BlackBody depending of its temperature
      *
@@ -35,9 +43,13 @@ public final class BlackBodyColor {
      * @return the associated {@code Color} of the code black body
      * @throws IllegalArgumentException if {@code temp} does not belong in the interval [1 000, 40 000]
      */
-    public static  Color colorForTemperature(int temp) throws IllegalArgumentException {
+    public static  Color starColorForParameters(int temp, HorizontalCoordinates localisation) throws IllegalArgumentException {
         checkInInterval(ClosedInterval.of(1000, 40000),temp);
-        return allTemperatureColors.get((int) Math.round(temp/100.0) -10);
+        double opacity = 1;
+        if(localisation.altDeg() < 0)
+            opacity = 0.3;
+        return allTemperatureColors.get((int) Math.round(temp/100.0) -10)
+                .deriveColor(0, 1, 1, opacity);
     }
     
     /**

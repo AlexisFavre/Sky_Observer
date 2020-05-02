@@ -100,12 +100,16 @@ public class SkyCanvasPainter { // TODO Check if ok with removed projections
         planeToCanvas.transform2DPoints(sky.starPointsRefs(), 0, screenPoints, 0, l/2);
 
         graph2D.setLineWidth(1);
-        graph2D.beginPath();
-        graph2D.setStroke(Color.BLUE);
+
         for(Asterism a: sky.asterisms()) {
+
             for(int j = 0; j < sky.asterismIndices(a).size() - 1; ++j) {
+                graph2D.beginPath();
                 int idOfStarFrom = sky.asterismIndices(a).get(j);
                 int idOfStarTo = sky.asterismIndices(a).get(j + 1);
+                graph2D.setStroke(BlackBodyColor.colorForPath(
+                        sky.horizontalPositionOf(sky.stars().get(idOfStarFrom)),
+                        sky.horizontalPositionOf(sky.stars().get(idOfStarTo))));
                 double xFr = screenPoints[2*idOfStarFrom];
                 double yFr = screenPoints[2*idOfStarFrom+1];
                 double xTo = screenPoints[2*idOfStarTo];
@@ -114,14 +118,15 @@ public class SkyCanvasPainter { // TODO Check if ok with removed projections
                     graph2D.moveTo(xFr, yFr);
                     graph2D.lineTo(xTo, yTo);
                 }
+                graph2D.stroke();
+                graph2D.closePath();
             }
         }
-        graph2D.stroke();
-        graph2D.closePath();
+
 
         int i = 0;
         for(Star s: sky.stars()) {
-            drawEllipseOf(BlackBodyColor.colorForTemperature(s.colorTemperature()),
+            drawEllipseOf(BlackBodyColor.starColorForParameters(s.colorTemperature(), sky.horizontalPositionOf(s)),
                     screenPoints[i], screenPoints[i + 1], s.magnitude(), planeToCanvas);
             i += 2;
         }

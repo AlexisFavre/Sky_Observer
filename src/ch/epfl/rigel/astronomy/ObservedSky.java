@@ -24,6 +24,7 @@ public final class ObservedSky { //TODO should be final ?
     private final StarCatalogue catalog;
     private final Map<CelestialObject, CartesianCoordinates> skyObjects;
     private final StereographicProjection projection;
+    private final EquatorialToHorizontalConversion equToHor;
 
     private final Sun sun;
     private final Moon moon;
@@ -49,7 +50,7 @@ public final class ObservedSky { //TODO should be final ?
         
         // create coordinates converters
         EclipticToEquatorialConversion eclToEqu   = new EclipticToEquatorialConversion(obsTime);
-        EquatorialToHorizontalConversion equToHor = new EquatorialToHorizontalConversion(obsTime, obsPlace);
+        equToHor = new EquatorialToHorizontalConversion(obsTime, obsPlace);
         
         List<PlanetModel> extraterrestrialModels = new ArrayList<>();
         extraterrestrialModels.addAll(PlanetModel.ALL);
@@ -89,6 +90,10 @@ public final class ObservedSky { //TODO should be final ?
             starPointsRefs[++i] = point.y();
             ++i;
         }
+    }
+
+    public HorizontalCoordinates horizontalPositionOf(Star star) {
+        return equToHor.apply(star.equatorialPos());
     }
 
     public CartesianCoordinates pointIfVisible(CartesianCoordinates pointOnPlane) {
