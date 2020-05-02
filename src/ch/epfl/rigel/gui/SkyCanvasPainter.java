@@ -15,6 +15,8 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Transform;
 
+import java.time.LocalTime;
+
 /**
  * Used to paint the sky on a given {@code Canvas}
  * Different elements of the sky can be painted separately
@@ -43,8 +45,20 @@ public class SkyCanvasPainter { // TODO Check if ok with removed projections
      * @param planeToCanvas the new actual transformation to use
      */
     public void actualize(ObservedSky sky, Transform planeToCanvas) {
-        clear();
+        clearAt(sky.observationTime().toLocalTime());
         drawSky(sky, planeToCanvas);
+    }
+
+    /**
+     * Clear what has been drawn on the {@code Canvas} and reset it as a colored board
+     * with color depending on the time of day
+     *
+     * @param time time of day for which the graph is cleared
+     */
+    public void clearAt(LocalTime time) {
+        graph2D.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        graph2D.setFill(BlackBodyColor.skyColorAt(time));
+        graph2D.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
     }
 
     /**

@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +20,7 @@ import javafx.scene.paint.Color;
  * Used to obtain the {@code Color} of a black body
  *
  * @author Alexis FAVRE (310552)
- * @see ColorTemperatureLoader
+ * //@see ColorTemperatureLoader
  */
 public final class BlackBodyColor {
 
@@ -27,6 +28,16 @@ public final class BlackBodyColor {
     private final static List<Color> allTemperatureColors = load();
     
     private BlackBodyColor() {}
+
+    public static Color skyColorAt(LocalTime time) {
+        double advancementOfDay = time.toSecondOfDay()/86400.0;
+        System.out.println(time);
+        //double sid = 86400;
+        return Color.color(0.1 * (1 - Math.cos((advancementOfDay-0.15)*6.28)),
+                0.15 * (1 - Math.cos((advancementOfDay-0.15)*6.28)),
+                0.25 * (1 - Math.cos((advancementOfDay-0.15)*6.28)),
+                1-(0.1 * (1 - Math.cos((advancementOfDay-0.15)*6.28))));
+    }
 
     /**
      * Gives the associated {@code Color} of the BlackBody depending of its temperature

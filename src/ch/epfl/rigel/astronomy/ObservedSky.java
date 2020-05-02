@@ -1,5 +1,6 @@
 package ch.epfl.rigel.astronomy;
 
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,6 +22,8 @@ import ch.epfl.rigel.coordinates.*;
  */
 public final class ObservedSky { //TODO should be final ?
 
+    private final ZonedDateTime obsTime;
+
     private final StarCatalogue catalog;
     private final Map<CelestialObject, CartesianCoordinates> skyObjects;
     private final StereographicProjection projection;
@@ -41,6 +44,8 @@ public final class ObservedSky { //TODO should be final ?
      */
     public ObservedSky(ZonedDateTime obsTime, GeographicCoordinates obsPlace,
                        HorizontalCoordinates observerLook, StarCatalogue catalog) {
+
+        this.obsTime = obsTime;
 
         this.catalog    = catalog;
         this.skyObjects = new HashMap<>();
@@ -90,6 +95,8 @@ public final class ObservedSky { //TODO should be final ?
             ++i;
         }
     }
+
+    public ZonedDateTime observationTime() {return obsTime;}
 
     public CartesianCoordinates pointIfVisible(CartesianCoordinates pointOnPlane) {
         HorizontalCoordinates horizontalCoordinates = projection.inverseApply(pointOnPlane);
