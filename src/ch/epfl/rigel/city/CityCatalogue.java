@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.Set;
+import java.util.TreeSet;
 
 import ch.epfl.rigel.coordinates.GeographicCoordinates;
 
@@ -22,7 +22,8 @@ import ch.epfl.rigel.coordinates.GeographicCoordinates;
 public final class CityCatalogue{
     
     private final static String FILE_OF_CITIES = "/worldcities.csv";
-    private final Map<String, GeographicCoordinates> coordinatesOfTheCity;
+    // city are ordered compared to their name because the user will enter a name to select a city
+    private final Set<City> coordinatesOfTheCity; 
 
     /**
      * @param coordinatesOfTheCity
@@ -31,10 +32,10 @@ public final class CityCatalogue{
         this.coordinatesOfTheCity = load();
     }
     
-    private Map<String, GeographicCoordinates> load() {
+    private Set<City> load() {
         try(BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(FILE_OF_CITIES), StandardCharsets.US_ASCII))){
             String currentLine;
-            TreeMap<String, GeographicCoordinates> coordinatesOfTheCity = new TreeMap<>();
+            TreeSet<City> coordinatesOfTheCity = new TreeSet<>();
             reader.readLine();
             while((currentLine = reader.readLine()) != null) {
                 try {
@@ -44,16 +45,15 @@ public final class CityCatalogue{
                 double longitude = (! lineInfos[3].equals("")) ? Double.parseDouble(lineInfos[3].substring(1, lineInfos[3].length()-1)) : 0;
                 String country = (! lineInfos[4].equals("")) ? lineInfos[4].substring(1, lineInfos[4].length()-1) : null;
                 if(name != null && country != null) {
-                    StringBuilder sb = new StringBuilder();
-                    sb.append(name).append(" (").append(country).append(")");
-                    GeographicCoordinates coordinates = GeographicCoordinates.ofDeg(longitude, latitude);
-                    coordinatesOfTheCity.put(sb.toString(), coordinates);
+                    City c = new City(name, country, GeographicCoordinates.ofDeg(longitude, latitude));
+                    coordinatesOfTheCity.add(c);
                 }
                 } catch(Exception e) {
-                    // many differents types of errors can occurs
+                    // many differents types of errors can occurs due to the name of cities
+                    // which can contains commas
                 }
             }
-            return Map.copyOf(coordinatesOfTheCity);
+            return Set.copyOf(coordinatesOfTheCity);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -62,7 +62,7 @@ public final class CityCatalogue{
     /**
      * @return the coordinatesOfTheCity
      */
-    public Map<String, GeographicCoordinates> coordinatesOfTheCity() {
+    public Set<City> coordinatesOfTheCity() {
         return coordinatesOfTheCity;
     }
 }
