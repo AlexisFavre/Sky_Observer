@@ -91,6 +91,34 @@ public final class ObservedSky { //TODO should be final ?
         }
     }
 
+    public CartesianCoordinates pointIfVisible(CartesianCoordinates pointOnPlane) {
+        HorizontalCoordinates horizontalCoordinates = projection.inverseApply(pointOnPlane);
+        if(horizontalCoordinates.altDeg() > 0)
+            return pointOnPlane;
+        else
+            return null;
+    }
+
+    public CartesianCoordinates pointForObjectWithName(String name) throws IllegalArgumentException {
+        if(name.equals("Soleil"))
+            return pointIfVisible(sunPoint);
+        if(name.equals("Lune"))
+            return pointIfVisible(moonPoint);
+        for(Planet p: planets) {
+            if(p.name().equalsIgnoreCase(name)) {
+                int i = planets.indexOf(p);
+                return pointIfVisible(CartesianCoordinates.of(planetPointsRefs[2*i], planetPointsRefs[2*i + 1]));
+            }
+        }
+        for(Star s: stars()) {
+            if(s.name().equalsIgnoreCase(name)) {
+                int i = stars().indexOf(s);
+                return pointIfVisible(CartesianCoordinates.of(starPointsRefs[2*i], starPointsRefs[2*i + 1]));
+            }
+        }
+        throw new IllegalArgumentException("unknown object");
+    }
+
     /**
      * Gives the closest sky object from the place corresponding to the given plan point
      * if there exists one that is closer to the given maximal distance
@@ -102,21 +130,25 @@ public final class ObservedSky { //TODO should be final ?
      */
     public CelestialObject objectClosestTo(CartesianCoordinates point, double maximalDistance) {
         CelestialObject closestObject = null;
-        double d2 = Double.MAX_VALUE;
-        for(CelestialObject p: skyObjects.keySet()) {
-            CartesianCoordinates c = skyObjects.get(p);
-            if(        Math.abs(c.x()-point.x()) < maximalDistance*2    //make preliminary selection
-                    && Math.abs(c.y()-point.y()) < maximalDistance*2) {
-                double d = point.distance(c);
-                if(    d < maximalDistance
-                    && d < d2
-                    && d > 0)
-                closestObject = p;
-                d2 = point.distance(c);
+        if(pointIfVisible(point) != null) {
+            double d2 = Double.MAX_VALUE;
+            for (CelestialObject p : skyObjects.keySet()) {
+                CartesianCoordinates c = skyObjects.get(p);
+                if (Math.abs(c.x() - point.x()) < maximalDistance * 2    //make preliminary selection
+                        && Math.abs(c.y() - point.y()) < maximalDistance * 2) {
+                    double d = point.distance(c);
+                    if (d < maximalDistance
+                            && d < d2
+                            && d > 0)
+                        closestObject = p;
+                    d2 = point.distance(c);
+                }
             }
         }
         return closestObject;
     }
+    
+    //getters================================================================================================
 
     /**
      * @return the projection used for observation
