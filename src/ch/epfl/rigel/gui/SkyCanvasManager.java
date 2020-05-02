@@ -198,13 +198,16 @@ public class SkyCanvasManager {
     }
 
     protected void goToDestinationWithName(String destination) {
-        CartesianCoordinates destinationOnPlane = sky.get().pointForObjectWithName(destination);
-        if(destinationOnPlane != null) {
-            HorizontalCoordinates coordinates = projection.get().inverseApply(destinationOnPlane);
-            centerAnimator.setDestination(coordinates.azDeg(), coordinates.altDeg());
-            centerAnimator.start();
+        try {
+            CartesianCoordinates destinationOnPlane = sky.get().pointForObjectWithName(destination);
+            if (destinationOnPlane != null) {
+                HorizontalCoordinates coordinates = projection.get().inverseApply(destinationOnPlane);
+                centerAnimator.setDestination(coordinates.azDeg(), coordinates.altDeg());
+                centerAnimator.start();
+            } else
+                System.out.println("Votre position sur la terre ne vous permet pas de voir cet astre");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Cet astre n'est pas référencé");
         }
-        else
-            System.out.println("Astre introuvable");
     }
 }
