@@ -25,9 +25,9 @@ public class CityCatalogueTest {
     }
     
     @Test
-    public void printKeys() throws Exception {
+    public void printNamesAndCountry() throws Exception {
         for (City c : set) {
-            System.out.println(c.name());
+            System.out.printf("name : %s  country : %s %n", c.name(), c.country());
         }
     }
     
