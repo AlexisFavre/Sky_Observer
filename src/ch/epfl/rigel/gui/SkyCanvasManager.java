@@ -38,7 +38,7 @@ public final class SkyCanvasManager {
     private final static int CHANGE_OF_ALTITUDE_WHEN_KEY_PRESSED = 5;
 
     // TODO Replace
-    private BorderPane pane;
+    private Canvas canvas;
     private SkyCanvasPainter painter;
     
     public DoubleBinding mouseAzDeg;
@@ -62,14 +62,9 @@ public final class SkyCanvasManager {
     public SkyCanvasManager(StarCatalogue catalog, DateTimeBean dtb, ObserverLocationBean olb, ViewingParametersBean vpb) {
 
         Canvas canvas = new Canvas();
-        pane = new BorderPane(canvas);
-        pane.setPrefSize(800, 600);
-        canvas.widthProperty().bind(pane.widthProperty());
-        canvas.heightProperty().bind(pane.heightProperty());
+        painter = new SkyCanvasPainter(canvas);
         
         mousePosition = new SimpleObjectProperty<>(CartesianCoordinates.of(0, 0)); // to initialize it
-        
-        painter = new SkyCanvasPainter(canvas);
 
         //BLINDS =====================================================================================
         projection = Bindings.createObjectBinding(
@@ -160,15 +155,15 @@ public final class SkyCanvasManager {
     /**
      * @return the pane containing the managed canvas
      */
-    public BorderPane pane() {
-        return pane;
+    public Canvas canvas() {
+        return canvas;
     }
 
     /**
      * Request the focus directly on the canvas and not on the pane
      * To use after scene integration of the pane
      */
-    public void focusOnCanvas() {
+    /*public void focusOnCanvas() {
         pane.getChildren().get(0).requestFocus();
-    }
+    }*/
 }
