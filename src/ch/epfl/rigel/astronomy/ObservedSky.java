@@ -4,13 +4,16 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ch.epfl.rigel.coordinates.*;
+import ch.epfl.rigel.coordinates.CartesianCoordinates;
+import ch.epfl.rigel.coordinates.EclipticToEquatorialConversion;
+import ch.epfl.rigel.coordinates.EquatorialToHorizontalConversion;
+import ch.epfl.rigel.coordinates.GeographicCoordinates;
+import ch.epfl.rigel.coordinates.HorizontalCoordinates;
+import ch.epfl.rigel.coordinates.StereographicProjection;
 
 /**
  * Represents a set of {@code CelestialObjects} projected on a plan
@@ -19,8 +22,7 @@ import ch.epfl.rigel.coordinates.*;
  *
  * @author Augustin Allard (299918)
  */
-public final class ObservedSky { //TODO should be final ?
-
+public final class ObservedSky {
     private final StarCatalogue catalog;
     private final Map<CelestialObject, CartesianCoordinates> skyObjects;
     private final StereographicProjection projection;
@@ -106,7 +108,7 @@ public final class ObservedSky { //TODO should be final ?
         for(CelestialObject p: skyObjects.keySet()) {
             CartesianCoordinates c = skyObjects.get(p);
             if(        Math.abs(c.x()-point.x()) < maximalDistance*2    //make preliminary selection
-                    && Math.abs(c.y()-point.y()) < maximalDistance*2) {
+                    && Math.abs(c.y()-point.y()) < maximalDistance*2) { // TODO better solution ?
                 double d = point.distance(c);
                 if(    d < maximalDistance
                     && d < d2
