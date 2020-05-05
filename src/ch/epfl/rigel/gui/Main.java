@@ -18,6 +18,7 @@ import ch.epfl.rigel.coordinates.GeographicCoordinates;
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
+import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
@@ -57,7 +58,7 @@ public class Main extends Application {
 
         SkyCanvasManager manager = new SkyCanvasManager(CATALOG, observationTime, epfl, view);
         BorderPane root = new BorderPane();
-        root.getChildren().addAll(controlBar(observerPosition(), observationInstant(), timePassing()));
+        root.setTop(controlBar(observerPosition(), observationInstant(), timePassing()));
         
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
@@ -68,6 +69,8 @@ public class Main extends Application {
         HBox controlBar = new HBox();
         Separator vertSeparator1 = new Separator();
         Separator vertSeparator2 = new Separator();
+        vertSeparator1.setOrientation(Orientation.VERTICAL);
+        vertSeparator2.setOrientation(Orientation.VERTICAL);
         controlBar.getChildren().addAll(observerPosition,
                                         vertSeparator1,
                                         observationInstant,
