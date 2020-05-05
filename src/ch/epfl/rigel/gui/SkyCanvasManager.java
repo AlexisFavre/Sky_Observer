@@ -40,6 +40,8 @@ public final class SkyCanvasManager {
     // TODO Replace
     private Canvas canvas;
     private SkyCanvasPainter painter;
+    private ObserverLocationBean olb;
+    private DateTimeBean dtb;
     
     public DoubleBinding mouseAzDeg;
     public DoubleBinding mouseAltDeg;
@@ -63,6 +65,8 @@ public final class SkyCanvasManager {
 
         Canvas canvas = new Canvas();
         painter = new SkyCanvasPainter(canvas);
+        this.olb = olb;
+        this.dtb = dtb;
         
         mousePosition = new SimpleObjectProperty<>(CartesianCoordinates.of(0, 0)); // to initialize it
 
@@ -157,6 +161,14 @@ public final class SkyCanvasManager {
      */
     public Canvas canvas() {
         return canvas;
+    }
+    
+    public ObserverLocationBean observerLocationBean() {
+        return olb;
+    }
+    
+    public DateTimeBean dateTimeBean() {
+        return dtb;
     }
 
     /**
