@@ -17,6 +17,7 @@ import ch.epfl.rigel.astronomy.StarCatalogue;
 import ch.epfl.rigel.coordinates.GeographicCoordinates;
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
 import javafx.application.Application;
+import javafx.beans.property.Property;
 import javafx.collections.FXCollections;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
@@ -37,6 +38,7 @@ import javafx.util.converter.NumberStringConverter;
 public class Main extends Application {
 
     private final StarCatalogue CATALOG = initCatalog();
+    private SkyCanvasManager manager = null; //not cause of NullPointerException
 
     public static void main(String[] args) {
         launch(args);
@@ -56,10 +58,11 @@ public class Main extends Application {
         ViewingParametersBean view = new ViewingParametersBean(HorizontalCoordinates.ofDeg(180 + 1.e-7, 22),
                 68.4);
 
-        SkyCanvasManager manager = new SkyCanvasManager(CATALOG, observationTime, epfl, view);
+        manager = new SkyCanvasManager(CATALOG, observationTime, epfl, view);
+        //System.out.println(manager == null); print false
         BorderPane root = new BorderPane();
         root.setTop(controlBar(observerPosition(), observationInstant(), timePassing()));
-        
+        System.out.println("test where exception appaer");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
         
@@ -108,17 +111,22 @@ public class Main extends Application {
     // to format the TextFields of longitude and latitude
     // must be used only with the Strings : Longitude or Latitude
     private TextFormatter<Number> positionFormatter(String typeCoordinate){
+        boolean formatterForLat = typeCoordinate.equalsIgnoreCase("Latitude");
+        boolean formatterForLon = typeCoordinate.equalsIgnoreCase("Longitude");
+        if(!formatterForLat && !formatterForLon)
+            throw new UnsupportedOperationException("Invalid Coordinate Type : " + typeCoordinate);
+        
         NumberStringConverter stringConverter = new NumberStringConverter("#0.00");
         
         UnaryOperator<TextFormatter.Change> filter = (change -> {
             try {
                 String newText = change.getControlNewText();
                 double newCoordinateInDeg = stringConverter.fromString(newText).doubleValue();
-                if(typeCoordinate.equals("Longitude"))
+                if(formatterForLon)
                     return GeographicCoordinates.isValidLonDeg(newCoordinateInDeg)
                             ? change
                             : null;
-                if(typeCoordinate.equals("Latitude"))
+                if(formatterForLat)
                     return GeographicCoordinates.isValidLatDeg(newCoordinateInDeg)
                             ? change
                             : null;
@@ -127,8 +135,13 @@ public class Main extends Application {
                 return null;
               }
         });
-        // TODO bind TextFormatter to observerLocationBean
-        return new TextFormatter<Number>(stringConverter, 0, filter);
+        // TODO need Bidirectional bind ?
+        TextFormatter<Number> coordinateDisplay =  new TextFormatter<>(stringConverter, 0, filter);
+        if(formatterForLon)
+            manager.observerLocationBean().lonDegProperty().bindBidirectional(coordinateDisplay.valueProperty());
+        if(formatterForLat)
+            manager.observerLocationBean().latDegProperty().bindBidirectional(coordinateDisplay.valueProperty());
+        return coordinateDisplay;
     }
     
     // observation instant ==============================================================
@@ -138,6 +151,7 @@ public class Main extends Application {
                                   + "-fx-alignment: baseline-left;");
         Label date = new Label("Date :");
         DatePicker datePicker = new DatePicker();
+        manager.dateTimeBean().dateProperty().bindBidirectional(datePicker.valueProperty());
         datePicker.setStyle("-fx-pref-width: 120;");
         
         Label hour = new Label("Heure :");
@@ -147,10 +161,12 @@ public class Main extends Application {
         hourField.setTextFormatter(dateTimeFormatter());
         
         List<String> notObservableListZoneId = new ArrayList<>(ZoneId.getAvailableZoneIds());
-        ComboBox<String> zoneIdList = new ComboBox<>(); //TODO bind
+        ComboBox<String> zoneIdList = new ComboBox<>();
+        //manager.dateTimeBean().zoneProperty().bindBidirectional(zoneIdList.valueProperty()); //TODO how bind
         zoneIdList.setItems(FXCollections.observableList(notObservableListZoneId).sorted());
         zoneIdList.setStyle("-fx-pref-width: 180;");
-        //zoneIdList.disabledProperty() //TODO bind to running of timeAnimator
+        //zoneIdList.disabledProperty() //TODO bind to running of timeAnimator 
+        // but we don't have TimeAnimator yet
         
         observationInstant.getChildren().addAll(date, datePicker, hour, hourField, zoneIdList);
         return observationInstant;
@@ -159,7 +175,9 @@ public class Main extends Application {
     private TextFormatter<LocalTime> dateTimeFormatter(){
         DateTimeFormatter hmsFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
       LocalTimeStringConverter stringConverter = new LocalTimeStringConverter(hmsFormatter, hmsFormatter);
-        return new TextFormatter<LocalTime>(stringConverter); //TODO  bind with bean
+        TextFormatter<LocalTime> timeDisplay =  new TextFormatter<>(stringConverter);
+        manager.dateTimeBean().timeProperty().bindBidirectional(timeDisplay.valueProperty());
+        return timeDisplay;
     }
     
     // timePassing=======================================================================
@@ -167,15 +185,16 @@ public class Main extends Application {
         HBox timePassing = new HBox();
         timePassing.setStyle("-fx-spacing: inherit;");
         
-        ChoiceBox<NamedTimeAccelerator> accelerators = new ChoiceBox<>(); //TODO bind
+        ChoiceBox<NamedTimeAccelerator> accelerators = new ChoiceBox<>(); //TODO bind but need TimeAnimator
         accelerators.setItems(FXCollections.observableArrayList(NamedTimeAccelerator.values()));
         
         Button resetButton = new Button("\uf0e2");
-        // TO CONTINUE (import FONT AWESOME)
+        // TO CONTINUE (import FONT AWESOME) TODO 
         
         return timePassing;
     }
 
+    // additional methods=================================================================
     private StarCatalogue initCatalog() {
         try (InputStream hygStream = getClass().getResourceAsStream("/hygdata_v3.csv");
              InputStream aStream = getClass().getResourceAsStream("/asterisms.txt")) {

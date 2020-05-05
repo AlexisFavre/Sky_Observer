@@ -63,7 +63,7 @@ public final class SkyCanvasManager {
      */
     public SkyCanvasManager(StarCatalogue catalog, DateTimeBean dtb, ObserverLocationBean olb, ViewingParametersBean vpb) {
 
-        Canvas canvas = new Canvas();
+        canvas = new Canvas();
         painter = new SkyCanvasPainter(canvas);
         this.olb = olb;
         this.dtb = dtb;
@@ -78,7 +78,7 @@ public final class SkyCanvasManager {
                         Math.max(canvas.getWidth(), canvas.getHeight())/ projection.get().applyToAngle(Angle.ofDeg(vpb.getFieldOfViewDeg())),
                 canvas.widthProperty(), canvas.heightProperty(), vpb.fieldOfViewDegProperty(), projection);
 
-        planeToCanvas = Bindings.createObjectBinding(
+        planeToCanvas = Bindings.createObjectBinding( // matrice est null lorsque leve NPE
                 () -> Transform.affine(scaleOfView.get(), 0, 0, -scaleOfView.get(),
                             canvas.getWidth()/2, canvas.getHeight()/2)
                 , scaleOfView);
