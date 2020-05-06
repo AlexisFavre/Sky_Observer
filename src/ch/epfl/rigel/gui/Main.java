@@ -17,6 +17,7 @@ import ch.epfl.rigel.astronomy.StarCatalogue;
 import ch.epfl.rigel.coordinates.GeographicCoordinates;
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
@@ -41,7 +42,7 @@ public class Main extends Application {
     private final StarCatalogue CATALOG = initCatalog();
     private final Font fontAwesome = loadFontAwesome();
     private SkyCanvasManager manager;
-    private TimeAnimator animator;//not cause of NullPointerException
+    private TimeAnimator animator;
 
     public static void main(String[] args) {
         launch(args);
@@ -54,13 +55,11 @@ public class Main extends Application {
         primaryStage.setMinWidth(800);
         primaryStage.setMinHeight(600);
         
-        
         DateTimeBean observationTime = new DateTimeBean(ZonedDateTime.parse("2020-02-17T20:15:00+01:00"));
         ObserverLocationBean epfl = new ObserverLocationBean();
         epfl.setLonDeg(6.57);
         epfl.setLatDeg(46.52);
-        ViewingParametersBean view = new ViewingParametersBean(HorizontalCoordinates.ofDeg(180 + 1.e-7, 22),
-                68.4);
+        ViewingParametersBean view = new ViewingParametersBean(HorizontalCoordinates.ofDeg(180 + 1.e-7, 22), 68.4);
         animator = new TimeAnimator(observationTime);
 
         manager = new SkyCanvasManager(CATALOG, observationTime, epfl, view);
@@ -71,8 +70,11 @@ public class Main extends Application {
         //System.out.println(manager == null); print false
         BorderPane root = new BorderPane();
         root.setCenter(skyPane);
+        root.setBottom(informationPane());
         root.setTop(controlBar(observerPosition(), observationInstant(), timePassing()));
+        
         System.out.println("test where exception appaer");
+        
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
         manager.canvas().requestFocus();
@@ -80,10 +82,8 @@ public class Main extends Application {
 
     private HBox controlBar(HBox observerPosition, HBox observationInstant, HBox timePassing) {
         HBox controlBar = new HBox();
-        Separator vertSeparator1 = new Separator();
-        Separator vertSeparator2 = new Separator();
-        vertSeparator1.setOrientation(Orientation.VERTICAL);
-        vertSeparator2.setOrientation(Orientation.VERTICAL);
+        Separator vertSeparator1 = new Separator(Orientation.VERTICAL);
+        Separator vertSeparator2 = new Separator(Orientation.VERTICAL);
         controlBar.getChildren().addAll(observerPosition,
                                         vertSeparator1,
                                         observationInstant,
@@ -207,14 +207,14 @@ public class Main extends Application {
         playButton.setFont(fontAwesome);
         playButton.setOnAction(event ->{
             if(animator.runningProperty().get() == false) {
-                animator.start();
                 playButton.setText("\uf04c");
+                animator.start();
             }
-            else {
-                animator.stop();
+            else {                                  //TODO good way ?
                 playButton.setText("\uf04b");
+                animator.stop();
             }
-        }); //TODO good way ?
+        });
         timePassing.getChildren().addAll(accelerators, resetButton, playButton);
         return timePassing;
     }
@@ -225,10 +225,18 @@ public class Main extends Application {
         infoPane.setStyle("-fx-padding: 4;\n" + 
                 "-fx-background-color: white;");
         Text fielOfViewText = new Text();
-        Text observerLookText = new Text();
+        fielOfViewText.setText(Bindings.format("Champ de vue : %.1f°", manager.scaleOfView().get()).get()); 
+        
         Text closestObjectText = new Text();
-        //TODO make binds
-        infoPane.getChildren().addAll(fielOfViewText, observerLookText, closestObjectText);
+        closestObjectText.setText(Bindings.format("%s", manager.objectUnderMouse.toString()).get());
+        
+        Text observerLookText = new Text();
+        observerLookText.setText(Bindings.format("Azimut : %.1f°, hauteur : %.1f°",
+                manager.mouseAzDeg, manager.mouseAltDeg).get());
+        
+        infoPane.setLeft(fielOfViewText);
+        infoPane.setCenter(closestObjectText);
+        infoPane.setRight(observerLookText);
         return infoPane;
     }
 

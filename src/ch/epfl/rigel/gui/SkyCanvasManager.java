@@ -170,6 +170,10 @@ public final class SkyCanvasManager {
     public DateTimeBean dateTimeBean() {
         return dtb;
     }
+    
+    public DoubleBinding scaleOfView() {
+        return scaleOfView;
+    }
 
     /**
      * Request the focus directly on the canvas and not on the pane
