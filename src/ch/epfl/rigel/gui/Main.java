@@ -32,6 +32,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.converter.LocalTimeStringConverter;
 import javafx.util.converter.NumberStringConverter;
@@ -39,6 +40,7 @@ import javafx.util.converter.NumberStringConverter;
 public class Main extends Application {
 
     private final StarCatalogue CATALOG = initCatalog();
+    private final Font fontAwesome = loadFontAwesome();
     private SkyCanvasManager manager;
     private TimeAnimator animator;//not cause of NullPointerException
 
@@ -63,13 +65,18 @@ public class Main extends Application {
         animator = new TimeAnimator(observationTime);
 
         manager = new SkyCanvasManager(CATALOG, observationTime, epfl, view);
+        BorderPane skyPane = new BorderPane(manager.canvas());
+        manager.canvas().widthProperty().bind(skyPane.widthProperty());
+        manager.canvas().heightProperty().bind(skyPane.heightProperty());
+        
         //System.out.println(manager == null); print false
         BorderPane root = new BorderPane();
+        root.setCenter(skyPane);
         root.setTop(controlBar(observerPosition(), observationInstant(), timePassing()));
         System.out.println("test where exception appaer");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
-        
+        manager.canvas().requestFocus();
     }
 
     private HBox controlBar(HBox observerPosition, HBox observationInstant, HBox timePassing) {
@@ -195,6 +202,9 @@ public class Main extends Application {
         //animator.acceleratorProperty().bind(Bindings.select(accelerators));
         
         Button resetButton = new Button("\uf0e2");
+        resetButton.setFont(fontAwesome);
+        
+        Button playButton = new Button();
         // TO CONTINUE (import FONT AWESOME) TODO 
         
         return timePassing;
@@ -210,5 +220,14 @@ public class Main extends Application {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
+    
+    private Font loadFontAwesome() {
+        try(InputStream fontStream = getClass().getResourceAsStream("/Font Awesome 5 Free-Solid-900.otf");){
+            return Font.loadFont(fontStream, 15);
+        } catch (IOException e) {
+            return null;
+        }
+        
     }
 }
