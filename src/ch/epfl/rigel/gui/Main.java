@@ -121,8 +121,8 @@ public class Main extends Application {
     // to format the TextFields of longitude and latitude
     // must be used only with the Strings : Longitude or Latitude
     private TextFormatter<Number> positionFormatter(String typeCoordinate){
-        boolean formatterForLat = typeCoordinate.equalsIgnoreCase("Latitude");
         boolean formatterForLon = typeCoordinate.equalsIgnoreCase("Longitude");
+        boolean formatterForLat = typeCoordinate.equalsIgnoreCase("Latitude");
         if(!formatterForLat && !formatterForLon)
             throw new UnsupportedOperationException("Invalid Coordinate Type : " + typeCoordinate);
         
@@ -161,7 +161,7 @@ public class Main extends Application {
                                   + "-fx-alignment: baseline-left;");
         Label date = new Label("Date :");
         DatePicker datePicker = new DatePicker();
-        manager.dateTimeBean().dateProperty().bindBidirectional(datePicker.valueProperty());
+        //TODO manager.dateTimeBean().dateProperty().bindBidirectional(datePicker.valueProperty());
         datePicker.setStyle("-fx-pref-width: 120;");
         datePicker.disableProperty().bind(animator.runningProperty());
         
@@ -170,14 +170,14 @@ public class Main extends Application {
         hourField.setStyle("-fx-pref-width: 75;\n"
                          + "-fx-alignment: baseline-right;");
         hourField.setTextFormatter(dateTimeFormatter());
-        hourField.disableProperty().bind(animator.runningProperty());
+        //TODO hourField.disableProperty().bind(animator.runningProperty());
         
         List<String> notObservableListZoneId = new ArrayList<>(ZoneId.getAvailableZoneIds());
         ComboBox<String> zoneIdList = new ComboBox<>();
         //manager.dateTimeBean().zoneProperty().bindBidirectional(zoneIdList.valueProperty()); //TODO how bind
         zoneIdList.setItems(FXCollections.observableList(notObservableListZoneId).sorted());
         zoneIdList.setStyle("-fx-pref-width: 180;");
-        zoneIdList.disableProperty().bind(animator.runningProperty()); 
+        //TODO zoneIdList.disableProperty().bind(animator.runningProperty()); 
         
         observationInstant.getChildren().addAll(date, datePicker, hour, hourField, zoneIdList);
         return observationInstant;
@@ -187,7 +187,7 @@ public class Main extends Application {
         DateTimeFormatter hmsFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
       LocalTimeStringConverter stringConverter = new LocalTimeStringConverter(hmsFormatter, hmsFormatter);
         TextFormatter<LocalTime> timeDisplay =  new TextFormatter<>(stringConverter);
-        manager.dateTimeBean().timeProperty().bindBidirectional(timeDisplay.valueProperty());
+        //TODO manager.dateTimeBean().timeProperty().bindBidirectional(timeDisplay.valueProperty());
         return timeDisplay;
     }
     
