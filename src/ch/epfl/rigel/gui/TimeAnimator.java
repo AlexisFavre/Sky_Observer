@@ -77,10 +77,13 @@ public final class TimeAnimator extends AnimationTimer {
         return running;
     }
     
-    /**
-     * @param accelerator the accelerator to set
-     */
-    public void setAccelerator(TimeAccelerator accelerator) {
-        this.accelerator.setValue(accelerator);
+    public ObjectProperty<TimeAccelerator> acceleratorProperty(){
+        return accelerator;
     }
+//    /**
+//     * @param accelerator the accelerator to set
+//     */
+//    public void setAccelerator(TimeAccelerator accelerator) {
+//        this.accelerator.setValue(accelerator);
+//    }
 }

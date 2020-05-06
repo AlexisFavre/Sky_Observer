@@ -17,6 +17,7 @@ import ch.epfl.rigel.astronomy.StarCatalogue;
 import ch.epfl.rigel.coordinates.GeographicCoordinates;
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.Property;
 import javafx.collections.FXCollections;
 import javafx.geometry.Orientation;
@@ -38,7 +39,8 @@ import javafx.util.converter.NumberStringConverter;
 public class Main extends Application {
 
     private final StarCatalogue CATALOG = initCatalog();
-    private SkyCanvasManager manager = null; //not cause of NullPointerException
+    private SkyCanvasManager manager;
+    private TimeAnimator animator;//not cause of NullPointerException
 
     public static void main(String[] args) {
         launch(args);
@@ -51,12 +53,14 @@ public class Main extends Application {
         primaryStage.setMinWidth(800);
         primaryStage.setMinHeight(600);
         
+        
         DateTimeBean observationTime = new DateTimeBean(ZonedDateTime.parse("2020-02-17T20:15:00+01:00"));
         ObserverLocationBean epfl = new ObserverLocationBean();
         epfl.setLonDeg(6.57);
         epfl.setLatDeg(46.52);
         ViewingParametersBean view = new ViewingParametersBean(HorizontalCoordinates.ofDeg(180 + 1.e-7, 22),
                 68.4);
+        animator = new TimeAnimator(observationTime);
 
         manager = new SkyCanvasManager(CATALOG, observationTime, epfl, view);
         //System.out.println(manager == null); print false
@@ -153,20 +157,21 @@ public class Main extends Application {
         DatePicker datePicker = new DatePicker();
         manager.dateTimeBean().dateProperty().bindBidirectional(datePicker.valueProperty());
         datePicker.setStyle("-fx-pref-width: 120;");
+        datePicker.disableProperty().bind(animator.runningProperty());
         
         Label hour = new Label("Heure :");
         TextField hourField = new TextField();
         hourField.setStyle("-fx-pref-width: 75;\n"
                          + "-fx-alignment: baseline-right;");
         hourField.setTextFormatter(dateTimeFormatter());
+        hourField.disableProperty().bind(animator.runningProperty());
         
         List<String> notObservableListZoneId = new ArrayList<>(ZoneId.getAvailableZoneIds());
         ComboBox<String> zoneIdList = new ComboBox<>();
         //manager.dateTimeBean().zoneProperty().bindBidirectional(zoneIdList.valueProperty()); //TODO how bind
         zoneIdList.setItems(FXCollections.observableList(notObservableListZoneId).sorted());
         zoneIdList.setStyle("-fx-pref-width: 180;");
-        //zoneIdList.disabledProperty() //TODO bind to running of timeAnimator 
-        // but we don't have TimeAnimator yet
+        zoneIdList.disableProperty().bind(animator.runningProperty()); 
         
         observationInstant.getChildren().addAll(date, datePicker, hour, hourField, zoneIdList);
         return observationInstant;
@@ -185,8 +190,9 @@ public class Main extends Application {
         HBox timePassing = new HBox();
         timePassing.setStyle("-fx-spacing: inherit;");
         
-        ChoiceBox<NamedTimeAccelerator> accelerators = new ChoiceBox<>(); //TODO bind but need TimeAnimator
+        ChoiceBox<NamedTimeAccelerator> accelerators = new ChoiceBox<>();// devrait mettre name ?
         accelerators.setItems(FXCollections.observableArrayList(NamedTimeAccelerator.values()));
+        //animator.acceleratorProperty().bind(Bindings.select(accelerators));
         
         Button resetButton = new Button("\uf0e2");
         // TO CONTINUE (import FONT AWESOME) TODO 
