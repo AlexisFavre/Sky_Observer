@@ -17,8 +17,6 @@ import ch.epfl.rigel.astronomy.StarCatalogue;
 import ch.epfl.rigel.coordinates.GeographicCoordinates;
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
 import javafx.application.Application;
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.Property;
 import javafx.collections.FXCollections;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
@@ -33,6 +31,7 @@ import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.converter.LocalTimeStringConverter;
 import javafx.util.converter.NumberStringConverter;
@@ -204,10 +203,33 @@ public class Main extends Application {
         Button resetButton = new Button("\uf0e2");
         resetButton.setFont(fontAwesome);
         
-        Button playButton = new Button();
-        // TO CONTINUE (import FONT AWESOME) TODO 
-        
+        Button playButton = new Button("\uf04b");
+        playButton.setFont(fontAwesome);
+        playButton.setOnAction(event ->{
+            if(animator.runningProperty().get() == false) {
+                animator.start();
+                playButton.setText("\uf04c");
+            }
+            else {
+                animator.stop();
+                playButton.setText("\uf04b");
+            }
+        }); //TODO good way ?
+        timePassing.getChildren().addAll(accelerators, resetButton, playButton);
         return timePassing;
+    }
+    
+    // Information Pane===================================================================
+    private BorderPane informationPane() {
+        BorderPane infoPane = new BorderPane();
+        infoPane.setStyle("-fx-padding: 4;\n" + 
+                "-fx-background-color: white;");
+        Text fielOfViewText = new Text();
+        Text observerLookText = new Text();
+        Text closestObjectText = new Text();
+        //TODO make binds
+        infoPane.getChildren().addAll(fielOfViewText, observerLookText, closestObjectText);
+        return infoPane;
     }
 
     // additional methods=================================================================
