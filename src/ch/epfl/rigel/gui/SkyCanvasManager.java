@@ -17,7 +17,6 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Transform;
 
@@ -42,10 +41,11 @@ public final class SkyCanvasManager {
     private SkyCanvasPainter painter;
     private ObserverLocationBean olb;
     private DateTimeBean dtb;
+    private ViewingParametersBean vpb;
     
     public DoubleBinding mouseAzDeg;
     public DoubleBinding mouseAltDeg;
-    private ObjectProperty<CartesianCoordinates> mousePosition = new SimpleObjectProperty<>(CartesianCoordinates.of(0, 0));
+    private ObjectProperty<CartesianCoordinates> mousePosition;
     private ObjectBinding<HorizontalCoordinates> mouseHorizontalPosition;
     public ObjectBinding<CelestialObject> objectUnderMouse; //TODO pourquoi en private?
 
@@ -67,6 +67,7 @@ public final class SkyCanvasManager {
         painter = new SkyCanvasPainter(canvas);
         this.olb = olb;
         this.dtb = dtb;
+        this.vpb = vpb;
         
         mousePosition = new SimpleObjectProperty<>(CartesianCoordinates.of(0, 0)); // to initialize it
 
@@ -75,33 +76,34 @@ public final class SkyCanvasManager {
                 () -> new StereographicProjection(vpb.getCenter()), vpb.centerProperty());
         
         scaleOfView = Bindings.createDoubleBinding(() ->
-                        Math.max(canvas.getWidth(), canvas.getHeight())/ projection.get().applyToAngle(Angle.ofDeg(vpb.getFieldOfViewDeg())),
+                        Math.max(canvas.getWidth(), canvas.getHeight())
+                        / projection.get().applyToAngle(Angle.ofDeg(vpb.getFieldOfViewDeg())),
                 canvas.widthProperty(), canvas.heightProperty(), vpb.fieldOfViewDegProperty(), projection);
 
-        planeToCanvas = Bindings.createObjectBinding( // matrice est null lorsque leve NPE
+        planeToCanvas = Bindings.createObjectBinding(
                 () -> Transform.affine(scaleOfView.get(), 0, 0, -scaleOfView.get(),
-                            canvas.getWidth()/2, canvas.getHeight()/2)
-                , scaleOfView);
+                            canvas.getWidth()/2, canvas.getHeight()/2), scaleOfView);
 
         mouseHorizontalPosition = Bindings.createObjectBinding(
-                () -> projection.get().inverseApply(mousePosition.get()), mousePosition, projection, planeToCanvas);
+                () -> projection.get().inverseApply(mousePosition.get()),
+                        mousePosition, projection, planeToCanvas);
 
         sky = Bindings.createObjectBinding(
                 () -> new ObservedSky(dtb.getZonedDateTime(), olb.getCoordinates(), vpb.getCenter(), catalog),
-                vpb.centerProperty(), olb.coordinatesProperty(), dtb.timeProperty(), dtb.dateProperty(), dtb.zoneProperty());
+                        vpb.centerProperty(), olb.coordinatesProperty(), dtb.timeProperty(),
+                        dtb.dateProperty(), dtb.zoneProperty());
 
-        mouseAzDeg  = Bindings.createDoubleBinding(() -> mouseHorizontalPosition.get().azDeg(), mouseHorizontalPosition);
-        mouseAltDeg = Bindings.createDoubleBinding(() -> mouseHorizontalPosition.get().altDeg(), mouseHorizontalPosition);
+        mouseAzDeg  = Bindings.createDoubleBinding(() ->
+            mouseHorizontalPosition.get().azDeg(), mouseHorizontalPosition);
+        
+        mouseAltDeg = Bindings.createDoubleBinding(() ->
+            mouseHorizontalPosition.get().altDeg(), mouseHorizontalPosition);
 
         objectUnderMouse = Bindings.createObjectBinding(
-                () -> sky.get().objectClosestTo(mousePosition.get(), MAX_DISTANCE_FOR_CLOSEST_OBJECT_TO/scaleOfView.get()),
+                () -> sky.get().
+                objectClosestTo(mousePosition.get(), MAX_DISTANCE_FOR_CLOSEST_OBJECT_TO/scaleOfView.get()),
                 mousePosition, planeToCanvas, sky);
 
-        //PRINT CLOSEST OBJECT VIA LISTENER =========================================================
-        objectUnderMouse.addListener((p, o, n) -> {
-            if(objectUnderMouse.get() != null && n != o)
-                System.out.println(objectUnderMouse.get()); //TODO will be printed in a special case in step 11
-        });
 
         //RE_DRAW SKY VIA LISTENER ==================================================================
         sky.addListener(e-> painter.actualize(sky.get(), planeToCanvas.get()));
@@ -125,7 +127,6 @@ public final class SkyCanvasManager {
                     vpb.setCenter(HorizontalCoordinates.ofDeg(ROInter_0To360.reduce( az - CHANGE_OF_AZIMUT_WHEN_KEY_PRESSED), alt));
                     break;
                 default:
-                    break;
             }
             e.consume();
         });
@@ -135,6 +136,7 @@ public final class SkyCanvasManager {
             try {
                 Point2D mp = planeToCanvas.get().createInverse().transform(e.getX(), e.getY());
                 mousePosition.setValue(CartesianCoordinates.of(mp.getX(), mp.getY()));
+                
             } catch (NonInvertibleTransformException error) {
                 System.out.println("un-computable mouse coordinates on plane; cause: non invertible transformation");
             }
@@ -148,17 +150,11 @@ public final class SkyCanvasManager {
             e.consume();
         });
         
-        // MOUSE CLICKED LISTENER
+        // MOUSE CLICKED LISTENER====================================================================
         canvas.setOnMouseClicked(e -> canvas.requestFocus());
         
-        //ADAPTATION OF SKY WHEN SIZE OF STAGE CHANGE
-        canvas.widthProperty().addListener( e -> painter.actualize(sky.get(), planeToCanvas.get()));
-        canvas.heightProperty().addListener(e -> painter.actualize(sky.get(), planeToCanvas.get()));
-    }
+    } //End Constructor =============================================================================
 
-    /**
-     * @return the pane containing the managed canvas
-     */
     public Canvas canvas() {
         return canvas;
     }
@@ -171,15 +167,7 @@ public final class SkyCanvasManager {
         return dtb;
     }
     
-    public DoubleBinding scaleOfView() {
-        return scaleOfView;
+    public ViewingParametersBean viewingParameterBean() {
+        return vpb;
     }
-
-    /**
-     * Request the focus directly on the canvas and not on the pane
-     * To use after scene integration of the pane
-     */
-    /*public void focusOnCanvas() {
-        pane.getChildren().get(0).requestFocus();
-    }*/
 }
