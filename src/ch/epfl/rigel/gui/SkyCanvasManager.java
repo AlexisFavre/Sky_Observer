@@ -43,11 +43,11 @@ public final class SkyCanvasManager {
     private DateTimeBean dtb;
     private ViewingParametersBean vpb;
     
-    public DoubleBinding mouseAzDeg;
-    public DoubleBinding mouseAltDeg;
+    private DoubleBinding mouseAzDeg;
+    private DoubleBinding mouseAltDeg;
     private ObjectProperty<CartesianCoordinates> mousePosition;
     private ObjectBinding<HorizontalCoordinates> mouseHorizontalPosition;
-    public ObjectBinding<CelestialObject> objectUnderMouse; //TODO pourquoi en private?
+    private ObjectBinding<CelestialObject> objectUnderMouse; //TODO pourquoi en private?
 
     private DoubleBinding scaleOfView;
     private ObjectBinding<ObservedSky> sky;
@@ -153,21 +153,57 @@ public final class SkyCanvasManager {
         // MOUSE CLICKED LISTENER====================================================================
         canvas.setOnMouseClicked(e -> canvas.requestFocus());
         
-    } //End Constructor =============================================================================
+    } //End Constructor
 
+    // getters ======================================================================================
+    
+    /**
+     * @return the canvas where the sky is drawn
+     */
     public Canvas canvas() {
         return canvas;
     }
     
+    /**
+     * @return the ObserverLocationBean
+     */
     public ObserverLocationBean observerLocationBean() {
         return olb;
     }
     
+    /**
+     * 
+     * @return the DateTimeBean
+     */
     public DateTimeBean dateTimeBean() {
         return dtb;
     }
     
+    /**
+     * @return the ViewingParametersBean
+     */
     public ViewingParametersBean viewingParameterBean() {
         return vpb;
+    }
+
+    /**
+     * @return the mouseAzDeg
+     */
+    public DoubleBinding mouseAzDeg() {
+        return mouseAzDeg;
+    }
+
+    /**
+     * @return the mouseAltDeg
+     */
+    public DoubleBinding mouseAltDeg() {
+        return mouseAltDeg;
+    }
+
+    /**
+     * @return the objectUnderMouse
+     */
+    public ObjectBinding<CelestialObject> objectUnderMouse() {
+        return objectUnderMouse;
     }
 }

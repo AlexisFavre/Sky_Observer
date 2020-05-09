@@ -42,7 +42,14 @@ public class Main extends Application {
     private final static String PATTERN_LONG_AND_LAT = "#0.00";
     private final static String LONG = "Longitude";
     private final static String LAT = "Latitude";
+    
+    // constants for initialization
     private final static int INDEX_ACCELERATOR_X300 = 2;
+    private final static double EPFL_LON_DEG = 6.57;
+    private final static double EPFL_LAT_DEG = 46.52;
+    private final static double INITIAL_FIEL_OF_VIEW_DEG = 68.4;
+    private final static HorizontalCoordinates INITIAl_CENTER_OF_PROJECTION = HorizontalCoordinates.ofDeg(180 + 1.e-7, 22);
+    
     private final Font fontAwesome = loadFontAwesome();
     private final StarCatalogue catalog = initCatalog();
     
@@ -67,9 +74,9 @@ public class Main extends Application {
         // Initiate sky
         DateTimeBean observationTime = new DateTimeBean(currentInstant);
         ObserverLocationBean epfl = new ObserverLocationBean();
-        epfl.setLonDeg(6.57);
-        epfl.setLatDeg(46.52);
-        ViewingParametersBean view = new ViewingParametersBean(HorizontalCoordinates.ofDeg(180 + 1.e-7, 22), 68.4);
+        epfl.setLonDeg(EPFL_LON_DEG);
+        epfl.setLatDeg(EPFL_LAT_DEG);
+        ViewingParametersBean view = new ViewingParametersBean(INITIAl_CENTER_OF_PROJECTION, INITIAL_FIEL_OF_VIEW_DEG);
         animator = new TimeAnimator(observationTime);
         manager = new SkyCanvasManager(catalog, observationTime, epfl, view);
         
@@ -269,12 +276,12 @@ public class Main extends Application {
         Text closestObjectText = new Text();
         closestObjectText.textProperty().bind(
                 Bindings.format("%s",
-                        manager.objectUnderMouse)); //TODO when null should print nothing
+                        manager.objectUnderMouse())); //TODO when null should print nothing
         
         Text observerLookText = new Text();
         observerLookText.textProperty().bind(
                 Bindings.format("Azimut : %.1f°, hauteur : %.1f°",
-                manager.mouseAzDeg, manager.mouseAltDeg));
+                manager.mouseAzDeg(), manager.mouseAltDeg()));
         
         infoPane.setLeft(fielOfViewText);
         infoPane.setCenter(closestObjectText);
