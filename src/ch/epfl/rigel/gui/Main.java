@@ -67,7 +67,6 @@ public class Main extends Application {
         manager.canvas().widthProperty().bind(skyPane.widthProperty());
         manager.canvas().heightProperty().bind(skyPane.heightProperty());
         
-        //System.out.println(manager == null); print false
         BorderPane root = new BorderPane();
         root.setCenter(skyPane);
         root.setBottom(informationPane());
@@ -145,7 +144,6 @@ public class Main extends Application {
                 return null;
               }
         });
-        // TODO need Bidirectional bind ?
         TextFormatter<Number> coordinateDisplay =  new TextFormatter<>(stringConverter, 0, filter);
         if(formatterForLon)
             manager.observerLocationBean().lonDegProperty().bindBidirectional(coordinateDisplay.valueProperty());
@@ -161,7 +159,7 @@ public class Main extends Application {
                                   + "-fx-alignment: baseline-left;");
         Label date = new Label("Date :");
         DatePicker datePicker = new DatePicker();
-        //TODO manager.dateTimeBean().dateProperty().bindBidirectional(datePicker.valueProperty());
+        datePicker.valueProperty().bindBidirectional(manager.dateTimeBean().dateProperty());
         datePicker.setStyle("-fx-pref-width: 120;");
         datePicker.disableProperty().bind(animator.runningProperty());
         
@@ -170,13 +168,14 @@ public class Main extends Application {
         hourField.setStyle("-fx-pref-width: 75;\n"
                          + "-fx-alignment: baseline-right;");
         hourField.setTextFormatter(dateTimeFormatter());
-        //TODO hourField.disableProperty().bind(animator.runningProperty());
+        //hourField.disableProperty().bind(animator.runningProperty());
         
         List<String> notObservableListZoneId = new ArrayList<>(ZoneId.getAvailableZoneIds());
         ComboBox<String> zoneIdList = new ComboBox<>();
         //manager.dateTimeBean().zoneProperty().bindBidirectional(zoneIdList.valueProperty()); //TODO how bind
         zoneIdList.setItems(FXCollections.observableList(notObservableListZoneId).sorted());
         zoneIdList.setStyle("-fx-pref-width: 180;");
+        zoneIdList.getSelectionModel().select("UTC");
         //TODO zoneIdList.disableProperty().bind(animator.runningProperty()); 
         
         observationInstant.getChildren().addAll(date, datePicker, hour, hourField, zoneIdList);
@@ -187,7 +186,7 @@ public class Main extends Application {
         DateTimeFormatter hmsFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
       LocalTimeStringConverter stringConverter = new LocalTimeStringConverter(hmsFormatter, hmsFormatter);
         TextFormatter<LocalTime> timeDisplay =  new TextFormatter<>(stringConverter);
-        //TODO manager.dateTimeBean().timeProperty().bindBidirectional(timeDisplay.valueProperty());
+        timeDisplay.valueProperty().bindBidirectional(manager.dateTimeBean().timeProperty());
         return timeDisplay;
     }
     
@@ -199,6 +198,7 @@ public class Main extends Application {
         ChoiceBox<NamedTimeAccelerator> accelerators = new ChoiceBox<>();// devrait mettre name ?
         accelerators.setItems(FXCollections.observableArrayList(NamedTimeAccelerator.values()));
         //animator.acceleratorProperty().bind(Bindings.select(accelerators));
+        accelerators.getSelectionModel().selectFirst(); // put accelerator x1 by default
         
         Button resetButton = new Button("\uf0e2");
         resetButton.setFont(fontAwesome);
@@ -225,14 +225,14 @@ public class Main extends Application {
         infoPane.setStyle("-fx-padding: 4;\n" + 
                 "-fx-background-color: white;");
         Text fielOfViewText = new Text();
-        fielOfViewText.setText(Bindings.format("Champ de vue : %.1f°", manager.scaleOfView().get()).get()); 
-        
+        fielOfViewText.textProperty().bind(Bindings.format("Champ de vue : %.1f°", manager.scaleOfView())); 
+
         Text closestObjectText = new Text();
-        closestObjectText.setText(Bindings.format("%s", manager.objectUnderMouse.toString()).get());
+        closestObjectText.textProperty().bind(Bindings.format("%s", manager.objectUnderMouse));
         
         Text observerLookText = new Text();
-        observerLookText.setText(Bindings.format("Azimut : %.1f°, hauteur : %.1f°",
-                manager.mouseAzDeg, manager.mouseAltDeg).get());
+        observerLookText.textProperty().bind(Bindings.format("Azimut : %.1f°, hauteur : %.1f°",
+                manager.mouseAzDeg, manager.mouseAltDeg));
         
         infoPane.setLeft(fielOfViewText);
         infoPane.setCenter(closestObjectText);
