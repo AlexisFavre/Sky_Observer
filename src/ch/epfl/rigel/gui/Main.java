@@ -6,6 +6,7 @@ import java.io.UncheckedIOException;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.chrono.Chronology;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -173,12 +174,12 @@ public class Main extends Application {
         TextFormatter<Number> coordinateDisplay =  new TextFormatter<>(stringConverter, 0, filter);
         
         if(formatterForLon)
-            manager.observerLocationBean().lonDegProperty().
-                bindBidirectional(coordinateDisplay.valueProperty());
+            coordinateDisplay.valueProperty().
+                bindBidirectional(manager.observerLocationBean().lonDegProperty());
         
         if(formatterForLat)
-            manager.observerLocationBean().latDegProperty().
-                bindBidirectional(coordinateDisplay.valueProperty());
+            coordinateDisplay.valueProperty().
+                bindBidirectional(manager.observerLocationBean().latDegProperty());
         
         return coordinateDisplay;
     }
@@ -201,7 +202,7 @@ public class Main extends Application {
         hourField.setStyle("-fx-pref-width: 75;\n"
                          + "-fx-alignment: baseline-right;");
         hourField.setTextFormatter(dateTimeFormatter());
-        //hourField.disableProperty().bind(animator.runningProperty());
+        hourField.disableProperty().bind(animator.runningProperty());
         
         List<ZoneId> notObservableListZoneId =  
                 ZoneId.getAvailableZoneIds().
@@ -213,7 +214,7 @@ public class Main extends Application {
         zoneIdList.valueProperty().bindBidirectional(manager.dateTimeBean().zoneProperty()); //TODO how bind
         zoneIdList.setItems(FXCollections.observableList(notObservableListZoneId));
         zoneIdList.setStyle("-fx-pref-width: 180;");
-        //TODO zoneIdList.disableProperty().bind(animator.runningProperty()); 
+        zoneIdList.disableProperty().bind(animator.runningProperty()); 
         
         observationInstant.getChildren().addAll(date, datePicker, hour, hourField, zoneIdList);
         return observationInstant;
@@ -235,17 +236,24 @@ public class Main extends Application {
         HBox timePassing = new HBox();
         timePassing.setStyle("-fx-spacing: inherit;");
         
-        ChoiceBox<NamedTimeAccelerator> accelerators = new ChoiceBox<>();// devrait mettre name ?
+        ChoiceBox<NamedTimeAccelerator> accelerators = new ChoiceBox<>();
         accelerators.setItems(FXCollections.observableArrayList(NamedTimeAccelerator.values()));
-        //animator.acceleratorProperty().bind(Bindings.select(accelerators));
         accelerators.getSelectionModel().select(INDEX_ACCELERATOR_X300);
+        animator.acceleratorProperty().bind(Bindings.select(accelerators.valueProperty(), "accelerator"));
         
         // to reset to the current instant
         Button resetButton = new Button("\uf0e2"); //unicode for the image
         resetButton.setFont(fontAwesome);
         resetButton.setOnAction(event -> {
             currentInstant = ZonedDateTime.now(manager.dateTimeBean().getZone());
-            manager.dateTimeBean().setZonedDateTime(currentInstant);
+            if(animator.runningProperty().get() == true) {
+                animator.stop();  //can't modify dateTimeBean when animation is running
+                manager.dateTimeBean().setZonedDateTime(currentInstant);
+                animator.start();
+          } else {
+                manager.dateTimeBean().setZonedDateTime(currentInstant);
+            }
+
         });
         
         // to active or stop the time evolution
