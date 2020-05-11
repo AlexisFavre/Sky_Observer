@@ -6,9 +6,7 @@ import java.io.UncheckedIOException;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.chrono.Chronology;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
@@ -20,6 +18,12 @@ import ch.epfl.rigel.coordinates.GeographicCoordinates;
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableBooleanValue;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
@@ -42,10 +46,16 @@ import javafx.util.converter.NumberStringConverter;
 public class Main extends Application {
 
     private final static String PATTERN_LONG_AND_LAT = "#0.00";
+    private final static String PATTERN_TIME = "HH:mm:ss";
     private final static String LONG = "Longitude";
     private final static String LAT = "Latitude";
+    private final static String UNICODE_FOR_RESET_BUT = "\uf0e2";
+    private final static String UNICODE_FOR_PLAY_BUT = "\uf04b";
+    private final static String UNICODE_FOR_PAUSE_BUT = "\uf04c";
     
     // constants for initialization
+    private final static int MINIMAL_WIDTH_STAGE = 800;
+    private final static int MINIMAL_HEIGHT_STAGE = 600;
     private final static int INDEX_ACCELERATOR_X300 = 2;
     private final static double EPFL_LON_DEG = 6.57;
     private final static double EPFL_LAT_DEG = 46.52;
@@ -68,8 +78,8 @@ public class Main extends Application {
         
         // Initiate stage (window)
         primaryStage.setTitle("Rigel");
-        primaryStage.setMinWidth(800);
-        primaryStage.setMinHeight(600);
+        primaryStage.setMinWidth(MINIMAL_WIDTH_STAGE);
+        primaryStage.setMinHeight(MINIMAL_HEIGHT_STAGE);
         
         currentInstant = ZonedDateTime.now();
         
@@ -168,7 +178,7 @@ public class Main extends Application {
                 return null;
                 
             } catch (Exception e) { //if cannot convert the input string into a double
-                return null;
+                return null; // or nullPointerException if user try to entirely clear the textField
               }
         });
         TextFormatter<Number> coordinateDisplay =  new TextFormatter<>(stringConverter, 0, filter);
@@ -222,7 +232,7 @@ public class Main extends Application {
     
     private TextFormatter<LocalTime> dateTimeFormatter(){
         
-        DateTimeFormatter hmsFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        DateTimeFormatter hmsFormatter = DateTimeFormatter.ofPattern(PATTERN_TIME);
         LocalTimeStringConverter stringConverter = new LocalTimeStringConverter(hmsFormatter, hmsFormatter);
         TextFormatter<LocalTime> timeDisplay =  new TextFormatter<>(stringConverter);
         timeDisplay.valueProperty().bindBidirectional(manager.dateTimeBean().timeProperty());
@@ -242,7 +252,7 @@ public class Main extends Application {
         animator.acceleratorProperty().bind(Bindings.select(accelerators.valueProperty(), "accelerator"));
         
         // to reset to the current instant
-        Button resetButton = new Button("\uf0e2"); //unicode for the image
+        Button resetButton = new Button(UNICODE_FOR_RESET_BUT);
         resetButton.setFont(fontAwesome);
         resetButton.setOnAction(event -> {
             currentInstant = ZonedDateTime.now(manager.dateTimeBean().getZone());
@@ -257,16 +267,17 @@ public class Main extends Application {
         });
         
         // to active or stop the time evolution
-        Button playButton = new Button("\uf04b"); //unicode for the image
+        Button playButton = new Button(UNICODE_FOR_PLAY_BUT);
         playButton.setFont(fontAwesome);
         playButton.setOnAction(event -> {
             
             if(animator.runningProperty().get() == false) {
-                playButton.setText("\uf04c"); //unicode for the image
+                playButton.setText(UNICODE_FOR_PAUSE_BUT);
                 animator.start();
             
-            } else {                                  //TODO good way ?
-                playButton.setText("\uf04b"); //unicode for the image
+            } else {                                  //TODO good way ?,
+                //should use Bindings.when(boolean).then.....
+                playButton.setText(UNICODE_FOR_PLAY_BUT);
                 animator.stop();
             }
         });
@@ -287,10 +298,11 @@ public class Main extends Application {
                 Bindings.format("Champ de vue : %.1f°", 
                         manager.viewingParameterBean().fieldOfViewDegProperty())); 
 
+        BooleanProperty b = new SimpleBooleanProperty(manager.objectUnderMouse() != null);
+        ObjectProperty<String> s = new SimpleObjectProperty<>("");
         Text closestObjectText = new Text();
-        closestObjectText.textProperty().bind(
-                Bindings.format("%s",
-                        manager.objectUnderMouse())); //TODO when null should print nothing
+        closestObjectText.textProperty().bind((ObservableValue<? extends String>) Bindings.when(b).then(manager.objectUnderMouse()));
+              //  Bindings.format("%s", manager.objectUnderMouse()) : Bindings.format("")); //TODO when null should print nothing
         
         Text observerLookText = new Text();
         observerLookText.textProperty().bind(
@@ -323,7 +335,7 @@ public class Main extends Application {
             return Font.loadFont(fontStream, 15);
             
         } catch (IOException e) {
-            return null;
+            throw new UncheckedIOException(e);
         }
         
     }
