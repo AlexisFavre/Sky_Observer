@@ -18,12 +18,6 @@ import ch.epfl.rigel.coordinates.GeographicCoordinates;
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ObservableBooleanValue;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
@@ -37,6 +31,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -94,7 +89,7 @@ public class Main extends Application {
         
         
         // Pane containing the canvas where the sky is drawn
-        BorderPane skyPane = new BorderPane(manager.canvas());
+        Pane skyPane = new Pane(manager.canvas());
         manager.canvas().widthProperty().bind(skyPane.widthProperty());
         manager.canvas().heightProperty().bind(skyPane.heightProperty());
         
@@ -276,7 +271,7 @@ public class Main extends Application {
                 animator.start();
             
             } else {                                  //TODO good way ?,
-                //should use Bindings.when(boolean).then.....
+                //should use Bindings.when(boolean).then.....?
                 playButton.setText(UNICODE_FOR_PLAY_BUT);
                 animator.stop();
             }
@@ -298,11 +293,12 @@ public class Main extends Application {
                 Bindings.format("Champ de vue : %.1f°", 
                         manager.viewingParameterBean().fieldOfViewDegProperty())); 
 
-        BooleanProperty b = new SimpleBooleanProperty(manager.objectUnderMouse() != null);
-        ObjectProperty<String> s = new SimpleObjectProperty<>("");
+        //BooleanProperty b = new SimpleBooleanProperty(manager.objectUnderMouse() != null);
+        //ObjectProperty<String> s = new SimpleObjectProperty<>("");
         Text closestObjectText = new Text();
-        closestObjectText.textProperty().bind((ObservableValue<? extends String>) Bindings.when(b).then(manager.objectUnderMouse()));
+        //closestObjectText.textProperty().bind((ObservableValue<? extends String>) Bindings.when(b).then(manager.objectUnderMouse()));
               //  Bindings.format("%s", manager.objectUnderMouse()) : Bindings.format("")); //TODO when null should print nothing
+        closestObjectText.textProperty().bind(Bindings.format("%s",manager.objectUnderMouse()));
         
         Text observerLookText = new Text();
         observerLookText.textProperty().bind(
