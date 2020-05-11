@@ -10,6 +10,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 
 import ch.epfl.rigel.astronomy.AsterismLoader;
 import ch.epfl.rigel.astronomy.HygDatabaseLoader;
@@ -202,10 +203,15 @@ public class Main extends Application {
         hourField.setTextFormatter(dateTimeFormatter());
         //hourField.disableProperty().bind(animator.runningProperty());
         
-        List<String> notObservableListZoneId = new ArrayList<>(ZoneId.getAvailableZoneIds());
-        ComboBox<String> zoneIdList = new ComboBox<>();
-        //manager.dateTimeBean().zoneProperty().bindBidirectional(zoneIdList.valueProperty()); //TODO how bind
-        zoneIdList.setItems(FXCollections.observableList(notObservableListZoneId).sorted());
+        List<ZoneId> notObservableListZoneId =  
+                ZoneId.getAvailableZoneIds().
+                stream().
+                sorted().
+                map(ZoneId::of).
+                collect(Collectors.toList());
+        ComboBox<ZoneId> zoneIdList = new ComboBox<>();
+        zoneIdList.valueProperty().bindBidirectional(manager.dateTimeBean().zoneProperty()); //TODO how bind
+        zoneIdList.setItems(FXCollections.observableList(notObservableListZoneId));
         zoneIdList.setStyle("-fx-pref-width: 180;");
         //TODO zoneIdList.disableProperty().bind(animator.runningProperty()); 
         
