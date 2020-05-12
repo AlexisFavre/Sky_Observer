@@ -12,7 +12,7 @@ import javafx.beans.property.SimpleObjectProperty;
  *
  * @author Augustin ALLARD (299918)
  */
-public class ViewingParametersBean {
+public final class ViewingParametersBean {
     
     private DoubleProperty fieldOfViewDeg = new SimpleDoubleProperty();
     private ObjectProperty<HorizontalCoordinates> center = new SimpleObjectProperty<>(null);
