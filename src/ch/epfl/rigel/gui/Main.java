@@ -293,12 +293,18 @@ public class Main extends Application {
                 Bindings.format("Champ de vue : %.1f°", 
                         manager.viewingParameterBean().fieldOfViewDegProperty())); 
 
-        //BooleanProperty b = new SimpleBooleanProperty(manager.objectUnderMouse() != null);
-        //ObjectProperty<String> s = new SimpleObjectProperty<>("");
         Text closestObjectText = new Text();
-        //closestObjectText.textProperty().bind((ObservableValue<? extends String>) Bindings.when(b).then(manager.objectUnderMouse()));
-              //  Bindings.format("%s", manager.objectUnderMouse()) : Bindings.format("")); //TODO when null should print nothing
-        closestObjectText.textProperty().bind(Bindings.format("%s",manager.objectUnderMouse()));
+        closestObjectText.textProperty().bind(Bindings.createStringBinding(
+                () -> {
+                        try { 
+                            if (manager.objectUnderMouse() != null)  
+                                return manager.objectUnderMouse().get().info();
+                            return null; // not reachable, if objectUnderMouse == null,
+                                        // will throws a NullPointerException which will be catch
+                        } catch (NullPointerException e) {return "";}
+                     }, 
+                manager.objectUnderMouse()));
+                    
         
         Text observerLookText = new Text();
         observerLookText.textProperty().bind(
