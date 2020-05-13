@@ -22,6 +22,7 @@ public final class TimeAnimator extends AnimationTimer {
     private SimpleBooleanProperty running;
     private Long nanoOfBegin;
     private ZonedDateTime initial;
+    private final static long VAL_WHEN_ACC_STOPED = -1L;
 
     /**
      * @param dtb the {@code DateTimeBean} that will be periodically updated
@@ -30,7 +31,7 @@ public final class TimeAnimator extends AnimationTimer {
         this.dtb = dtb;
         accelerator = new SimpleObjectProperty<>(null);
         running = new SimpleBooleanProperty(false);
-        nanoOfBegin = null;
+        nanoOfBegin = VAL_WHEN_ACC_STOPED;
     }
 
     /**
@@ -49,7 +50,7 @@ public final class TimeAnimator extends AnimationTimer {
      */
     @Override
     public void handle(long now) {
-        if (nanoOfBegin == null) {
+        if (nanoOfBegin == VAL_WHEN_ACC_STOPED) {
             nanoOfBegin = now;
             initial = dtb.getZonedDateTime();
         }
@@ -66,7 +67,7 @@ public final class TimeAnimator extends AnimationTimer {
 
         // to stop the time optional
         initial = dtb.getZonedDateTime();
-        nanoOfBegin = null;
+        nanoOfBegin = VAL_WHEN_ACC_STOPED;
     }
     
     /**
@@ -80,10 +81,4 @@ public final class TimeAnimator extends AnimationTimer {
     public ObjectProperty<TimeAccelerator> acceleratorProperty(){
         return accelerator;
     }
-//    /**
-//     * @param accelerator the accelerator to set
-//     */
-//    public void setAccelerator(TimeAccelerator accelerator) {
-//        this.accelerator.setValue(accelerator);
-//    }
 }
