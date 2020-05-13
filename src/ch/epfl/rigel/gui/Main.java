@@ -38,6 +38,11 @@ import javafx.stage.Stage;
 import javafx.util.converter.LocalTimeStringConverter;
 import javafx.util.converter.NumberStringConverter;
 
+/**
+ * Main Class of the application
+ * manage the user interface
+ * @author Alexis FAVRE (310552)
+ */
 public class Main extends Application {
 
     private final static String PATTERN_LONG_AND_LAT = "#0.00";
@@ -296,12 +301,9 @@ public class Main extends Application {
         Text closestObjectText = new Text();
         closestObjectText.textProperty().bind(Bindings.createStringBinding(
                 () -> {
-                        try { 
-                            if (manager.objectUnderMouse() != null)  
-                                return manager.objectUnderMouse().get().info();
-                            return null; // not reachable, if objectUnderMouse == null,
-                                        // will throws a NullPointerException which will be catch
-                        } catch (NullPointerException e) {return "";}
+                        if (manager.objectUnderMouse().get().isPresent())  
+                            return manager.objectUnderMouse().get().get().info();
+                        return "";
                      }, 
                 manager.objectUnderMouse()));
                     

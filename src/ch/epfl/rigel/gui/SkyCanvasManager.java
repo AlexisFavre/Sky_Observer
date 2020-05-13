@@ -1,7 +1,8 @@
 package ch.epfl.rigel.gui;
 
-import static ch.epfl.rigel.math.RightOpenInterval.ROInter_0To360;
+import java.util.Optional;
 
+import static ch.epfl.rigel.math.RightOpenInterval.ROInter_0To360;
 import ch.epfl.rigel.astronomy.CelestialObject;
 import ch.epfl.rigel.astronomy.ObservedSky;
 import ch.epfl.rigel.astronomy.StarCatalogue;
@@ -47,7 +48,7 @@ public final class SkyCanvasManager {
     private DoubleBinding mouseAltDeg;
     private ObjectProperty<CartesianCoordinates> mousePosition;
     private ObjectBinding<HorizontalCoordinates> mouseHorizontalPosition;
-    private ObjectBinding<CelestialObject> objectUnderMouse; //TODO pourquoi en private?
+    private ObjectBinding<Optional<CelestialObject>> objectUnderMouse; //TODO pourquoi en private?
 
     private DoubleBinding scaleOfView;
     private ObjectBinding<ObservedSky> sky;
@@ -203,7 +204,7 @@ public final class SkyCanvasManager {
     /**
      * @return the objectUnderMouse
      */
-    public ObjectBinding<CelestialObject> objectUnderMouse() {
+    public ObjectBinding<Optional<CelestialObject>> objectUnderMouse() {
         return objectUnderMouse;
     }
 }
