@@ -19,9 +19,10 @@ public final class TimeAnimator extends AnimationTimer {
     
     private DateTimeBean dtb;
     private ObjectProperty<TimeAccelerator> accelerator;
+    
     private SimpleBooleanProperty running;
-    private Long nanoOfBegin;
     private ZonedDateTime initial;
+    private Long nanoOfBegin;
     private final static long VAL_WHEN_ACC_STOPED = -1L;
 
     /**
