@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,7 +64,7 @@ public final class BlackBodyColor {
         List<Color> colorList = new ArrayList<Color>();
         
         try(BufferedReader reader = new BufferedReader(new InputStreamReader(
-                BlackBodyColor.class.getResourceAsStream(NAME_OF_FILE_OF_TEMPERATURES)));) {
+                BlackBodyColor.class.getResourceAsStream(NAME_OF_FILE_OF_TEMPERATURES), StandardCharsets.US_ASCII));) {
             
             String currentLine;
             while((currentLine = reader.readLine()) != null) {
