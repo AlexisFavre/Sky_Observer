@@ -13,7 +13,7 @@ import java.time.ZonedDateTime;
 @FunctionalInterface
 public interface TimeAccelerator {
     
-    final static double FREQUENCE_OF_REFRESHING_OF_JAVAFX = 1e-9; // all nanoseconds
+    final static double FREQUENCE_OF_REFRESHING_OF_JAVAFX = 1e-9; // each nanoSeconde
 
     /**
      * Gives the simulation time (that elapses faster than the real time)

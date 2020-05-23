@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -39,7 +39,7 @@ public enum AsterismLoader implements StarCatalogue.Loader {
             String currentLine;
             while ((currentLine = reader.readLine()) != null) {
                 String[] lineHips = currentLine.split(",", -1);
-                List<Star> lineStarsContainedInBuilder = new ArrayList<>();
+                List<Star> lineStarsContainedInBuilder = new LinkedList<>();
                 boolean builderContainsAllAsterismStars = true;
 
                 // containing verification

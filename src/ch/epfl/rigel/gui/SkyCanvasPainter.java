@@ -102,9 +102,9 @@ public final class SkyCanvasPainter { // TODO Check if ok with removed projectio
      **************************************************************************/
 
     private void drawStars(ObservedSky sky, Transform planeToCanvas) {
-        int l = sky.starPointsRefs().length;
-        double[] screenPoints = new double[l];
-        planeToCanvas.transform2DPoints(sky.starPointsRefs(), 0, screenPoints, 0, l/2);
+        int length = sky.starPointsRefs().length;
+        double[] screenPoints = new double[length];
+        planeToCanvas.transform2DPoints(sky.starPointsRefs(), 0, screenPoints, 0, length/2);
 
         graph2D.setLineWidth(1);
         graph2D.beginPath();
@@ -148,7 +148,7 @@ public final class SkyCanvasPainter { // TODO Check if ok with removed projectio
         }
     }
 
-    private void drawSun(ObservedSky sky, Transform planeToCanvas) {
+    private void drawSun(ObservedSky sky, Transform planeToCanvas) { //should do like dans l'enoncé
         drawEllipseOf("yellow", sky.sunPoint(), sky.sun().angularSize(), planeToCanvas,
                 2.2, 0, 0.25);
         drawEllipseOf("yellow", sky.sunPoint(), sky.sun().angularSize(), planeToCanvas,
