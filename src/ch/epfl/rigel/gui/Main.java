@@ -8,6 +8,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
@@ -18,6 +19,7 @@ import ch.epfl.rigel.coordinates.GeographicCoordinates;
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.DoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
@@ -47,8 +49,6 @@ public class Main extends Application {
 
     private final static String PATTERN_LONG_AND_LAT = "#0.00";
     private final static String PATTERN_TIME = "HH:mm:ss";
-    private final static String LONG = "Longitude";
-    private final static String LAT = "Latitude";
     private final static String UNICODE_FOR_RESET_BUT = "\uf0e2";
     private final static String UNICODE_FOR_PLAY_BUT = "\uf04b";
     private final static String UNICODE_FOR_PAUSE_BUT = "\uf04c";
@@ -133,8 +133,8 @@ public class Main extends Application {
                                 + "-fx-alignment: baseline-left;");
         
         
-        Label lon = new Label(LONG + " (°) :");
-        Label lat = new Label(LAT  + " (°) :");
+        Label lon = new Label("Longitude (°) :");
+        Label lat = new Label("Latitude  (°) :");
         
         TextField lonField = new TextField();
         TextField latField = new TextField();
@@ -145,51 +145,31 @@ public class Main extends Application {
         lonField.setStyle(styleForField);
         latField.setStyle(styleForField);
         
-        lonField.setTextFormatter(positionFormatter(LONG));
-        latField.setTextFormatter(positionFormatter(LAT));
+        lonField.setTextFormatter(positionFormatter(
+                GeographicCoordinates :: isValidLonDeg, manager.observerLocationBean().lonDegProperty()));
+        latField.setTextFormatter(positionFormatter(
+                GeographicCoordinates :: isValidLatDeg, manager.observerLocationBean().latDegProperty()));
         
         observerPosition.getChildren().addAll(lon, lonField, lat, latField);
         return observerPosition;
     }
     
-    // to format the TextFields of longitude and latitude
-    // must be used only with the Strings : Longitude or Latitude
-    private TextFormatter<Number> positionFormatter(String typeCoordinate){
-        
-        boolean formatterForLon = typeCoordinate.equalsIgnoreCase(LONG);
-        boolean formatterForLat = typeCoordinate.equalsIgnoreCase(LAT);
-        if(!formatterForLat && !formatterForLon)
-            throw new UnsupportedOperationException("Invalid Coordinate Type : " + typeCoordinate);
-        
+    // to make TextFormatter for lonField and LatField
+    private TextFormatter<Number> positionFormatter(Predicate<Double> isValidCoordinate, DoubleProperty coordinateProperty){
         NumberStringConverter stringConverter = new NumberStringConverter(PATTERN_LONG_AND_LAT);
         
         UnaryOperator<TextFormatter.Change> filter = (change -> {
             try {
                 String newText = change.getControlNewText();
                 double newCoordinateInDeg = stringConverter.fromString(newText).doubleValue();
-                if(formatterForLon)
-                    return GeographicCoordinates.isValidLonDeg(newCoordinateInDeg)
-                            ? change
-                            : null;
-                if(formatterForLat)
-                    return GeographicCoordinates.isValidLatDeg(newCoordinateInDeg)
-                            ? change
-                            : null;
-                return null;
+                return isValidCoordinate.test(newCoordinateInDeg) ? change : null;
                 
-            } catch (Exception e) { //if cannot convert the input string into a double
-                return null; // or nullPointerException if user try to entirely clear the textField
+            } catch (Exception e) { //ParseException if cannot convert the input string into a double
+                return null; // or NullPointerException if user try to entirely clear the textField
               }
         });
         TextFormatter<Number> coordinateDisplay =  new TextFormatter<>(stringConverter, 0, filter);
-        
-        if(formatterForLon)
-            coordinateDisplay.valueProperty().
-                bindBidirectional(manager.observerLocationBean().lonDegProperty());
-        
-        if(formatterForLat)
-            coordinateDisplay.valueProperty().
-                bindBidirectional(manager.observerLocationBean().latDegProperty());
+        coordinateDisplay.valueProperty().bindBidirectional(coordinateProperty);
         
         return coordinateDisplay;
     }
@@ -198,7 +178,7 @@ public class Main extends Application {
     private HBox observationInstant() {
         
         HBox observationInstant = new HBox();
-        observationInstant.setStyle("-fx-spacing: inherit;\n" //TODO remove or should use \n 
+        observationInstant.setStyle("-fx-spacing: inherit;\n" //TODO remove or should use \n ??
                                   + "-fx-alignment: baseline-left;");
         
         Label date = new Label("Date :");
@@ -218,10 +198,10 @@ public class Main extends Application {
                 ZoneId.getAvailableZoneIds().
                 stream().
                 sorted().
-                map(ZoneId::of).
+                map(ZoneId :: of).
                 collect(Collectors.toList());
         ComboBox<ZoneId> zoneIdList = new ComboBox<>();
-        zoneIdList.valueProperty().bindBidirectional(manager.dateTimeBean().zoneProperty()); //TODO how bind
+        zoneIdList.valueProperty().bindBidirectional(manager.dateTimeBean().zoneProperty());
         zoneIdList.setItems(FXCollections.observableList(notObservableListZoneId));
         zoneIdList.setStyle("-fx-pref-width: 180;");
         zoneIdList.disableProperty().bind(animator.runningProperty()); 
