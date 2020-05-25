@@ -26,10 +26,18 @@ import javafx.scene.transform.Transform;
  */
 public final class SkyCanvasPainter { // TODO Check if ok with removed projections
 
-    private final static double ALTITUDE_OF_OCTANTS = -1.5;
-    private final static int ANGLE_IN_DEGREES_BETWEEN_OCTANTS = 45;
-    private final static ClosedInterval RANGE_OF_MAGNITUDE = ClosedInterval.of(-2, 5);
+    private final static int OCTANTS_NB = 8;
+    private final static double ALT_OF_OCT_INDICATORS = -1.5;
     private final static HorizontalCoordinates CENTER_OF_HORIZON_CIRCLE = HorizontalCoordinates.ofDeg(0, 0);
+    private final static ClosedInterval RANGE_OF_MAGNITUDE = ClosedInterval.of(-2, 5);
+
+    private final static Color FONT_COLOR = Color.BLACK;
+    private final static Color PLANET_COLOR = Color.LIGHTGRAY;
+    private final static int ASTERISM_LINE_WIDTH = 1;
+    private final static Color ASTERISM_LINE_COLOR = Color.BLUE;
+    private final static int HORIZON_LINE_WIDTH = 2;
+    private final static Color HORIZON_COLOR = Color.RED;
+
     
     private Canvas canvas;
     private GraphicsContext graph2D;
@@ -58,8 +66,7 @@ public final class SkyCanvasPainter { // TODO Check if ok with removed projectio
      * Clear what has been drawn on the {@code Canvas} and reset it as a black board
      */
     public void clear() {
-        graph2D.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        graph2D.setFill(Color.BLACK);
+        graph2D.setFill(FONT_COLOR);
         graph2D.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
     }
 
@@ -106,9 +113,9 @@ public final class SkyCanvasPainter { // TODO Check if ok with removed projectio
         double[] screenPoints = new double[length];
         planeToCanvas.transform2DPoints(sky.starPointsRefs(), 0, screenPoints, 0, length/2);
 
-        graph2D.setLineWidth(1);
+        graph2D.setLineWidth(ASTERISM_LINE_WIDTH);
         graph2D.beginPath();
-        graph2D.setStroke(Color.BLUE);
+        graph2D.setStroke(ASTERISM_LINE_COLOR);
         for(Asterism a: sky.asterisms()) {
             Iterator<Integer> iteratorOverID = sky.asterismIndices(a).iterator();
             int idOfStarFrom = iteratorOverID.next();
@@ -143,17 +150,19 @@ public final class SkyCanvasPainter { // TODO Check if ok with removed projectio
 
         int i = 0;
         for(Planet p: sky.planets()) {
-            drawEllipseOf(Color.LIGHTGRAY, screenPoints[i], screenPoints[i + 1], p.magnitude(), planeToCanvas);
+            drawEllipseOf(PLANET_COLOR, screenPoints[i], screenPoints[i + 1], p.magnitude(), planeToCanvas);
             i += 2;
         }
     }
 
     private void drawSun(ObservedSky sky, Transform planeToCanvas) { //should do like dans l'enoncé
-        drawEllipseOf("yellow", sky.sunPoint(), sky.sun().angularSize(), planeToCanvas,
+        double sunAngSize = sky.sun().angularSize();
+        CartesianCoordinates sunPoint = sky.sunPoint();
+        drawEllipseOf("yellow", sunPoint, sunAngSize, planeToCanvas,
                 2.2, 0, 0.25);
-        drawEllipseOf("yellow", sky.sunPoint(), sky.sun().angularSize(), planeToCanvas,
+        drawEllipseOf("yellow", sunPoint, sunAngSize, planeToCanvas,
                 1, 2, 1);
-        drawEllipseOf(sky.sunPoint(), sky.sun().angularSize(), planeToCanvas);
+        drawEllipseOf(sunPoint, sunAngSize, planeToCanvas);
     }
 
     private void drawMoon(ObservedSky sky, Transform planeToCanvas) {
@@ -164,24 +173,26 @@ public final class SkyCanvasPainter { // TODO Check if ok with removed projectio
         CartesianCoordinates center = projection.circleCenterForParallel(CENTER_OF_HORIZON_CIRCLE);
         Point2D screenPointForCenter = planeToCanvas.transform(center.x(), center.y());
         double r = projection.circleRadiusForParallel(CENTER_OF_HORIZON_CIRCLE)*planeToCanvas.getMxx();
-        graph2D.setStroke(Color.RED);
-        graph2D.setLineWidth(2);
-        graph2D.strokeOval(screenPointForCenter.getX() - r, screenPointForCenter.getY() - r, 2*r, 2*r);
+        double d = 2*r;
+        graph2D.setStroke(HORIZON_COLOR);
+        graph2D.setLineWidth(HORIZON_LINE_WIDTH);
+        graph2D.strokeOval(screenPointForCenter.getX() - r, screenPointForCenter.getY() - r, d, d);
 
         double az = 0;
-        for(int i = 0; i < 8; ++i) {
-            HorizontalCoordinates c = HorizontalCoordinates.ofDeg(az, ALTITUDE_OF_OCTANTS);
-            drawCardinal(c, c.azOctantName(), projection, planeToCanvas);
-            az += ANGLE_IN_DEGREES_BETWEEN_OCTANTS;
+        for(int i = 0; i < OCTANTS_NB; ++i) {
+            HorizontalCoordinates cardinalCoord = HorizontalCoordinates.ofDeg(az, ALT_OF_OCT_INDICATORS);
+            drawCardinal(cardinalCoord, cardinalCoord.azOctantName(), projection, planeToCanvas);
+            az += 360.0/OCTANTS_NB;
         }
     }
 
     private void drawEllipseOf(String color, CartesianCoordinates planePoint, double angularSize, Transform planeToCanvas,
                                double scaleFact, double scaleAdd, double opacity) {
         Point2D screenPoint = planeToCanvas.transform(planePoint.x(), planePoint.y());
-        double d = 2*Math.tan(angularSize/4)*planeToCanvas.getMxx()*scaleFact + scaleAdd;
+        double r = Math.tan(angularSize/4)*planeToCanvas.getMxx()*scaleFact + scaleAdd;
+        double d = 2*r;
         graph2D.setFill(Color.web(color, opacity));
-        graph2D.fillOval(screenPoint.getX() - d/2, screenPoint.getY() - d/2, d, d);
+        graph2D.fillOval(screenPoint.getX() - r, screenPoint.getY() - r, d, d);
     }
 
     private void drawEllipseOf(CartesianCoordinates planePoint, double angularSize, Transform planeToCanvas) {
@@ -190,7 +201,7 @@ public final class SkyCanvasPainter { // TODO Check if ok with removed projectio
 
     private void drawEllipseOf(Color color, double planeX, double planeY, double magnitude, Transform planeToCanvas) {
         double m = RANGE_OF_MAGNITUDE.clip(magnitude);
-        double f = (99 - 17*m)/140;
+        double f = (99 - 17*m)/140; // TODO should replace value?
         double d = f*2*Math.tan(Angle.ofDeg(0.5)/4.0)*planeToCanvas.getMxx();
         graph2D.setFill(color);
         graph2D.fillOval(planeX - d/2, planeY - d/2, d, d);
@@ -199,7 +210,7 @@ public final class SkyCanvasPainter { // TODO Check if ok with removed projectio
     private void drawCardinal(HorizontalCoordinates c, String text,
                               StereographicProjection projection, Transform planeToCanvas) {
         CartesianCoordinates s = projection.apply(c);
-        Point2D screenSud = planeToCanvas.transform(s.x(), s.y());
-        graph2D.strokeText(text, screenSud.getX(), screenSud.getY());
+        Point2D screenPoint = planeToCanvas.transform(s.x(), s.y());
+        graph2D.strokeText(text, screenPoint.getX(), screenPoint.getY());
     }
 }

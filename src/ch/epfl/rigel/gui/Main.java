@@ -273,8 +273,8 @@ public class Main extends Application {
         infoPane.setStyle("-fx-padding: 4;\n" + 
                 "-fx-background-color: white;");
         
-        Text fielOfViewText = new Text();
-        fielOfViewText.textProperty().bind(
+        Text fieldOfViewText = new Text();
+        fieldOfViewText.textProperty().bind(
                 Bindings.format("Champ de vue : %.1f°", 
                         manager.viewingParameterBean().fieldOfViewDegProperty())); 
 
@@ -293,7 +293,7 @@ public class Main extends Application {
                 Bindings.format("Azimut : %.1f°, hauteur : %.1f°",
                 manager.mouseAzDeg(), manager.mouseAltDeg()));
         
-        infoPane.setLeft(fielOfViewText);
+        infoPane.setLeft(fieldOfViewText);
         infoPane.setCenter(closestObjectText);
         infoPane.setRight(observerLookText);
         
