@@ -24,12 +24,13 @@ import javafx.scene.transform.Transform;
  *
  * @author Augustin ALLARD (299918)
  */
-public final class SkyCanvasPainter { // TODO Check if ok with removed projections
+public final class SkyCanvasPainter { // TODO Check if ok with removed projections, t'entend quoi par là ??
 
     private final static int OCTANTS_NB = 8;
     private final static double ALT_OF_OCT_INDICATORS = -1.5;
     private final static HorizontalCoordinates CENTER_OF_HORIZON_CIRCLE = HorizontalCoordinates.ofDeg(0, 0);
     private final static ClosedInterval RANGE_OF_MAGNITUDE = ClosedInterval.of(-2, 5);
+    private final static double DIAMETER_FACTOR = Math.tan(Angle.ofDeg(0.5)/4.0);
 
     private final static Color FONT_COLOR = Color.BLACK;
     private final static Color PLANET_COLOR = Color.LIGHTGRAY;
@@ -39,8 +40,8 @@ public final class SkyCanvasPainter { // TODO Check if ok with removed projectio
     private final static Color HORIZON_COLOR = Color.RED;
 
     
-    private Canvas canvas;
-    private GraphicsContext graph2D;
+    private final Canvas canvas;
+    private final GraphicsContext graph2D;
 
     /**
      *
@@ -116,15 +117,19 @@ public final class SkyCanvasPainter { // TODO Check if ok with removed projectio
         graph2D.setLineWidth(ASTERISM_LINE_WIDTH);
         graph2D.beginPath();
         graph2D.setStroke(ASTERISM_LINE_COLOR);
+        
         for(Asterism a: sky.asterisms()) {
+            
             Iterator<Integer> iteratorOverID = sky.asterismIndices(a).iterator();
             int idOfStarFrom = iteratorOverID.next();
             while(iteratorOverID.hasNext()) {
+                
                 int idOfStarTo = iteratorOverID.next();
                 double xFr = screenPoints[2*idOfStarFrom];
                 double yFr = screenPoints[2*idOfStarFrom+1];
                 double xTo = screenPoints[2*idOfStarTo];
                 double yTo = screenPoints[2*idOfStarTo+1];
+                
                 if(canvas.getBoundsInLocal().contains(xFr, yFr) || canvas.getBoundsInLocal().contains(xTo, yTo)) {
                     graph2D.moveTo(xFr, yFr);
                     graph2D.lineTo(xTo, yTo);
@@ -159,9 +164,9 @@ public final class SkyCanvasPainter { // TODO Check if ok with removed projectio
         double sunAngSize = sky.sun().angularSize();
         CartesianCoordinates sunPoint = sky.sunPoint();
         drawEllipseOf("yellow", sunPoint, sunAngSize, planeToCanvas,
-                2.2, 0, 0.25);
+                2.2, 0, 0.25); //TODO MUST NOT USE MAGIC NUMBERS !!
         drawEllipseOf("yellow", sunPoint, sunAngSize, planeToCanvas,
-                1, 2, 1);
+                1, 2, 1); //TODO MUST NOT USE MAGIC NUMBERS !!
         drawEllipseOf(sunPoint, sunAngSize, planeToCanvas);
     }
 
@@ -182,7 +187,7 @@ public final class SkyCanvasPainter { // TODO Check if ok with removed projectio
         for(int i = 0; i < OCTANTS_NB; ++i) {
             HorizontalCoordinates cardinalCoord = HorizontalCoordinates.ofDeg(az, ALT_OF_OCT_INDICATORS);
             drawCardinal(cardinalCoord, cardinalCoord.azOctantName(), projection, planeToCanvas);
-            az += 360.0/OCTANTS_NB;
+            az += 360.0/OCTANTS_NB;//TODO MUST NOT USE MAGIC NUMBERS !!
         }
     }
 
@@ -196,15 +201,16 @@ public final class SkyCanvasPainter { // TODO Check if ok with removed projectio
     }
 
     private void drawEllipseOf(CartesianCoordinates planePoint, double angularSize, Transform planeToCanvas) {
-        drawEllipseOf("white", planePoint, angularSize, planeToCanvas, 1, 0, 1);
+        drawEllipseOf("white", planePoint, angularSize, planeToCanvas, 1, 0, 1); //TODO MUST NOT USE MAGIC NUMBERS !!
     }
 
     private void drawEllipseOf(Color color, double planeX, double planeY, double magnitude, Transform planeToCanvas) {
-        double m = RANGE_OF_MAGNITUDE.clip(magnitude);
-        double f = (99 - 17*m)/140; // TODO should replace value?
-        double d = f*2*Math.tan(Angle.ofDeg(0.5)/4.0)*planeToCanvas.getMxx();
+        double clipedMagnitude = RANGE_OF_MAGNITUDE.clip(magnitude);
+        double sizeFactor = (99 - 17*clipedMagnitude)/140;
+        double halfDiameter = sizeFactor * DIAMETER_FACTOR * planeToCanvas.getMxx();
+        double diameter = halfDiameter * 2d;
         graph2D.setFill(color);
-        graph2D.fillOval(planeX - d/2, planeY - d/2, d, d);
+        graph2D.fillOval(planeX - halfDiameter, planeY - halfDiameter, diameter, diameter);
     }
 
     private void drawCardinal(HorizontalCoordinates c, String text,

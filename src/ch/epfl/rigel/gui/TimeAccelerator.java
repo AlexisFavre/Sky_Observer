@@ -45,7 +45,7 @@ public interface TimeAccelerator {
      */
     static TimeAccelerator discrete(int frequency, Duration step) {
         return (initial, elapsed) -> {
-            long factor = (long)Math.floor(elapsed*frequency*FREQUENCE_OF_REFRESHING_OF_JAVAFX);
+            long factor = (long) Math.floor(elapsed*frequency*FREQUENCE_OF_REFRESHING_OF_JAVAFX);
             return initial
                     .plusNanos(step.getNano()*factor)
                     .plusSeconds(step.getSeconds()*factor);

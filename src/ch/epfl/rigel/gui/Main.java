@@ -45,18 +45,22 @@ import javafx.util.converter.NumberStringConverter;
  * manage the user interface
  * @author Alexis FAVRE (310552)
  */
-public class Main extends Application {
+public final class Main extends Application {
 
     private final static String PATTERN_LONG_AND_LAT = "#0.00";
     private final static String PATTERN_TIME = "HH:mm:ss";
     private final static String UNICODE_FOR_RESET_BUT = "\uf0e2";
     private final static String UNICODE_FOR_PLAY_BUT = "\uf04b";
     private final static String UNICODE_FOR_PAUSE_BUT = "\uf04c";
+    private final static String NAME_FILE_OF_ASTERISMS = "/asterisms.txt";
+    private final static String NAME_FILE_OF_STARS = "/hygdata_v3.csv";
     
     // constants for initialization
     private final static int MINIMAL_WIDTH_STAGE = 800;
     private final static int MINIMAL_HEIGHT_STAGE = 600;
     private final static int INDEX_ACCELERATOR_X300 = 2;
+    private final static int FONT_SIZE = 15;
+    
     private final static double EPFL_LON_DEG = 6.57;
     private final static double EPFL_LAT_DEG = 46.52;
     private final static double INITIAL_FIEL_OF_VIEW_DEG = 68.4;
@@ -134,7 +138,7 @@ public class Main extends Application {
         
         
         Label lon = new Label("Longitude (°) :");
-        Label lat = new Label("Latitude  (°) :");
+        Label lat = new Label("Latitude (°) :");
         
         TextField lonField = new TextField();
         TextField latField = new TextField();
@@ -178,7 +182,7 @@ public class Main extends Application {
     private HBox observationInstant() {
         
         HBox observationInstant = new HBox();
-        observationInstant.setStyle("-fx-spacing: inherit;\n" //TODO remove or should use \n ??
+        observationInstant.setStyle("-fx-spacing: inherit;"
                                   + "-fx-alignment: baseline-left;");
         
         Label date = new Label("Date :");
@@ -189,7 +193,7 @@ public class Main extends Application {
         
         Label hour = new Label("Heure :");
         TextField hourField = new TextField();
-        hourField.setStyle("-fx-pref-width: 75;\n"
+        hourField.setStyle("-fx-pref-width: 75;"
                          + "-fx-alignment: baseline-right;");
         hourField.setTextFormatter(dateTimeFormatter());
         hourField.disableProperty().bind(animator.runningProperty());
@@ -235,8 +239,8 @@ public class Main extends Application {
         Button resetButton = new Button(UNICODE_FOR_RESET_BUT);
         resetButton.setFont(fontAwesome);
         resetButton.setOnAction(event -> {
-            currentInstant = ZonedDateTime.now(manager.dateTimeBean().getZone());
-            if(animator.runningProperty().get() == true) {
+            currentInstant = ZonedDateTime.now();
+            if(animator.runningProperty().get()) {
                 animator.stop();  //can't modify dateTimeBean when animation is running
                 manager.dateTimeBean().setZonedDateTime(currentInstant);
                 animator.start();
@@ -251,7 +255,7 @@ public class Main extends Application {
         playButton.setFont(fontAwesome);
         playButton.setOnAction(event -> {
             
-            if(animator.runningProperty().get() == false) {
+            if( !animator.runningProperty().get()) {
                 playButton.setText(UNICODE_FOR_PAUSE_BUT);
                 animator.start();
             
@@ -270,7 +274,7 @@ public class Main extends Application {
     private BorderPane informationPane() {
         
         BorderPane infoPane = new BorderPane();
-        infoPane.setStyle("-fx-padding: 4;\n" + 
+        infoPane.setStyle("-fx-padding: 4;" + 
                 "-fx-background-color: white;");
         
         Text fieldOfViewText = new Text();
@@ -303,8 +307,8 @@ public class Main extends Application {
     // additional methods=================================================================
     private StarCatalogue initCatalog() {
         
-        try (InputStream hygStream = getClass().getResourceAsStream("/hygdata_v3.csv");
-             InputStream aStream = getClass().getResourceAsStream("/asterisms.txt")) {
+        try (InputStream hygStream = getClass().getResourceAsStream(NAME_FILE_OF_STARS);
+             InputStream aStream = getClass().getResourceAsStream(NAME_FILE_OF_ASTERISMS)) {
             return new StarCatalogue.Builder()
                     .loadFrom(hygStream, HygDatabaseLoader.INSTANCE)
                     .loadFrom(aStream, AsterismLoader.INSTANCE).build();
@@ -316,7 +320,7 @@ public class Main extends Application {
     
     private Font loadFontAwesome() {
         try(InputStream fontStream = getClass().getResourceAsStream("/Font Awesome 5 Free-Solid-900.otf");){
-            return Font.loadFont(fontStream, 15);
+            return Font.loadFont(fontStream, FONT_SIZE);
             
         } catch (IOException e) {
             throw new UncheckedIOException(e);

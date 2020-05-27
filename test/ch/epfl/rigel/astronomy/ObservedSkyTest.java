@@ -49,7 +49,7 @@ class ObservedSkyTest {
         //Si fail: Cloner/Copier le tableau
         double firstStarXMemory = SKY.starPointsRefs()[0];
         SKY.starPointsRefs()[0] = Double.MAX_VALUE;
-        assertEquals(firstStarXMemory, SKY.starPointsRefs()[0]); // TODO Understand
+        assertEquals(firstStarXMemory, SKY.starPointsRefs()[0]); 
         //assertEquals(Double.MAX_VALUE, SKY.starPointsRefs()[0]); not the same because not working
     }
 }

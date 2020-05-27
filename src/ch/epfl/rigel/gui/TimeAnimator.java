@@ -17,13 +17,14 @@ import javafx.beans.property.SimpleObjectProperty;
  */
 public final class TimeAnimator extends AnimationTimer {
     
-    private DateTimeBean dtb;
-    private ObjectProperty<TimeAccelerator> accelerator;
+    private final static long VAL_WHEN_ACC_STOPED = -1L;
     
-    private SimpleBooleanProperty running;
+    private final DateTimeBean dtb;
+    private final ObjectProperty<TimeAccelerator> accelerator;
+    private final SimpleBooleanProperty running;
+    
     private ZonedDateTime initial;
     private Long nanoOfBegin;
-    private final static long VAL_WHEN_ACC_STOPED = -1L;
 
     /**
      * @param dtb the {@code DateTimeBean} that will be periodically updated

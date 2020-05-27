@@ -108,12 +108,13 @@ public final class ObservedSky {
     public Optional<CelestialObject> objectClosestTo(CartesianCoordinates point, double maximalDistance) {
         CelestialObject closestObject = null;
         double d2 = Double.MAX_VALUE;
+        double twiceMaximalDistance = maximalDistance*2;
         
         for(CelestialObject p: skyObjects.keySet()) {
             CartesianCoordinates c = skyObjects.get(p);
             
-            if(        Math.abs(c.x()-point.x()) < maximalDistance*2    //make preliminary selection
-                    && Math.abs(c.y()-point.y()) < maximalDistance*2) { // TODO better solution ?
+            if(        Math.abs(c.x()-point.x()) < twiceMaximalDistance    //make preliminary selection
+                    && Math.abs(c.y()-point.y()) < twiceMaximalDistance) { // TODO better solution ?
                 
                 double d = point.distance(c);
                 if(    d < maximalDistance
@@ -202,7 +203,7 @@ public final class ObservedSky {
      * @return the 7 extraterrestrials planets of the SolarSystem in their state corresponding to the observation moment
      */
     public List<Planet> planets() {
-        return Collections.unmodifiableList(planets);  //TODO need immutable ?
+        return Collections.unmodifiableList(planets);
     }
 
     /**

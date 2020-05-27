@@ -39,22 +39,22 @@ public final class SkyCanvasManager {
     private final static int CHANGE_OF_ALTITUDE_WHEN_KEY_PRESSED = 5;
     private final static CartesianCoordinates INITIAL_POS_MOUSE = CartesianCoordinates.of(0, 0);
 
-    private Canvas canvas;
-    private SkyCanvasPainter painter;
-    private ObserverLocationBean olb;
-    private DateTimeBean dtb;
-    private ViewingParametersBean vpb;
+    private final Canvas canvas;
+    private final SkyCanvasPainter painter;
+    private final ObserverLocationBean olb;
+    private final DateTimeBean dtb;
+    private final ViewingParametersBean vpb;
     
-    private DoubleBinding mouseAzDeg;
-    private DoubleBinding mouseAltDeg;
-    private ObjectProperty<CartesianCoordinates> mousePosition;
-    private ObjectBinding<HorizontalCoordinates> mouseHorizontalPosition;
-    private ObjectBinding<Optional<CelestialObject>> objectUnderMouse;
+    private final DoubleBinding mouseAzDeg;
+    private final DoubleBinding mouseAltDeg;
+    private final ObjectProperty<CartesianCoordinates> mousePosition;
+    private final ObjectBinding<HorizontalCoordinates> mouseHorizontalPosition;
+    private final ObjectBinding<Optional<CelestialObject>> objectUnderMouse;
 
-    private DoubleBinding scaleOfView;
-    private ObjectBinding<ObservedSky> sky;
-    private ObjectBinding<StereographicProjection> projection;
-    private ObjectBinding<Transform> planeToCanvas;
+    private final DoubleBinding scaleOfView;
+    private final ObjectBinding<ObservedSky> sky;
+    private final ObjectBinding<StereographicProjection> projection;
+    private final ObjectBinding<Transform> planeToCanvas;
     
     /**
      *
@@ -149,7 +149,7 @@ public final class SkyCanvasManager {
         }));
 
         //SCROLL LISTENER ===========================================================================
-        canvas.setOnScroll(e -> {
+        canvas.setOnScroll(e -> { //TODO TRY SCROLL WITH MOOSE , SENS OF ZOOM SEEM TO BE DIFFERENT
             double delta = (Math.abs(e.getDeltaX()) > Math.abs(e.getDeltaY())) 
                             ? e.getDeltaX() 
                             : e.getDeltaY();
