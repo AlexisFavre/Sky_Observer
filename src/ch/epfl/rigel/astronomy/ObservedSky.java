@@ -107,20 +107,19 @@ public final class ObservedSky {
      */
     public Optional<CelestialObject> objectClosestTo(CartesianCoordinates point, double maximalDistance) {
         CelestialObject closestObject = null;
-        double d2 = Double.MAX_VALUE;
-        double twiceMaximalDistance = maximalDistance*2;
+        double actualBestDist = maximalDistance;
         
         for(CelestialObject p: skyObjects.keySet()) {
             CartesianCoordinates c = skyObjects.get(p);
             
-            if(        Math.abs(c.x()-point.x()) < twiceMaximalDistance    //make preliminary selection
-                    && Math.abs(c.y()-point.y()) < twiceMaximalDistance) { // TODO better solution ?
+            if(Math.abs(c.x()-point.x()) < actualBestDist   //make preliminary selection
+                    && Math.abs(c.y()-point.y()) < actualBestDist) {
                 
                 double d = point.distance(c);
-                if(    d < maximalDistance
-                    && d < d2)
-                closestObject = p;
-                d2 = point.distance(c);
+                if(d < actualBestDist) {
+                    actualBestDist = d;
+                    closestObject = p;
+                }
             }
         }
         return Optional.ofNullable(closestObject);
