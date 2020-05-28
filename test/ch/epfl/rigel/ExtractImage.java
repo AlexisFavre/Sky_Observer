@@ -37,12 +37,12 @@ public final class ExtractImage extends Application {
         ZonedDateTime observationTime = ZonedDateTime.parse("2020-02-17T20:15:00+01:00");
         GeographicCoordinates observerCoordinates = GeographicCoordinates.ofDeg(6.57, 46.52);
         // Coordinates for planet & moon OBS
-        //GeographicCoordinates observerCoord = GeographicCoordinates.ofDeg(-150, 20); // TODO Verify moon size
+        //GeographicCoordinates observerCoord = GeographicCoordinates.ofDeg(-150, 20); //
         // Coordinates for Sun
         //GeographicCoordinates observerCoord = GeographicCoordinates.ofDeg(-100, 35);
         HorizontalCoordinates observerLook = HorizontalCoordinates.ofDeg(180, 45);
         
-        //test frama : TODO check the following pictures when translation will be corrected
+        //test frama : 
         // Sun : HorizontalCoordinates projCenter = HorizontalCoordinates.ofDeg(277, -23); 
         // Moon: HorizontalCoordinates projCenter = HorizontalCoordinates.ofDeg(3.7, -65); 
         // Moon2: HorizontalCoordinates projCenter = HorizontalCoordinates.ofDeg(0, 23);
@@ -64,7 +64,6 @@ public final class ExtractImage extends Application {
                   try {
                     ImageIO.write(swingImage, "png", new File("sky.png"));
                 } catch (IOException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
                 

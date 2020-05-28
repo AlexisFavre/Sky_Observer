@@ -1,7 +1,6 @@
 package ch.epfl.rigel.gui;
 
 import java.time.Duration;
-import java.time.ZonedDateTime;
 
 /**
  * Give a set of often used pre-created {@code TimeAccelerator}
@@ -17,8 +16,8 @@ public enum NamedTimeAccelerator {
     DAY("jour", TimeAccelerator.discrete(60, Duration.parse("P1D"))),
     SIDEREAL_DAY("jour sidéral", TimeAccelerator.discrete(60, Duration.parse("PT23H56M04S")));
 
-    private String name;
-    private TimeAccelerator accelerator;
+    private final String name;
+    private final TimeAccelerator accelerator;
 
     NamedTimeAccelerator(String name, TimeAccelerator accelerator) {
         this.name = name;
