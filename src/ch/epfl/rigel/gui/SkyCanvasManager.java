@@ -149,7 +149,7 @@ public final class SkyCanvasManager {
         }));
 
         //SCROLL LISTENER ===========================================================================
-        canvas.setOnScroll(e -> { //TODO TRY SCROLL WITH MOOSE , SENS OF ZOOM SEEM TO BE DIFFERENT
+        canvas.setOnScroll(e -> {
             double delta = (Math.abs(e.getDeltaX()) > Math.abs(e.getDeltaY())) 
                             ? e.getDeltaX() 
                             : e.getDeltaY();
