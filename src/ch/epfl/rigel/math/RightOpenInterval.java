@@ -53,7 +53,8 @@ public final class RightOpenInterval extends Interval {
             return v;
         double a = v - low();
         double b = size();
-        return low() + a - b*Math.floor(a/b);
+        double r = low() + a - b*Math.floor(a/b);
+        return (r == high()) ? low() : r ;
     }
 
     /**

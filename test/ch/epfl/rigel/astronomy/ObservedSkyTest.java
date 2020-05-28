@@ -1,17 +1,21 @@
 package ch.epfl.rigel.astronomy;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.Month;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.Objects;
+
+import org.junit.jupiter.api.Test;
+
 import ch.epfl.rigel.coordinates.CartesianCoordinates;
 import ch.epfl.rigel.coordinates.EquatorialCoordinates;
 import ch.epfl.rigel.coordinates.EquatorialToHorizontalConversion;
 import ch.epfl.rigel.coordinates.GeographicCoordinates;
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
-import ch.epfl.rigel.coordinates.StereographicProjection;
-import org.junit.jupiter.api.Test;
-
-import java.time.*;
-import java.util.Objects;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class ObservedSkyTest {
     
@@ -29,7 +33,7 @@ class ObservedSkyTest {
         EquatorialToHorizontalConversion convEquToHor = new EquatorialToHorizontalConversion(OBSERVATION_TIME, OBSERVER_COORD);
         CartesianCoordinates testPoint = SKY.projection().apply(convEquToHor.apply(
                 EquatorialCoordinates.of(0.004696959812148989,-0.861893035343076)));
-        assertEquals("Tau Phe", Objects.requireNonNull(SKY.objectClosestTo(testPoint, 0.1)).name());
+        assertEquals("Tau Phe", Objects.requireNonNull(SKY.objectClosestTo(testPoint, 0.1)).get().name());
     }
 
     @Test
@@ -45,7 +49,7 @@ class ObservedSkyTest {
         //Si fail: Cloner/Copier le tableau
         double firstStarXMemory = SKY.starPointsRefs()[0];
         SKY.starPointsRefs()[0] = Double.MAX_VALUE;
-        assertEquals(firstStarXMemory, SKY.starPointsRefs()[0]); // TODO Understand
+        assertEquals(firstStarXMemory, SKY.starPointsRefs()[0]); 
         //assertEquals(Double.MAX_VALUE, SKY.starPointsRefs()[0]); not the same because not working
     }
 }
