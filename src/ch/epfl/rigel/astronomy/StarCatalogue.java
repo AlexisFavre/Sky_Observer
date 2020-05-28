@@ -4,10 +4,10 @@ import static ch.epfl.rigel.Preconditions.checkArgument;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,10 +58,11 @@ public final class StarCatalogue {
             checkArgument(stars.containsAll(a.stars()));
 
             // map the asterism to its list of stars indexes
-            List<Integer> starIndexesOfA = new ArrayList<>();
-            for(Star s : a.stars()) {
+            List<Integer> starIndexesOfA = new LinkedList<>();
+            for (Star s : a.stars()) {
                 starIndexesOfA.add(indexOfStars.get(s));
             }
+            
             starsIndexesOfAsterismsNotImmutable.put(a, List.copyOf(starIndexesOfA));
         }
         starsIndexesOfAsterisms = Map.copyOf(starsIndexesOfAsterismsNotImmutable);
@@ -107,8 +108,8 @@ public final class StarCatalogue {
         private List<Asterism> asterisms;
         
         public Builder() {
-            this.stars     = new ArrayList<Star>();
-            this.asterisms = new ArrayList<Asterism>();
+            this.stars     = new LinkedList<Star>();
+            this.asterisms = new LinkedList<Asterism>();
         }
 
         /**

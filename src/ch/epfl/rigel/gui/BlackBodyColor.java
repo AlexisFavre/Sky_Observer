@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,13 +25,20 @@ import javafx.scene.paint.Color;
 public final class BlackBodyColor {
 
     // contains only colors corresponding to multiples of 100 temperatures
-    private final static List<Color> allTemperatureColors = load();
+    private final static List<Color> ALL_TEMPERATURES_COLORS = load();
+    
     private final static ClosedInterval RANGE_OF_TEMPERATURES = ClosedInterval.of(1000, 40000); //in Kelvin
     private final static int SMALLEST_TEMPERATURE = 1000;
-    private final static double RANGE_BETWEEN_TEMPERATUREs = 100;
+    private final static double RANGE_BETWEEN_TEMPERATURES = 100;
+    
     private final static String DIESE = "#";
     private final static String TYPE_OF_TEMPERATURES = "10deg";
     private final static String NAME_OF_FILE_OF_TEMPERATURES = "/bbr_color.txt";
+    
+    private final static int INDEX_BEGIN_TYPE_TEMP = 10;
+    private final static int INDEX_END_TYPE_TEMP = 15;
+    private final static int INDEX_BEGIN_COLOR_RGB = 80;
+    private final static int INDEX_END_COLOR_RGB = 87;
     
     private BlackBodyColor() {}
 
@@ -43,7 +51,7 @@ public final class BlackBodyColor {
      */
     public static  Color colorForTemperature(int temp) throws IllegalArgumentException {
         checkInInterval(RANGE_OF_TEMPERATURES,temp);
-        return allTemperatureColors.get((int) Math.round((temp - SMALLEST_TEMPERATURE) / RANGE_BETWEEN_TEMPERATUREs));
+        return ALL_TEMPERATURES_COLORS.get((int) Math.round((temp - SMALLEST_TEMPERATURE) / RANGE_BETWEEN_TEMPERATURES));
     }
     
     /**
@@ -54,12 +62,19 @@ public final class BlackBodyColor {
      */
     private static List<Color> load() throws UncheckedIOException {
         List<Color> colorList = new ArrayList<Color>();
+        
         try(BufferedReader reader = new BufferedReader(new InputStreamReader(
-                BlackBodyColor.class.getResourceAsStream(NAME_OF_FILE_OF_TEMPERATURES)));) {
+                BlackBodyColor.class.getResourceAsStream(NAME_OF_FILE_OF_TEMPERATURES), StandardCharsets.US_ASCII));) {
+            
             String currentLine;
             while((currentLine = reader.readLine()) != null) {
-                if(currentLine.charAt(0) != DIESE.charAt(0) && currentLine.substring(10, 15).equals(TYPE_OF_TEMPERATURES)) {
-                    colorList.add(Color.web(currentLine.substring(80, 87)));
+                
+                if(currentLine.charAt(0) != DIESE.charAt(0) 
+                        && currentLine.substring(INDEX_BEGIN_TYPE_TEMP, INDEX_END_TYPE_TEMP)
+                           .equals(TYPE_OF_TEMPERATURES)) {
+                    
+                    colorList.add(Color.web(currentLine.substring
+                            (INDEX_BEGIN_COLOR_RGB, INDEX_END_COLOR_RGB)));
                 }
             }
             

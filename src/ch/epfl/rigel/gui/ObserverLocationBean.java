@@ -17,9 +17,9 @@ import javafx.beans.value.ObservableObjectValue;
  */
 public final class ObserverLocationBean {
     
-    private DoubleProperty lonDeg;
-    private DoubleProperty latDeg;
-    private ObjectBinding<GeographicCoordinates> coordinates;
+    private final DoubleProperty lonDeg;
+    private final DoubleProperty latDeg;
+    private final ObjectBinding<GeographicCoordinates> coordinates;
     
     public ObserverLocationBean() {
         this.latDeg = new SimpleDoubleProperty();
