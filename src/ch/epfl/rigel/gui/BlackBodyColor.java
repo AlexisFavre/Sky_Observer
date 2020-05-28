@@ -79,7 +79,7 @@ public final class BlackBodyColor {
             }
             
         } catch (FileNotFoundException e) {
-             System.err.println("Such file not found : " + NAME_OF_FILE_OF_TEMPERATURES);
+             System.err.println("No such file found : " + NAME_OF_FILE_OF_TEMPERATURES);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

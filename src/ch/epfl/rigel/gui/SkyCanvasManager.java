@@ -92,7 +92,7 @@ public final class SkyCanvasManager {
                             mousePosition, projection, planeToCanvas);
 
         sky = Bindings.createObjectBinding(
-                () -> new ObservedSky(dtb.getZonedDateTime(), olb.getCoordinates(), vpb.getCenter(), catalog),
+                () -> new ObservedSky(dtb.getZonedDateTime(), olb.getCoordinates(), projection.get(), catalog),
                             vpb.centerProperty(), olb.coordinatesProperty(), dtb.timeProperty(),
                             dtb.dateProperty(), dtb.zoneProperty());
 
@@ -149,7 +149,7 @@ public final class SkyCanvasManager {
         }));
 
         //SCROLL LISTENER ===========================================================================
-        canvas.setOnScroll(e -> { //TODO TRY SCROLL WITH MOOSE , SENS OF ZOOM SEEM TO BE DIFFERENT
+        canvas.setOnScroll(e -> {
             double delta = (Math.abs(e.getDeltaX()) > Math.abs(e.getDeltaY())) 
                             ? e.getDeltaX() 
                             : e.getDeltaY();

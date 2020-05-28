@@ -259,8 +259,7 @@ public final class Main extends Application {
                 playButton.setText(UNICODE_FOR_PAUSE_BUT);
                 animator.start();
             
-            } else {                                  //TODO good way ?,
-                //should use Bindings.when(boolean).then.....?
+            } else {                                 
                 playButton.setText(UNICODE_FOR_PLAY_BUT);
                 animator.stop();
             }
