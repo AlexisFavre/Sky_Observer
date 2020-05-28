@@ -64,10 +64,10 @@ public final class Main extends Application {
     private final static double EPFL_LON_DEG = 6.57;
     private final static double EPFL_LAT_DEG = 46.52;
     private final static double INITIAL_FIEL_OF_VIEW_DEG = 68.4;
-    private final static HorizontalCoordinates INITIAl_CENTER_OF_PROJECTION = HorizontalCoordinates.ofDeg(180 + 1.e-7, 22);
+    private final static HorizontalCoordinates INITIAl_CENTER_OF_PROJECTION = HorizontalCoordinates.ofDeg(180 + 1.e-12, 22);
     
-    private final Font fontAwesome = loadFontAwesome();
-    private final StarCatalogue catalog = initCatalog();
+    private final static Font FONT_AWESOME = loadFontAwesome();
+    private final static StarCatalogue CATALOG = initCatalog();
     
     private SkyCanvasManager manager;
     private TimeAnimator animator;
@@ -94,7 +94,7 @@ public final class Main extends Application {
         epfl.setLatDeg(EPFL_LAT_DEG);
         ViewingParametersBean view = new ViewingParametersBean(INITIAl_CENTER_OF_PROJECTION, INITIAL_FIEL_OF_VIEW_DEG);
         animator = new TimeAnimator(observationTime);
-        manager = new SkyCanvasManager(catalog, observationTime, epfl, view);
+        manager = new SkyCanvasManager(CATALOG, observationTime, epfl, view);
         
         
         // Pane containing the canvas where the sky is drawn
@@ -113,6 +113,13 @@ public final class Main extends Application {
         primaryStage.show();
         manager.canvas().requestFocus();
     }
+    
+    /* *************************************************************************
+     *                                                                         *
+     *                    Internal implementation stuff                        *
+     *                                                                         *
+     **************************************************************************/
+    
     // top module, contain observer position, observation instant and time passing modules
     private HBox controlBar(HBox observerPosition, HBox observationInstant, HBox timePassing) {
         
@@ -166,12 +173,16 @@ public final class Main extends Application {
             try {
                 String newText = change.getControlNewText();
                 double newCoordinateInDeg = stringConverter.fromString(newText).doubleValue();
-                return isValidCoordinate.test(newCoordinateInDeg) ? change : null;
+                return isValidCoordinate
+                        .test(newCoordinateInDeg) 
+                        ? change 
+                        : null;
                 
             } catch (Exception e) { //ParseException if cannot convert the input string into a double
                 return null; // or NullPointerException if user try to entirely clear the textField
               }
         });
+        
         TextFormatter<Number> coordinateDisplay =  new TextFormatter<>(stringConverter, 0, filter);
         coordinateDisplay.valueProperty().bindBidirectional(coordinateProperty);
         
@@ -237,7 +248,7 @@ public final class Main extends Application {
         
         // to reset to the current instant
         Button resetButton = new Button(UNICODE_FOR_RESET_BUT);
-        resetButton.setFont(fontAwesome);
+        resetButton.setFont(FONT_AWESOME);
         resetButton.setOnAction(event -> {
             currentInstant = ZonedDateTime.now();
             if(animator.runningProperty().get()) {
@@ -252,7 +263,7 @@ public final class Main extends Application {
         
         // to active or stop the time evolution
         Button playButton = new Button(UNICODE_FOR_PLAY_BUT);
-        playButton.setFont(fontAwesome);
+        playButton.setFont(FONT_AWESOME);
         playButton.setOnAction(event -> {
             
             if( !animator.runningProperty().get()) {
@@ -304,26 +315,27 @@ public final class Main extends Application {
     }
 
     // additional methods=================================================================
-    private StarCatalogue initCatalog() {
+    private static StarCatalogue initCatalog() {
         
-        try (InputStream hygStream = getClass().getResourceAsStream(NAME_FILE_OF_STARS);
-             InputStream aStream = getClass().getResourceAsStream(NAME_FILE_OF_ASTERISMS)) {
-            return new StarCatalogue.Builder()
+        try (InputStream hygStream = Main.class.getResourceAsStream(NAME_FILE_OF_STARS);
+             InputStream aStream   = Main.class.getResourceAsStream(NAME_FILE_OF_ASTERISMS)) {
+            return new StarCatalogue
+                    .Builder()
                     .loadFrom(hygStream, HygDatabaseLoader.INSTANCE)
-                    .loadFrom(aStream, AsterismLoader.INSTANCE).build();
+                    .loadFrom(aStream,   AsterismLoader.INSTANCE)
+                    .build();
             
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
     
-    private Font loadFontAwesome() {
-        try(InputStream fontStream = getClass().getResourceAsStream("/Font Awesome 5 Free-Solid-900.otf");){
+    private static Font loadFontAwesome() {
+        try(InputStream fontStream = Main.class.getResourceAsStream("/Font Awesome 5 Free-Solid-900.otf");){
             return Font.loadFont(fontStream, FONT_SIZE);
             
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-        
     }
 }

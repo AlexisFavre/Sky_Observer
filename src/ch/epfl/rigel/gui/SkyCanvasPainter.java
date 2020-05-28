@@ -26,29 +26,30 @@ import javafx.scene.transform.Transform;
  */
 public final class SkyCanvasPainter {
 
-    private final static int DEG_360 = 360;
+    private final static int DEG_360    = 360;
     private final static int OCTANTS_NB = 8;
-    private final static double ALT_OF_OCT_INDICATORS = -1.5;
+    private final static double ALT_OF_OCT_INDICATORS      = -1.5;
     private final static HorizontalCoordinates CENTER_OF_HORIZON_CIRCLE = HorizontalCoordinates.ofDeg(0, 0);
     private final static ClosedInterval RANGE_OF_MAGNITUDE = ClosedInterval.of(-2, 5);
     
-    private final static double DIAMETER_FACTOR = Math.tan(Angle.ofDeg(0.5)/4.0);
-    private final static double INFLUENCE_FACT_OF_MAG_ON_SIZE = 17d/140d;
-    private final static double SIZE_FACTOR_FOR_ZERO_MAGNITUDE = 99d/140d;
+    private final static double DIAMETER_FACTOR    = Math.tan(Angle.ofDeg(0.5)/4.0);
+    private final static double INFLUENCE_FACT_OF_MAG_ON_SIZE  = 17d / 140d;
+    private final static double SIZE_FACTOR_FOR_ZERO_MAGNITUDE = 99d / 140d;
     private final static double SUN_HALO_SCALE_FACT = 2.2;
-    private final static double BASIC_SCALE_FACT = 1;
-    private final static double SUN_PLUS_SCALE_ADD = 2;
-    private final static double BASIC_SCALE_ADD = 0;
-    private final static double SUN_HALO_OPACITY = 0.25;
-    private final static double BASIC_OPACITY = 1;
+    private final static double BASIC_SCALE_FACT    = 1;
+    private final static double SUN_PLUS_SCALE_ADD  = 2;
+    private final static double BASIC_SCALE_ADD     = 0;
+    private final static double SUN_HALO_OPACITY    = 0.25;
+    private final static double BASIC_OPACITY       = 1;
 
-    private final static int ASTERISM_LINE_WIDTH = 1;
-    private final static int HORIZON_LINE_WIDTH = 2;
-    private final static Color FONT_COLOR = Color.BLACK;
-    private final static Color PLANET_COLOR = Color.LIGHTGRAY;
+    private final static int ASTERISM_LINE_WIDTH   = 1;
+    private final static int HORIZON_LINE_WIDTH    = 2;
+    private final static Color FONT_COLOR          = Color.BLACK;
+    private final static Color PLANET_COLOR        = Color.LIGHTGRAY;
     private final static Color ASTERISM_LINE_COLOR = Color.BLUE;
-    private final static Color HORIZON_COLOR = Color.RED;
-    private final static String SUN_MAIN_COLOR = "yellow";
+    private final static Color HORIZON_COLOR       = Color.RED;
+    private final static String SUN_MAIN_COLOR     = "yellow";
+    private final static String BASIC_COLOR        = "white";
 
     
     private final Canvas canvas;
@@ -74,13 +75,6 @@ public final class SkyCanvasPainter {
         drawSky(sky, planeToCanvas);
     }
 
-    /**
-     * Clear what has been drawn on the {@code Canvas} and reset it as a black board
-     */
-    public void clear() {
-        graph2D.setFill(FONT_COLOR);
-        graph2D.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-    }
 
     /**
      * Draw the sky on the canvas with all its elements apparent
@@ -119,6 +113,13 @@ public final class SkyCanvasPainter {
      *                    Internal implementation stuff                        *
      *                                                                         *
      **************************************************************************/
+    
+    //Clear what has been drawn on the {@code Canvas} and reset it as a black board
+    private void clear() {
+        graph2D.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        graph2D.setFill(FONT_COLOR);
+        graph2D.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+    }
 
     private void drawStars(ObservedSky sky, Transform planeToCanvas) {
         int length = sky.starPointsRefs().length;
@@ -133,6 +134,7 @@ public final class SkyCanvasPainter {
             
             Iterator<Integer> iteratorOverID = sky.asterismIndices(a).iterator();
             int idOfStarFrom = iteratorOverID.next();
+            
             while(iteratorOverID.hasNext()) {
                 
                 int idOfStarTo = iteratorOverID.next();
@@ -174,10 +176,13 @@ public final class SkyCanvasPainter {
     private void drawSun(ObservedSky sky, Transform planeToCanvas) {
         double sunAngSize = sky.sun().angularSize();
         CartesianCoordinates sunPoint = sky.sunPoint();
+        
         drawEllipseOf(SUN_MAIN_COLOR, sunPoint, sunAngSize, planeToCanvas,
                 SUN_HALO_SCALE_FACT, BASIC_SCALE_ADD, SUN_HALO_OPACITY);
+        
         drawEllipseOf(SUN_MAIN_COLOR, sunPoint, sunAngSize, planeToCanvas,
                 BASIC_SCALE_FACT, SUN_PLUS_SCALE_ADD, BASIC_OPACITY);
+        
         drawEllipseOf(sunPoint, sunAngSize, planeToCanvas);
     }
 
@@ -188,8 +193,10 @@ public final class SkyCanvasPainter {
     private void drawHorizon(StereographicProjection projection, Transform planeToCanvas) {
         CartesianCoordinates center = projection.circleCenterForParallel(CENTER_OF_HORIZON_CIRCLE);
         Point2D screenPointForCenter = planeToCanvas.transform(center.x(), center.y());
+        
         double radius = projection.circleRadiusForParallel(CENTER_OF_HORIZON_CIRCLE) * planeToCanvas.getMxx();
         double diameter = 2*radius;
+        
         graph2D.setStroke(HORIZON_COLOR);
         graph2D.setLineWidth(HORIZON_LINE_WIDTH);
         graph2D.strokeOval(screenPointForCenter.getX() - radius, screenPointForCenter.getY() - radius, diameter, diameter);
@@ -201,33 +208,36 @@ public final class SkyCanvasPainter {
             az += DEG_360/OCTANTS_NB;
         }
     }
+    
+    private void drawCardinal(HorizontalCoordinates c, String text,
+            StereographicProjection projection, Transform planeToCanvas) {
+        CartesianCoordinates s = projection.apply(c);
+        Point2D screenPoint = planeToCanvas.transform(s.x(), s.y());
+        graph2D.strokeText(text, screenPoint.getX(), screenPoint.getY());
+    }
 
     private void drawEllipseOf(String color, CartesianCoordinates planePoint, double angularSize, Transform planeToCanvas,
                                double scaleFact, double scaleAdd, double opacity) {
         Point2D screenPoint = planeToCanvas.transform(planePoint.x(), planePoint.y());
         double radius = Math.tan(angularSize/4)*planeToCanvas.getMxx()*scaleFact + scaleAdd;
         double diameter = 2*radius;
+        
         graph2D.setFill(Color.web(color, opacity));
         graph2D.fillOval(screenPoint.getX() - radius, screenPoint.getY() - radius, diameter, diameter);
     }
 
     private void drawEllipseOf(CartesianCoordinates planePoint, double angularSize, Transform planeToCanvas) {
-        drawEllipseOf("white", planePoint, angularSize, planeToCanvas, BASIC_SCALE_FACT, BASIC_SCALE_ADD, BASIC_OPACITY);
+        drawEllipseOf(BASIC_COLOR, planePoint, angularSize, planeToCanvas, BASIC_SCALE_FACT, BASIC_SCALE_ADD, BASIC_OPACITY);
     }
 
     private void drawEllipseOf(Color color, double planeX, double planeY, double magnitude, Transform planeToCanvas) {
         double clipedMagnitude = RANGE_OF_MAGNITUDE.clip(magnitude);
         double sizeFactor = SIZE_FACTOR_FOR_ZERO_MAGNITUDE - INFLUENCE_FACT_OF_MAG_ON_SIZE*clipedMagnitude;
+        
         double radius = sizeFactor * DIAMETER_FACTOR * planeToCanvas.getMxx();
         double diameter = 2*radius;
+        
         graph2D.setFill(color);
         graph2D.fillOval(planeX - radius, planeY - radius, diameter, diameter);
-    }
-
-    private void drawCardinal(HorizontalCoordinates c, String text,
-                              StereographicProjection projection, Transform planeToCanvas) {
-        CartesianCoordinates s = projection.apply(c);
-        Point2D screenPoint = planeToCanvas.transform(s.x(), s.y());
-        graph2D.strokeText(text, screenPoint.getX(), screenPoint.getY());
     }
 }
