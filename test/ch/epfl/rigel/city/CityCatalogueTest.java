@@ -1,17 +1,17 @@
 package ch.epfl.rigel.city;
 
-import static org.junit.Assert.assertEquals;
+
 
 import java.util.Map;
 
-import org.junit.Test;
+
 
 import ch.epfl.rigel.coordinates.GeographicCoordinates;
 import ch.epfl.rigel.math.Angle;
 
 public class CityCatalogueTest {
     
-    CityCatalogue ctc = new CityCatalogue();
+    /*CityCatalogue ctc = new CityCatalogue();
     Map<String, GeographicCoordinates> map = ctc.coordinatesOfTheCity();
 
     @Test
@@ -44,6 +44,6 @@ public class CityCatalogueTest {
     @Test
     public void testPenolaLong() throws Exception {
         assertEquals( Angle.ofDeg(140), map.get("Penola (Australia)").lon(), 1e-1);
-    }
+    }*/
 
 }

@@ -11,6 +11,7 @@ import ch.epfl.rigel.coordinates.HorizontalCoordinates;
 import ch.epfl.rigel.coordinates.StereographicProjection;
 import ch.epfl.rigel.math.Angle;
 import ch.epfl.rigel.math.ClosedInterval;
+import ch.epfl.rigel.math.RightOpenInterval;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.binding.ObjectBinding;
@@ -39,6 +40,9 @@ public final class SkyCanvasManager {
     private final static int CHANGE_OF_AZIMUT_WHEN_KEY_PRESSED = 10;
     private final static int CHANGE_OF_ALTITUDE_WHEN_KEY_PRESSED = 5;
     private final static CartesianCoordinates INITIAL_POS_MOUSE = CartesianCoordinates.of(0, 0);
+    private final static ClosedInterval CINTER_5TO90   = ClosedInterval.of(5, 90);
+    private final static ClosedInterval CINTER_30TO150 = ClosedInterval.of(30, 150);
+    private final static RightOpenInterval CINTER_0TO360 = RightOpenInterval.of(0, 360);
 
     private final Canvas canvas;
     private final SkyCanvasPainter painter;
@@ -56,6 +60,8 @@ public final class SkyCanvasManager {
     private final ObjectBinding<ObservedSky> sky;
     private final ObjectBinding<StereographicProjection> projection;
     private final ObjectBinding<Transform> planeToCanvas;
+
+    private ViewAnimator centerAnimator;
     
     /**
      *
@@ -66,6 +72,7 @@ public final class SkyCanvasManager {
      */
     public SkyCanvasManager(StarCatalogue catalog, DateTimeBean dtb, ObserverLocationBean olb, ViewingParametersBean vpb) {
 
+        centerAnimator = new ViewAnimator(vpb);
         canvas = new Canvas();
         painter = new SkyCanvasPainter(canvas);
         this.olb = olb;
@@ -139,11 +146,12 @@ public final class SkyCanvasManager {
 
         //MOUSE CLICK LISTENER ======================================================================
         canvas.setOnMouseClicked((event -> {
-            if(objectUnderMouse.get() != null) {
+            if(objectUnderMouse.get().isPresent() && canvas.isFocused()) {
                 HorizontalCoordinates mh = mouseHorizontalPosition.get();
-                // TODO Verify north passage
                 centerAnimator.setDestination(CINTER_0TO360.reduce(mh.azDeg()), CINTER_5TO90.clip(mh.altDeg()));
                 centerAnimator.start();
+            } else {
+                canvas.requestFocus();
             }
             event.consume();
         }));
@@ -168,9 +176,6 @@ public final class SkyCanvasManager {
             vpb.setFieldOfViewDeg(RANGE_FIELD_OF_VIEW_DEG.clip(vpb.getFieldOfViewDeg() + delta));
             e.consume();
         });
-        
-        // MOUSE CLICKED LISTENER====================================================================
-        canvas.setOnMouseClicked(e -> canvas.requestFocus());
         
     } //End Constructor
 

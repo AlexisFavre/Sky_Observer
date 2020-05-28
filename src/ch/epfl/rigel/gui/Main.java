@@ -106,7 +106,7 @@ public final class Main extends Application {
         BorderPane root = new BorderPane();
         root.setCenter(skyPane);
         root.setBottom(informationPane());
-        root.setTop(controlBar(observerPosition(), observationInstant(), timePassing()));
+        root.setTop(controlBar(observerPosition(), observationInstant(), timePassing(), starSearch()));
         
         
         primaryStage.setScene(new Scene(root));
@@ -114,7 +114,7 @@ public final class Main extends Application {
         manager.canvas().requestFocus();
     }
     // top module, contain observer position, observation instant and time passing modules
-    private HBox controlBar(HBox observerPosition, HBox observationInstant, HBox timePassing) {
+    private HBox controlBar(HBox observerPosition, HBox observationInstant, HBox timePassing, HBox searchBar) {
         
         HBox controlBar = new HBox();
         Separator vertSeparator1 = new Separator(Orientation.VERTICAL);
@@ -123,10 +123,29 @@ public final class Main extends Application {
                                         vertSeparator1,
                                         observationInstant,
                                         vertSeparator2,
-                                        timePassing);
+                                        timePassing,
+                                        searchBar);
         controlBar.setStyle("-fx-spacing: 4; "
                           + "-fx-padding: 4;");
         return controlBar;
+    }
+
+    private HBox starSearch() {
+        HBox starSearch = new HBox();
+        starSearch.setStyle("-fx-spacing: inherit;"
+                + "-fx-alignment: baseline-left;");
+
+        TextField searchBar = new TextField();
+        searchBar.setMinWidth(92);
+        searchBar.setPromptText("search a star");
+        searchBar.setOnAction(event -> {
+            String destination = searchBar.getText();
+            searchBar.deleteText(0, searchBar.getLength());
+            manager.goToDestinationWithName(destination);
+        });
+
+        starSearch.getChildren().addAll(searchBar);
+        return starSearch;
     }
     
     // observer Position ==================================================================================
