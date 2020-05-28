@@ -4,13 +4,17 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
-import ch.epfl.rigel.coordinates.*;
+import ch.epfl.rigel.coordinates.CartesianCoordinates;
+import ch.epfl.rigel.coordinates.EclipticToEquatorialConversion;
+import ch.epfl.rigel.coordinates.EquatorialToHorizontalConversion;
+import ch.epfl.rigel.coordinates.GeographicCoordinates;
+import ch.epfl.rigel.coordinates.HorizontalCoordinates;
+import ch.epfl.rigel.coordinates.StereographicProjection;
 
 /**
  * Represents a set of {@code CelestialObjects} projected on a plan
@@ -19,20 +23,20 @@ import ch.epfl.rigel.coordinates.*;
  *
  * @author Augustin Allard (299918)
  */
-public final class ObservedSky { //TODO should be final ?
-
+public final class ObservedSky {
     private final StarCatalogue catalog;
-    private final Map<CelestialObject, CartesianCoordinates> skyObjects;
     private final StereographicProjection projection;
     private final EquatorialToHorizontalConversion equToHor;
 
     private final Sun sun;
     private final Moon moon;
-    private final List<Planet> planets = new ArrayList<>();
+    private final List<Planet> planets;
     private final CartesianCoordinates sunPoint;
     private final CartesianCoordinates moonPoint;
     private final double[] planetPointsRefs;
     private final double[] starPointsRefs;
+
+    private final Map<CelestialObject, CartesianCoordinates> skyObjects;
 
     /**
      * @param obsTime the time of the observation
@@ -45,6 +49,7 @@ public final class ObservedSky { //TODO should be final ?
 
         this.catalog    = catalog;
         this.skyObjects = new HashMap<>();
+        this.planets    = new ArrayList<>();
         this.projection = new StereographicProjection(observerLook);
         double moment   = Epoch.J2010.daysUntil(obsTime);
         
@@ -68,7 +73,7 @@ public final class ObservedSky { //TODO should be final ?
         CartesianCoordinates point; //use to fulfill the lists and tabs with coordiantes of the celestialObjects
         planetPointsRefs = new double[extraterrestrialModels.size()*2];
         starPointsRefs   = new double[catalog.stars().size()*2];
-        int i = 0;
+        int indexTab = 0;
         
         // construct planetPointsRefs and planets
         for(PlanetModel planetModel: extraterrestrialModels) {
@@ -76,19 +81,17 @@ public final class ObservedSky { //TODO should be final ?
             point = projection.apply(equToHor.apply(planet.equatorialPos()));
             skyObjects.put(planet, point);
             planets.add(planet);
-            planetPointsRefs[i]   = point.x();
-            planetPointsRefs[++i] = point.y();
-            ++i;
+            planetPointsRefs[indexTab++]   = point.x();
+            planetPointsRefs[indexTab++] = point.y();
         }
-        i = 0;
+        indexTab = 0;
         
         //construct starPointsRefs
         for(Star star: catalog.stars()) {
             point = projection.apply(equToHor.apply(star.equatorialPos()));
             skyObjects.put(star, point);
-            starPointsRefs[i]   = point.x();
-            starPointsRefs[++i] = point.y();
-            ++i;
+            starPointsRefs[indexTab++]   = point.x();
+            starPointsRefs[indexTab++] = point.y();
         }
     }
 
@@ -130,30 +133,30 @@ public final class ObservedSky { //TODO should be final ?
      *
      * @param point the point from which we want the closest object
      * @param maximalDistance distance on the map corresponding to the radius of search
-     * @return the closest object if there exist one in the maximal distance circle 
-     * and {@code null} if no objects were found
+     * @return an {@code Optional} containing the closest object if there exist one in the maximal distance circle 
+     * and {@code Optional.empty} if no objects were found
      */
-    public CelestialObject objectClosestTo(CartesianCoordinates point, double maximalDistance) {
+    public Optional<CelestialObject> objectClosestTo(CartesianCoordinates point, double maximalDistance) {
         CelestialObject closestObject = null;
-        if(pointIfVisible(point) != null) {
-            double d2 = Double.MAX_VALUE;
-            for (CelestialObject p : skyObjects.keySet()) {
-                CartesianCoordinates c = skyObjects.get(p);
-                if (Math.abs(c.x() - point.x()) < maximalDistance * 2    //make preliminary selection
-                        && Math.abs(c.y() - point.y()) < maximalDistance * 2) {
-                    double d = point.distance(c);
-                    if (d < maximalDistance
-                            && d < d2
-                            && d > 0)
-                        closestObject = p;
-                    d2 = point.distance(c);
+        double actualBestDist = maximalDistance;
+        
+        for(CelestialObject p: skyObjects.keySet()) {
+            CartesianCoordinates c = skyObjects.get(p);
+            
+            if(Math.abs(c.x()-point.x()) < actualBestDist   //make preliminary selection
+                    && Math.abs(c.y()-point.y()) < actualBestDist) {
+                
+                double d = point.distance(c);
+                if(d < actualBestDist) {
+                    actualBestDist = d;
+                    closestObject = p;
                 }
             }
         }
-        return closestObject;
+        return Optional.ofNullable(closestObject);
     }
     
-    //getters================================================================================================
+    //getters====================================================================================
 
     /**
      * @return the projection used for observation
@@ -230,7 +233,7 @@ public final class ObservedSky { //TODO should be final ?
      * @return the 7 extraterrestrials planets of the SolarSystem in their state corresponding to the observation moment
      */
     public List<Planet> planets() {
-        return Collections.unmodifiableList(planets);  //TODO need immutable ?
+        return Collections.unmodifiableList(planets);
     }
 
     /**

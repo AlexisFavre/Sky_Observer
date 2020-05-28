@@ -33,8 +33,6 @@ public final class CartesianCoordinates {
      * @return the distance between the two points, infinite if other is null
      */
     public double distance(CartesianCoordinates other) {
-        if(other == null)
-            return Double.POSITIVE_INFINITY;
         return Math.hypot(x() - other.x(), y() - other.y());
     }
 
