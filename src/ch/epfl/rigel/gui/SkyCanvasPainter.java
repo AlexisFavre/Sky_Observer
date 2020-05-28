@@ -24,13 +24,22 @@ import javafx.scene.transform.Transform;
  *
  * @author Augustin ALLARD (299918)
  */
-public final class SkyCanvasPainter { // TODO Check if ok with removed projections, t'entend quoi par là ??
+public final class SkyCanvasPainter {
 
+    private final static int DEG_360 = 360;
     private final static int OCTANTS_NB = 8;
     private final static double ALT_OF_OCT_INDICATORS = -1.5;
     private final static HorizontalCoordinates CENTER_OF_HORIZON_CIRCLE = HorizontalCoordinates.ofDeg(0, 0);
     private final static ClosedInterval RANGE_OF_MAGNITUDE = ClosedInterval.of(-2, 5);
     private final static double DIAMETER_FACTOR = Math.tan(Angle.ofDeg(0.5)/4.0);
+    private final static double INFLUENCE_FACT_OF_MAG_ON_SIZE = 17d/140d;
+    private final static double SIZE_FACTOR_FOR_ZERO_MAGNITUDE = 99d/140d;
+    private final static double SUN_HALO_SCALE_FACT = 2.2;
+    private final static double BASIC_SCALE_FACT = 1;
+    private final static double SUN_PLUS_SCALE_ADD = 2;
+    private final static double BASIC_SCALE_ADD = 0;
+    private final static double SUN_HALO_OPACITY = 0.25;
+    private final static double BASIC_OPACITY = 1;
 
     private final static Color FONT_COLOR = Color.BLACK;
     private final static Color PLANET_COLOR = Color.LIGHTGRAY;
@@ -160,13 +169,13 @@ public final class SkyCanvasPainter { // TODO Check if ok with removed projectio
         }
     }
 
-    private void drawSun(ObservedSky sky, Transform planeToCanvas) { //should do like dans l'enoncé
+    private void drawSun(ObservedSky sky, Transform planeToCanvas) {
         double sunAngSize = sky.sun().angularSize();
         CartesianCoordinates sunPoint = sky.sunPoint();
         drawEllipseOf("yellow", sunPoint, sunAngSize, planeToCanvas,
-                2.2, 0, 0.25); //TODO MUST NOT USE MAGIC NUMBERS !!
+                SUN_HALO_SCALE_FACT, BASIC_SCALE_ADD, SUN_HALO_OPACITY);
         drawEllipseOf("yellow", sunPoint, sunAngSize, planeToCanvas,
-                1, 2, 1); //TODO MUST NOT USE MAGIC NUMBERS !!
+                BASIC_SCALE_FACT, SUN_PLUS_SCALE_ADD, BASIC_OPACITY);
         drawEllipseOf(sunPoint, sunAngSize, planeToCanvas);
     }
 
@@ -187,26 +196,26 @@ public final class SkyCanvasPainter { // TODO Check if ok with removed projectio
         for(int i = 0; i < OCTANTS_NB; ++i) {
             HorizontalCoordinates cardinalCoord = HorizontalCoordinates.ofDeg(az, ALT_OF_OCT_INDICATORS);
             drawCardinal(cardinalCoord, cardinalCoord.azOctantName(), projection, planeToCanvas);
-            az += 360.0/OCTANTS_NB;//TODO MUST NOT USE MAGIC NUMBERS !!
+            az += DEG_360/OCTANTS_NB;
         }
     }
 
     private void drawEllipseOf(String color, CartesianCoordinates planePoint, double angularSize, Transform planeToCanvas,
                                double scaleFact, double scaleAdd, double opacity) {
         Point2D screenPoint = planeToCanvas.transform(planePoint.x(), planePoint.y());
-        double r = Math.tan(angularSize/4)*planeToCanvas.getMxx()*scaleFact + scaleAdd;
-        double d = 2*r;
+        double radius = Math.tan(angularSize/4)*planeToCanvas.getMxx()*scaleFact + scaleAdd;
+        double diameter = 2*radius;
         graph2D.setFill(Color.web(color, opacity));
-        graph2D.fillOval(screenPoint.getX() - r, screenPoint.getY() - r, d, d);
+        graph2D.fillOval(screenPoint.getX() - radius, screenPoint.getY() - radius, diameter, diameter);
     }
 
     private void drawEllipseOf(CartesianCoordinates planePoint, double angularSize, Transform planeToCanvas) {
-        drawEllipseOf("white", planePoint, angularSize, planeToCanvas, 1, 0, 1); //TODO MUST NOT USE MAGIC NUMBERS !!
+        drawEllipseOf("white", planePoint, angularSize, planeToCanvas, BASIC_SCALE_FACT, BASIC_SCALE_ADD, BASIC_OPACITY);
     }
 
     private void drawEllipseOf(Color color, double planeX, double planeY, double magnitude, Transform planeToCanvas) {
         double clipedMagnitude = RANGE_OF_MAGNITUDE.clip(magnitude);
-        double sizeFactor = (99 - 17*clipedMagnitude)/140;
+        double sizeFactor = SIZE_FACTOR_FOR_ZERO_MAGNITUDE - INFLUENCE_FACT_OF_MAG_ON_SIZE*clipedMagnitude;
         double halfDiameter = sizeFactor * DIAMETER_FACTOR * planeToCanvas.getMxx();
         double diameter = halfDiameter * 2d;
         graph2D.setFill(color);

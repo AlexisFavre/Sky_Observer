@@ -80,9 +80,8 @@ public final class ObservedSky {
             point = projection.apply(equToHor.apply(planet.equatorialPos()));
             skyObjects.put(planet, point);
             planets.add(planet);
-            planetPointsRefs[indexTab]   = point.x();
-            planetPointsRefs[++indexTab] = point.y();
-            ++indexTab;
+            planetPointsRefs[indexTab++]   = point.x();
+            planetPointsRefs[indexTab++] = point.y();
         }
         indexTab = 0;
         
@@ -90,9 +89,8 @@ public final class ObservedSky {
         for(Star star: catalog.stars()) {
             point = projection.apply(equToHor.apply(star.equatorialPos()));
             skyObjects.put(star, point);
-            starPointsRefs[indexTab]   = point.x();
-            starPointsRefs[++indexTab] = point.y();
-            ++indexTab;
+            starPointsRefs[indexTab++]   = point.x();
+            starPointsRefs[indexTab++] = point.y();
         }
     }
 
