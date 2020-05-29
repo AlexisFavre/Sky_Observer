@@ -49,7 +49,7 @@ public final class BlackBodyColor {
      * @return the associated {@code Color} of the code black body
      * @throws IllegalArgumentException if {@code temp} does not belong in the interval [1 000, 40 000]
      */
-    public static  Color colorForTemperature(int temp) throws IllegalArgumentException {
+    public static  Color colorForTemperature(int temp) {
         checkInInterval(RANGE_OF_TEMPERATURES,temp);
         return ALL_TEMPERATURES_COLORS.get((int) Math.round((temp - SMALLEST_TEMPERATURE) / RANGE_BETWEEN_TEMPERATURES));
     }
@@ -60,7 +60,7 @@ public final class BlackBodyColor {
      * @return the {@code Color} set corresponding to all multiples of 100 temperatures
      * @throws UncheckedIOException if I/O error occurs
      */
-    private static List<Color> load() throws UncheckedIOException {
+    private static List<Color> load() {
         List<Color> colorList = new ArrayList<Color>();
         
         try(BufferedReader reader = new BufferedReader(new InputStreamReader(
@@ -79,7 +79,7 @@ public final class BlackBodyColor {
             }
             
         } catch (FileNotFoundException e) {
-             System.err.println("Such file not found : " + NAME_OF_FILE_OF_TEMPERATURES);
+             System.err.println("No such file found : " + NAME_OF_FILE_OF_TEMPERATURES);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

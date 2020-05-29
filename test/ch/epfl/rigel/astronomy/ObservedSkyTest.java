@@ -16,6 +16,7 @@ import ch.epfl.rigel.coordinates.EquatorialCoordinates;
 import ch.epfl.rigel.coordinates.EquatorialToHorizontalConversion;
 import ch.epfl.rigel.coordinates.GeographicCoordinates;
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
+import ch.epfl.rigel.coordinates.StereographicProjection;
 
 class ObservedSkyTest {
     
@@ -26,7 +27,7 @@ class ObservedSkyTest {
     GeographicCoordinates OBSERVER_COORD = GeographicCoordinates.ofDeg(30, 45);
     HorizontalCoordinates OBSERVER_LOOK = HorizontalCoordinates.ofDeg(20, 22);
 
-    ObservedSky SKY = new ObservedSky(OBSERVATION_TIME, OBSERVER_COORD, OBSERVER_LOOK, MyStarCatalogueTest.CATALOG);
+    ObservedSky SKY = new ObservedSky(OBSERVATION_TIME, OBSERVER_COORD,new StereographicProjection(OBSERVER_LOOK), MyStarCatalogueTest.CATALOG);
 
     @Test
     void objectClosestToTauPhe() {
