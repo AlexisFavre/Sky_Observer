@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 import ch.epfl.rigel.astronomy.AsterismLoader;
 import ch.epfl.rigel.astronomy.HygDatabaseLoader;
 import ch.epfl.rigel.astronomy.StarCatalogue;
+import ch.epfl.rigel.city.City;
+import ch.epfl.rigel.city.CityCatalogue;
 import ch.epfl.rigel.coordinates.GeographicCoordinates;
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
 import javafx.application.Application;
@@ -299,7 +301,20 @@ public final class Main extends Application {
         return timePassing;
     }
     
-    // Information Pane===================================================================
+    //city
+    private HBox city() {
+        HBox city = new HBox();
+        
+        Label cityLabel = new Label("Ville : ");
+        ComboBox<City> citiesList = new ComboBox<>();
+        citiesList.setItems(FXCollections.observableList(CityCatalogue.coordinatesOfTheCity));
+        citiesList.setStyle("-fx-pref-width: 180;");
+        //manager.observerLocationBean().coordinatesProperty().
+        return null;
+    }
+    //===================================================================================
+    //===========================Information Pane========================================
+    //===================================================================================
     private BorderPane informationPane() {
         
         BorderPane infoPane = new BorderPane();

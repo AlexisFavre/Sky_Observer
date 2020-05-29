@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -23,19 +25,17 @@ public final class CityCatalogue{
     
     private final static String FILE_OF_CITIES = "/worldcities.csv";
     // city are ordered compared to their name because the user will enter a name to select a city
-    private final Set<City> coordinatesOfTheCity; 
+    public final static List<City> coordinatesOfTheCity = load(); 
 
     /**
      * @param coordinatesOfTheCity
      */
-    public CityCatalogue() {
-        this.coordinatesOfTheCity = load();
-    }
+    public CityCatalogue() {}
     
-    private Set<City> load() {
-        try(BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(FILE_OF_CITIES), StandardCharsets.US_ASCII))){
+    private static List<City> load() {
+        try(BufferedReader reader = new BufferedReader(new InputStreamReader(CityCatalogue.class.getResourceAsStream(FILE_OF_CITIES), StandardCharsets.US_ASCII))){
             String currentLine;
-            TreeSet<City> coordinatesOfTheCity = new TreeSet<>();
+            List<City> cities = new ArrayList<>();
             reader.readLine();
             while((currentLine = reader.readLine()) != null) {
                 try {
@@ -46,14 +46,16 @@ public final class CityCatalogue{
                     String country = (! lineInfos[4].equals("")) ? lineInfos[4].substring(1, lineInfos[4].length()-1) : null;
                     if(name != null && country != null) {
                         City c = new City(name, country, GeographicCoordinates.ofDeg(longitude, latitude));
-                        coordinatesOfTheCity.add(c);
+                        cities.add(c);
                     }
                 } catch(NumberFormatException e) {
                     //some names of cities contain comma so the line is not correctly split
                     // and Double.ParseDouble try to read words but can't and throws NumberFormatException
                     }
             }
-            return Set.copyOf(coordinatesOfTheCity);
+            City epfl = new City("Epfl", "Switzerland", GeographicCoordinates.ofDeg(6.57, 46.52));
+            cities.add(epfl);
+            return List.copyOf(cities); //TODO SORT
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -62,7 +64,7 @@ public final class CityCatalogue{
     /**
      * @return the coordinatesOfTheCity
      */
-    public Set<City> coordinatesOfTheCity() {
+    public List<City> coordinatesOfTheCity() {
         return coordinatesOfTheCity;
     }
 }
