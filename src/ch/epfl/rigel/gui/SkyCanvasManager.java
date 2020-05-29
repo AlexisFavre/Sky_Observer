@@ -81,7 +81,7 @@ public final class SkyCanvasManager {
         
         mousePosition = new SimpleObjectProperty<>(INITIAL_POS_MOUSE);
 
-        //BLINDS =====================================================================================
+        //BINDINGS =====================================================================================
         projection = Bindings.createObjectBinding(
                 () -> new StereographicProjection(vpb.getCenter()), vpb.centerProperty());
         
@@ -93,22 +93,23 @@ public final class SkyCanvasManager {
 
         planeToCanvas = Bindings.createObjectBinding(
                 () -> Transform.affine(scaleOfView.get(), 0, 0, -scaleOfView.get(),
-                            canvas.getWidth()/2, canvas.getHeight()/2), scaleOfView);
+                            canvas.getWidth()/2, canvas.getHeight()/2),
+                            scaleOfView, canvas.widthProperty(), canvas.heightProperty());
 
         mouseHorizontalPosition = Bindings.createObjectBinding(
                 () -> projection.get().inverseApply(mousePosition.get()),
-                            mousePosition, projection, planeToCanvas);
+                            mousePosition, projection);
 
         sky = Bindings.createObjectBinding(
-                () -> new ObservedSky(dtb.getZonedDateTime(), olb.getCoordinates(), vpb.getCenter(), catalog),
-                            vpb.centerProperty(), olb.coordinatesProperty(), dtb.timeProperty(),
+                () -> new ObservedSky(dtb.getZonedDateTime(), olb.getCoordinates(), projection.get(), catalog),
+                            projection, olb.coordinatesProperty(), dtb.timeProperty(),
                             dtb.dateProperty(), dtb.zoneProperty());
 
-        mouseAzDeg  = Bindings.createDoubleBinding(() ->
+        mouseAzDeg  = Bindings.createDoubleBinding( () ->
             mouseHorizontalPosition.get().azDeg(),
                 mouseHorizontalPosition);
         
-        mouseAltDeg = Bindings.createDoubleBinding(() ->
+        mouseAltDeg = Bindings.createDoubleBinding( () ->
             mouseHorizontalPosition.get().altDeg(),
                 mouseHorizontalPosition);
 
@@ -119,12 +120,12 @@ public final class SkyCanvasManager {
 
 
         //RE_DRAW SKY VIA LISTENER ==================================================================
-        sky.addListener(e-> painter.actualize(sky.get(), planeToCanvas.get()));
+        sky.addListener(e -> painter.actualize(sky.get(), planeToCanvas.get()));
         planeToCanvas.addListener(e -> painter.actualize(sky.get(), planeToCanvas.get()));
 
         //KEYBOARD LISTENER ==============================================================================
         canvas.setOnKeyPressed(e -> {
-            double az = vpb.getCenter().azDeg();
+            double az  = vpb.getCenter().azDeg();
             double alt = vpb.getCenter().altDeg();
             switch (e.getCode()) {
                 case UP:
@@ -169,11 +170,18 @@ public final class SkyCanvasManager {
         }));
 
         //SCROLL LISTENER ===========================================================================
-        canvas.setOnScroll(e -> { //TODO TRY SCROLL WITH MOOSE , SENS OF ZOOM SEEM TO BE DIFFERENT
+        canvas.setOnScroll(e -> {
             double delta = (Math.abs(e.getDeltaX()) > Math.abs(e.getDeltaY())) 
                             ? e.getDeltaX() 
                             : e.getDeltaY();
             vpb.setFieldOfViewDeg(RANGE_FIELD_OF_VIEW_DEG.clip(vpb.getFieldOfViewDeg() + delta));
+            e.consume();
+        });
+        
+        // MOUSE CLICKED LISTENER====================================================================
+        canvas.setOnMousePressed(e -> {
+            if(e.isPrimaryButtonDown())
+                canvas.requestFocus();
             e.consume();
         });
         

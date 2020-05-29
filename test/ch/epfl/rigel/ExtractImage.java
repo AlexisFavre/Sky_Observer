@@ -15,6 +15,7 @@ import ch.epfl.rigel.astronomy.ObservedSky;
 import ch.epfl.rigel.astronomy.StarCatalogue;
 import ch.epfl.rigel.coordinates.GeographicCoordinates;
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
+import ch.epfl.rigel.coordinates.StereographicProjection;
 import ch.epfl.rigel.gui.SkyCanvasPainter;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -47,7 +48,7 @@ public final class ExtractImage extends Application {
         // Moon: HorizontalCoordinates projCenter = HorizontalCoordinates.ofDeg(3.7, -65); 
         // Moon2: HorizontalCoordinates projCenter = HorizontalCoordinates.ofDeg(0, 23);
         
-        ObservedSky sky = new ObservedSky(observationTime, observerCoordinates, observerLook, initCatalog());
+        ObservedSky sky = new ObservedSky(observationTime, observerCoordinates, new StereographicProjection(observerLook), initCatalog());
 
         Canvas canvas = new Canvas(800, 600);
         SkyCanvasPainter skyPainter = new SkyCanvasPainter(canvas);
