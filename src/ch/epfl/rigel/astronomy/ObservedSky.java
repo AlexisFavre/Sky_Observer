@@ -13,7 +13,6 @@ import ch.epfl.rigel.coordinates.CartesianCoordinates;
 import ch.epfl.rigel.coordinates.EclipticToEquatorialConversion;
 import ch.epfl.rigel.coordinates.EquatorialToHorizontalConversion;
 import ch.epfl.rigel.coordinates.GeographicCoordinates;
-import ch.epfl.rigel.coordinates.HorizontalCoordinates;
 import ch.epfl.rigel.coordinates.StereographicProjection;
 
 /**
@@ -24,6 +23,7 @@ import ch.epfl.rigel.coordinates.StereographicProjection;
  * @author Augustin Allard (299918)
  */
 public final class ObservedSky {
+    
     private final StarCatalogue catalog;
     private final StereographicProjection projection;
     private final EquatorialToHorizontalConversion equToHor;
@@ -41,16 +41,16 @@ public final class ObservedSky {
     /**
      * @param obsTime the time of the observation
      * @param obsPlace the coordinates of the observer
-     * @param observerLook the point where the observer is looking that will be the center of the projection
+     * @param projection that will be used
      * @param catalog containing the observed stars and asterisms
      */
     public ObservedSky(ZonedDateTime obsTime, GeographicCoordinates obsPlace,
-                       HorizontalCoordinates observerLook, StarCatalogue catalog) {
+                StereographicProjection projection, StarCatalogue catalog) {
 
         this.catalog    = catalog;
         this.skyObjects = new HashMap<>();
         this.planets    = new ArrayList<>();
-        this.projection = new StereographicProjection(observerLook);
+        this.projection = projection;
         double moment   = Epoch.J2010.daysUntil(obsTime);
         
         // create coordinates converters
@@ -61,36 +61,41 @@ public final class ObservedSky {
         extraterrestrialModels.addAll(PlanetModel.ALL);
         extraterrestrialModels.remove(PlanetModel.EARTH);
 
-        sun  = SunModel.SUN.at(moment, eclToEqu);
+        sun      = SunModel.SUN.at(moment, eclToEqu);
         sunPoint = projection.apply(equToHor.apply(sun.equatorialPos()));
         skyObjects.put(sun, sunPoint);
         
-        moon = MoonModel.MOON.at(moment, eclToEqu);
+        moon      = MoonModel.MOON.at(moment, eclToEqu);
         moonPoint = projection.apply(equToHor.apply(moon.equatorialPos()));
         skyObjects.put(moon, moonPoint);
         
-        // to construct planetPointsRefs and starPointsRefs
-        CartesianCoordinates point; //use to fulfill the lists and tabs with coordiantes of the celestialObjects
+        // to construct planetPointsRefs and starPointsRefs, each celestialObject take 2 cases, 
+        // the first for the x coordinate and the follower for y coordinate
         planetPointsRefs = new double[extraterrestrialModels.size()*2];
         starPointsRefs   = new double[catalog.stars().size()*2];
-        int indexTab = 0;
+        CartesianCoordinates point; //use to fulfill the lists and tabs with coordinates of the celestialObjects
+        int indexTab     = 0;
         
         // construct planetPointsRefs and planets
         for(PlanetModel planetModel: extraterrestrialModels) {
+            
             Planet planet = planetModel.at(moment, eclToEqu);
-            point = projection.apply(equToHor.apply(planet.equatorialPos()));
+            point         = projection.apply(equToHor.apply(planet.equatorialPos()));
+            
             skyObjects.put(planet, point);
             planets.add(planet);
-            planetPointsRefs[indexTab++]   = point.x();
+            planetPointsRefs[indexTab++] = point.x();
             planetPointsRefs[indexTab++] = point.y();
         }
         indexTab = 0;
         
         //construct starPointsRefs
         for(Star star: catalog.stars()) {
+            
             point = projection.apply(equToHor.apply(star.equatorialPos()));
+            
             skyObjects.put(star, point);
-            starPointsRefs[indexTab++]   = point.x();
+            starPointsRefs[indexTab++] = point.x();
             starPointsRefs[indexTab++] = point.y();
         }
     }
@@ -133,23 +138,25 @@ public final class ObservedSky {
      *
      * @param point the point from which we want the closest object
      * @param maximalDistance distance on the map corresponding to the radius of search
-     * @return an {@code Optional} containing the closest object if there exist one in the maximal distance circle 
-     * and {@code Optional.empty} if no objects were found
+     * @return an {@code Optional} containing the closest object if there exist one in the maximal distance disc 
+     * and {@code Optional.empty} if no enough closed objects have been found
      */
     public Optional<CelestialObject> objectClosestTo(CartesianCoordinates point, double maximalDistance) {
         CelestialObject closestObject = null;
-        double actualBestDist = maximalDistance;
+        double actualBestDist         = maximalDistance;
         
-        for(CelestialObject p: skyObjects.keySet()) {
+        for(CelestialObject p : skyObjects.keySet()) {
             CartesianCoordinates c = skyObjects.get(p);
             
-            if(Math.abs(c.x()-point.x()) < actualBestDist   //make preliminary selection
-                    && Math.abs(c.y()-point.y()) < actualBestDist) {
+            if(Math.abs(c.x() - point.x()) < actualBestDist   //make preliminary selection
+            && Math.abs(c.y() - point.y()) < actualBestDist) {
                 
-                double d = point.distance(c);
-                if(d < actualBestDist) {
-                    actualBestDist = d;
-                    closestObject = p;
+                double distanceFromCurrentCelestialObject = point.distance(c);
+                
+                if(distanceFromCurrentCelestialObject < actualBestDist) {
+                    
+                    actualBestDist = distanceFromCurrentCelestialObject;
+                    closestObject  = p;
                 }
             }
         }

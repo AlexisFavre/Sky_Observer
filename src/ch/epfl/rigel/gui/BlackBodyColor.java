@@ -75,7 +75,7 @@ public final class BlackBodyColor {
      * @return the {@code Color} set corresponding to all multiples of 100 temperatures
      * @throws UncheckedIOException if I/O error occurs
      */
-    private static List<Color> load() throws UncheckedIOException {
+    private static List<Color> load() {
         List<Color> colorList = new ArrayList<Color>();
         
         try(BufferedReader reader = new BufferedReader(new InputStreamReader(
@@ -94,7 +94,7 @@ public final class BlackBodyColor {
             }
             
         } catch (FileNotFoundException e) {
-             System.err.println("Such file not found : " + NAME_OF_FILE_OF_TEMPERATURES);
+             System.err.println("No such file found : " + NAME_OF_FILE_OF_TEMPERATURES);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
