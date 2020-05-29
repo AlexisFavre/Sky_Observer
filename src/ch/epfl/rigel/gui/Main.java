@@ -17,11 +17,13 @@ import ch.epfl.rigel.astronomy.HygDatabaseLoader;
 import ch.epfl.rigel.astronomy.StarCatalogue;
 import ch.epfl.rigel.coordinates.GeographicCoordinates;
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
+import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
@@ -31,12 +33,19 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import javafx.util.converter.LocalTimeStringConverter;
 import javafx.util.converter.NumberStringConverter;
 
@@ -108,10 +117,8 @@ public final class Main extends Application {
         root.setBottom(informationPane());
         root.setTop(controlBar(observerPosition(), observationInstant(), timePassing(), starSearch()));
         
-        
-        primaryStage.setScene(new Scene(root));
+        primaryStage.setScene(welcomeScene(primaryStage, new Scene(root)));
         primaryStage.show();
-        manager.canvas().requestFocus();
     }
     
     /* *************************************************************************
@@ -120,17 +127,70 @@ public final class Main extends Application {
      *                                                                         *
      **************************************************************************/
     
+    //welcome scene that the user see when he loads the application
+    private Scene welcomeScene(Stage stage, Scene nextscene) {
+        StackPane root = new StackPane();
+        Scene scene    = new Scene(root);
+        ImageView imgV = new ImageView(welcomeImage()); //TODO find a way to bind size
+        VBox vBox = new VBox(20);                       //TODO when end control bar, must put the same size
+        vBox.setSpacing(40);                            //for the welcome window
+            
+        //presentation texts
+        Text wlc  = new Text("Bienvenue");
+        wlc.setFill(Color.GHOSTWHITE);
+        wlc.setFont(Font.font(90));
+        
+        Text ready = new Text("Prêt à découvrir de nouveaux asterisms, étoiles et planètes ? :) ");
+        ready.setWrappingWidth(700);
+        ready.setTextAlignment(TextAlignment.CENTER);
+        ready.setFill(Color.GHOSTWHITE);
+        ready.setFont(Font.font(40));
+        
+        
+        // transitions between the welcome sceen to the main scene
+        FadeTransition quitWlcScene = new FadeTransition(Duration.millis(400));
+        quitWlcScene.setNode(root);
+        quitWlcScene.setFromValue(1);
+        quitWlcScene.setToValue(0);
+        
+        FadeTransition joinMainScene = new FadeTransition(Duration.millis(1000));
+        joinMainScene.setNode(nextscene.getRoot());
+        joinMainScene.setFromValue(0);
+        joinMainScene.setToValue(1);
+        
+        quitWlcScene.setOnFinished(e -> {
+            stage.setScene(nextscene);
+            joinMainScene.play();
+            manager.canvas().requestFocus();
+        });
+        
+        
+        //button to switch to main scene
+        Button but = new Button("Commencer l'observation");
+        but.minWidth(150);
+        but.setOnAction(e -> quitWlcScene.play());
+        
+        vBox.getChildren().addAll(wlc, ready, but);
+        vBox.setAlignment(Pos.CENTER);
+        
+        root.getChildren().addAll(imgV, vBox);
+        
+        return scene;
+    }
+    
     // top module, contain observer position, observation instant and time passing modules
     private HBox controlBar(HBox observerPosition, HBox observationInstant, HBox timePassing, HBox searchBar) {
         
         HBox controlBar = new HBox();
         Separator vertSeparator1 = new Separator(Orientation.VERTICAL);
         Separator vertSeparator2 = new Separator(Orientation.VERTICAL);
+        Separator vertSeparator3 = new Separator(Orientation.VERTICAL);
         controlBar.getChildren().addAll(observerPosition,
                                         vertSeparator1,
                                         observationInstant,
                                         vertSeparator2,
                                         timePassing,
+                                        vertSeparator3,
                                         searchBar);
         controlBar.setStyle("-fx-spacing: 4; "
                           + "-fx-padding: 4;");
@@ -350,8 +410,17 @@ public final class Main extends Application {
     }
     
     private static Font loadFontAwesome() {
-        try(InputStream fontStream = Main.class.getResourceAsStream("/Font Awesome 5 Free-Solid-900.otf");){
+        try(InputStream fontStream = Main.class.getResourceAsStream("/Font Awesome 5 Free-Solid-900.otf")){
             return Font.loadFont(fontStream, FONT_SIZE);
+            
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+    
+    private static Image welcomeImage() {
+        try(InputStream imgStream = Main.class.getResourceAsStream("/Sky Image.jpg")) {
+            return new Image(imgStream);
             
         } catch (IOException e) {
             throw new UncheckedIOException(e);

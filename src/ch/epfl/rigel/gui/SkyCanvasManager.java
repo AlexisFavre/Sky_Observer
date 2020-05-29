@@ -1,8 +1,9 @@
 package ch.epfl.rigel.gui;
 
+import static ch.epfl.rigel.math.RightOpenInterval.ROInter_0To360;
+
 import java.util.Optional;
 
-import static ch.epfl.rigel.math.RightOpenInterval.ROInter_0To360;
 import ch.epfl.rigel.astronomy.CelestialObject;
 import ch.epfl.rigel.astronomy.ObservedSky;
 import ch.epfl.rigel.astronomy.StarCatalogue;
@@ -18,7 +19,6 @@ import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Point2D;
-import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Transform;
@@ -36,13 +36,11 @@ public final class SkyCanvasManager {
     
     private final static ClosedInterval RANGE_OBSERVABLE_ALTITUDES   = ClosedInterval.of(5, 90);
     private final static ClosedInterval RANGE_FIELD_OF_VIEW_DEG = ClosedInterval.of(30, 150);
+    private final static RightOpenInterval CINTER_0TO360 = RightOpenInterval.of(0, 360);
     private final static int MAX_DISTANCE_FOR_CLOSEST_OBJECT_TO = 10;
     private final static int CHANGE_OF_AZIMUT_WHEN_KEY_PRESSED = 10;
     private final static int CHANGE_OF_ALTITUDE_WHEN_KEY_PRESSED = 5;
     private final static CartesianCoordinates INITIAL_POS_MOUSE = CartesianCoordinates.of(0, 0);
-    private final static ClosedInterval CINTER_5TO90   = ClosedInterval.of(5, 90);
-    private final static ClosedInterval CINTER_30TO150 = ClosedInterval.of(30, 150);
-    private final static RightOpenInterval CINTER_0TO360 = RightOpenInterval.of(0, 360);
 
     private final Canvas canvas;
     private final SkyCanvasPainter painter;
@@ -145,16 +143,18 @@ public final class SkyCanvasManager {
             e.consume();
         });
 
-        //MOUSE CLICK LISTENER ======================================================================
-        canvas.setOnMouseClicked((event -> {
-            if(objectUnderMouse.get().isPresent() && canvas.isFocused()) {
-                HorizontalCoordinates mh = mouseHorizontalPosition.get();
-                centerAnimator.setDestination(CINTER_0TO360.reduce(mh.azDeg()), CINTER_5TO90.clip(mh.altDeg()));
-                centerAnimator.start();
-            } else {
-                canvas.requestFocus();
+        //MOUSE CLICKED LISTENER ======================================================================
+        canvas.setOnMousePressed((e -> {
+            if(e.isPrimaryButtonDown()) {
+                if(objectUnderMouse.get().isPresent() && canvas.isFocused()) {
+                    HorizontalCoordinates mh = mouseHorizontalPosition.get();
+                    centerAnimator.setDestination(CINTER_0TO360.reduce(mh.azDeg()), RANGE_OBSERVABLE_ALTITUDES.clip(mh.altDeg()));
+                    centerAnimator.start();
+                } else {
+                    canvas.requestFocus();
+                }
             }
-            event.consume();
+            e.consume();
         }));
 
         //MOUSE MOVE LISTENER =======================================================================
@@ -175,13 +175,6 @@ public final class SkyCanvasManager {
                             ? e.getDeltaX() 
                             : e.getDeltaY();
             vpb.setFieldOfViewDeg(RANGE_FIELD_OF_VIEW_DEG.clip(vpb.getFieldOfViewDeg() + delta));
-            e.consume();
-        });
-        
-        // MOUSE CLICKED LISTENER====================================================================
-        canvas.setOnMousePressed(e -> {
-            if(e.isPrimaryButtonDown())
-                canvas.requestFocus();
             e.consume();
         });
         
