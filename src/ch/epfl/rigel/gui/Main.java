@@ -20,6 +20,7 @@ import ch.epfl.rigel.coordinates.HorizontalCoordinates;
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.geometry.Orientation;
@@ -30,9 +31,11 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -132,19 +135,34 @@ public final class Main extends Application {
         StackPane root = new StackPane();
         Scene scene    = new Scene(root);
         ImageView imgV = new ImageView(welcomeImage()); //TODO find a way to bind size
-        VBox vBox = new VBox(20);                       //TODO when end control bar, must put the same size
-        vBox.setSpacing(40);                            //for the welcome window
+        
+        VBox selectionBox = new VBox(40);
+        selectionBox.setAlignment(Pos.CENTER_RIGHT);
+        Text drawingTxt = new Text("Voulez vous observez le ciel");
+        drawingTxt.setFill(Color.GHOSTWHITE);
+//        drawingTxt.textProperty()
+        
+        selectionBox.getChildren().addAll(
+                drawingTxt,
+                butToDrawCelestailObjects("avec les étoiles  ",  manager.drawWithStars()),
+                butToDrawCelestailObjects("avec les planètes", manager.drawWithPlanets()),
+                butToDrawCelestailObjects("avec le Soleil    ",    manager.drawWithSun()),
+                butToDrawCelestailObjects("avec la Lune      ",      manager.drawWithMoon()),
+                butToDrawCelestailObjects("avec l'horizon    ",    manager.drawWithHorizon()));
+        
+        VBox mainBox = new VBox(40);
+        mainBox.setAlignment(Pos.CENTER);                  //TODO when end control bar, must put the same size
             
         //presentation texts
-        Text wlc  = new Text("Bienvenue");
-        wlc.setFill(Color.GHOSTWHITE);
-        wlc.setFont(Font.font(90));
+        Text wlcTxt  = new Text("Bienvenue");
+        wlcTxt.setFill(Color.GHOSTWHITE);
+        wlcTxt.setFont(Font.font(90));
         
-        Text ready = new Text("Prêt à découvrir de nouveaux asterisms, étoiles et planètes ? :) ");
-        ready.setWrappingWidth(700);
-        ready.setTextAlignment(TextAlignment.CENTER);
-        ready.setFill(Color.GHOSTWHITE);
-        ready.setFont(Font.font(40));
+        Text readyTxt = new Text("Prêt à découvrir de nouveaux asterisms, étoiles et planètes ? :) ");
+        readyTxt.setWrappingWidth(700);
+        readyTxt.setTextAlignment(TextAlignment.CENTER);
+        readyTxt.setFill(Color.GHOSTWHITE);
+        readyTxt.setFont(Font.font(40));
         
         
         // transitions between the welcome sceen to the main scene
@@ -170,12 +188,21 @@ public final class Main extends Application {
         but.minWidth(150);
         but.setOnAction(e -> quitWlcScene.play());
         
-        vBox.getChildren().addAll(wlc, ready, but);
-        vBox.setAlignment(Pos.CENTER);
+        mainBox.getChildren().addAll(wlcTxt, readyTxt, but);
+        mainBox.setAlignment(Pos.CENTER);
         
-        root.getChildren().addAll(imgV, vBox);
+        root.getChildren().addAll(imgV, mainBox, selectionBox);
         
         return scene;
+    }
+    
+    private RadioButton butToDrawCelestailObjects(String name, BooleanProperty propertyToBind) {// TODO find better names
+        RadioButton but = new RadioButton(name);
+        propertyToBind.bind(but.selectedProperty());
+        but.setAlignment(Pos.TOP_LEFT);
+        but.setSelected(true);
+        but.setTextFill(Color.GHOSTWHITE);
+        return but;
     }
     
     // top module, contain observer position, observation instant and time passing modules

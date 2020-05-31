@@ -16,7 +16,9 @@ import ch.epfl.rigel.math.RightOpenInterval;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.binding.ObjectBinding;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
@@ -48,6 +50,12 @@ public final class SkyCanvasManager {
     private final DateTimeBean dtb;
     private final ViewingParametersBean vpb;
     
+    private final BooleanProperty drawWithStars;
+    private final BooleanProperty drawWithHorizon;
+    private final BooleanProperty drawWithPlanets;
+    private final BooleanProperty drawWithSun;
+    private final BooleanProperty drawWithMoon;
+    
     private final DoubleBinding mouseAzDeg;
     private final DoubleBinding mouseAltDeg;
     private final ObjectProperty<CartesianCoordinates> mousePosition;
@@ -78,6 +86,12 @@ public final class SkyCanvasManager {
         this.vpb = vpb;
         
         mousePosition = new SimpleObjectProperty<>(INITIAL_POS_MOUSE);
+        
+        drawWithStars   = new SimpleBooleanProperty();
+        drawWithPlanets = new SimpleBooleanProperty();
+        drawWithSun     = new SimpleBooleanProperty();
+        drawWithMoon    = new SimpleBooleanProperty();
+        drawWithHorizon = new SimpleBooleanProperty();
 
         //BINDINGS =====================================================================================
         projection = Bindings.createObjectBinding(
@@ -118,8 +132,13 @@ public final class SkyCanvasManager {
 
 
         //RE_DRAW SKY VIA LISTENER ==================================================================
-        sky.addListener(e -> painter.actualize(sky.get(), planeToCanvas.get()));
-        planeToCanvas.addListener(e -> painter.actualize(sky.get(), planeToCanvas.get()));
+        sky.addListener(e -> painter.actualize(sky.get(), planeToCanvas.get(), 
+                drawWithStars.get(), drawWithPlanets.get(), drawWithSun.get(),
+                drawWithMoon.get(), drawWithHorizon.get()));
+        
+        planeToCanvas.addListener(e -> painter.actualize(sky.get(), planeToCanvas.get(), 
+                drawWithStars.get(), drawWithPlanets.get(), drawWithSun.get(),
+                drawWithMoon.get(), drawWithHorizon.get()));
 
         //KEYBOARD LISTENER ==============================================================================
         canvas.setOnKeyPressed(e -> {
@@ -248,5 +267,44 @@ public final class SkyCanvasManager {
      */
     public ObjectBinding<Optional<CelestialObject>> objectUnderMouse() {
         return objectUnderMouse;
+    }
+
+
+    /**
+     * @return the drawWithStars property
+     */
+    public BooleanProperty drawWithStars() {
+        return drawWithStars;
+    }
+
+
+    /**
+     * @return the drawWithPlanets property
+     */
+    public BooleanProperty drawWithPlanets() {
+        return drawWithPlanets;
+    }
+
+
+    /**
+     * @return the drawWithSun property
+     */
+    public BooleanProperty drawWithSun() {
+        return drawWithSun;
+    }
+
+
+    /**
+     * @return the drawWithMoon property
+     */
+    public BooleanProperty drawWithMoon() {
+        return drawWithMoon;
+    }
+    
+    /**
+     * @return the drawWithHorizon property
+     */
+    public BooleanProperty drawWithHorizon() {
+        return drawWithHorizon;
     }
 }
