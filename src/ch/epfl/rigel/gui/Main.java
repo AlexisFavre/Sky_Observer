@@ -138,17 +138,20 @@ public final class Main extends Application {
         
         VBox selectionBox = new VBox(40);
         selectionBox.setAlignment(Pos.CENTER_RIGHT);
+        
         Text drawingTxt = new Text("Voulez vous observez le ciel");
         drawingTxt.setFill(Color.GHOSTWHITE);
-//        drawingTxt.textProperty()
+        drawingTxt.setFont(Font.font(20));
+        drawingTxt.setWrappingWidth(180);
+        drawingTxt.setTextAlignment(TextAlignment.CENTER);
         
         selectionBox.getChildren().addAll(
                 drawingTxt,
-                butToDrawCelestailObjects("avec les étoiles  ",  manager.drawWithStars()),
+                butToDrawCelestailObjects("avec les étoiles   ",  manager.drawWithStars()),
                 butToDrawCelestailObjects("avec les planètes", manager.drawWithPlanets()),
-                butToDrawCelestailObjects("avec le Soleil    ",    manager.drawWithSun()),
-                butToDrawCelestailObjects("avec la Lune      ",      manager.drawWithMoon()),
-                butToDrawCelestailObjects("avec l'horizon    ",    manager.drawWithHorizon()));
+                butToDrawCelestailObjects("avec le Soleil       ",    manager.drawWithSun()),
+                butToDrawCelestailObjects("avec la Lune       ",      manager.drawWithMoon()),
+                butToDrawCelestailObjects("avec l'horizon     ",    manager.drawWithHorizon()));
         
         VBox mainBox = new VBox(40);
         mainBox.setAlignment(Pos.CENTER);                  //TODO when end control bar, must put the same size
@@ -158,7 +161,7 @@ public final class Main extends Application {
         wlcTxt.setFill(Color.GHOSTWHITE);
         wlcTxt.setFont(Font.font(90));
         
-        Text readyTxt = new Text("Prêt à découvrir de nouveaux asterisms, étoiles et planètes ? :) ");
+        Text readyTxt = new Text("Prêt à découvrir de nouveaux asterisms, étoiles et planètes ?");
         readyTxt.setWrappingWidth(700);
         readyTxt.setTextAlignment(TextAlignment.CENTER);
         readyTxt.setFill(Color.GHOSTWHITE);
@@ -202,6 +205,7 @@ public final class Main extends Application {
         but.setAlignment(Pos.TOP_LEFT);
         but.setSelected(true);
         but.setTextFill(Color.GHOSTWHITE);
+        but.setFont(Font.font(15));
         return but;
     }
     
