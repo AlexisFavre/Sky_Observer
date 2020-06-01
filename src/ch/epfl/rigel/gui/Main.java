@@ -35,7 +35,6 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
-import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -115,12 +114,12 @@ public final class Main extends Application {
         manager.canvas().heightProperty().bind(skyPane.heightProperty());
         
         // Initiate user interface
-        BorderPane root = new BorderPane();
-        root.setCenter(skyPane);
-        root.setBottom(informationPane());
-        root.setTop(controlBar(observerPosition(), observationInstant(), timePassing(), starSearch()));
+        BorderPane mainRoot = new BorderPane();
+        mainRoot.setCenter(skyPane);
+        mainRoot.setBottom(informationPane());
+        mainRoot.setTop(controlBar(observerPosition(), observationInstant(), timePassing(), starSearch()));
         
-        primaryStage.setScene(welcomeScene(primaryStage, new Scene(root)));
+        primaryStage.setScene(welcomeScene(primaryStage, new Scene(mainRoot)));
         primaryStage.show();
     }
     
@@ -132,32 +131,38 @@ public final class Main extends Application {
     
     //welcome scene that the user see when he loads the application
     private Scene welcomeScene(Stage stage, Scene nextscene) {
-        StackPane root = new StackPane();
-        Scene scene    = new Scene(root);
-        ImageView imgV = new ImageView(welcomeImage()); //TODO find a way to bind size
+        StackPane wlcRoot = new StackPane();
+        Scene scene       = new Scene(wlcRoot);
+        ImageView imgV    = new ImageView(welcomeImage()); //TODO find a way to bind size
+        BorderPane presentationPane = new BorderPane(); 
+        //TODO when we will have finish control bar, must put the same size of window
         
+        
+        //box used to select celestial objects to draw
         VBox selectionBox = new VBox(40);
         selectionBox.setAlignment(Pos.CENTER_RIGHT);
         
-        Text drawingTxt = new Text("Voulez vous observez le ciel");
+        Text drawingTxt   = new Text("Voulez vous observez le ciel");
         drawingTxt.setFill(Color.GHOSTWHITE);
         drawingTxt.setFont(Font.font(20));
-        drawingTxt.setWrappingWidth(180);
+        drawingTxt.setWrappingWidth(180);  //TODO should use CSS ??
         drawingTxt.setTextAlignment(TextAlignment.CENTER);
         
         selectionBox.getChildren().addAll(
                 drawingTxt,
-                butToDrawCelestailObjects("avec les étoiles   ",  manager.drawWithStars()),
-                butToDrawCelestailObjects("avec les planètes", manager.drawWithPlanets()),
-                butToDrawCelestailObjects("avec le Soleil       ",    manager.drawWithSun()),
-                butToDrawCelestailObjects("avec la Lune       ",      manager.drawWithMoon()),
+                butToDrawCelestailObjects("avec les étoiles   ",    manager.drawWithStars()),
+                butToDrawCelestailObjects("avec les planètes",      manager.drawWithPlanets()),
+                butToDrawCelestailObjects("avec le Soleil       ",  manager.drawWithSun()), //TODO better way to align
+                butToDrawCelestailObjects("avec la Lune       ",    manager.drawWithMoon()),
                 butToDrawCelestailObjects("avec l'horizon     ",    manager.drawWithHorizon()));
         
-        VBox mainBox = new VBox(40);
-        mainBox.setAlignment(Pos.CENTER);                  //TODO when end control bar, must put the same size
+        
+        //box used to present welcome text
+        VBox wlcBox   = new VBox(40);
+        wlcBox.setAlignment(Pos.CENTER);                  
             
         //presentation texts
-        Text wlcTxt  = new Text("Bienvenue");
+        Text wlcTxt   = new Text("Bienvenue");
         wlcTxt.setFill(Color.GHOSTWHITE);
         wlcTxt.setFont(Font.font(90));
         
@@ -168,9 +173,9 @@ public final class Main extends Application {
         readyTxt.setFont(Font.font(40));
         
         
-        // transitions between the welcome sceen to the main scene
+        // transitions between the welcome scene to the main scene
         FadeTransition quitWlcScene = new FadeTransition(Duration.millis(400));
-        quitWlcScene.setNode(root);
+        quitWlcScene.setNode(wlcRoot);
         quitWlcScene.setFromValue(1);
         quitWlcScene.setToValue(0);
         
@@ -187,14 +192,18 @@ public final class Main extends Application {
         
         
         //button to switch to main scene
-        Button but = new Button("Commencer l'observation");
-        but.minWidth(150);
-        but.setOnAction(e -> quitWlcScene.play());
+        Button switchBut = new Button("Commencer l'observation");
+        switchBut.minWidth(150);
+        switchBut.setOnAction(e -> quitWlcScene.play());
         
-        mainBox.getChildren().addAll(wlcTxt, readyTxt, but);
-        mainBox.setAlignment(Pos.CENTER);
         
-        root.getChildren().addAll(imgV, mainBox, selectionBox);
+        wlcBox.getChildren().addAll(wlcTxt, readyTxt, switchBut);
+        wlcBox.setAlignment(Pos.CENTER);
+        
+        presentationPane.setCenter(wlcBox);
+        presentationPane.setRight(selectionBox);
+        
+        wlcRoot.getChildren().addAll(imgV, presentationPane);
         
         return scene;
     }
