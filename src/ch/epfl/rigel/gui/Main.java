@@ -33,7 +33,6 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.Labeled;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
@@ -61,19 +60,21 @@ import javafx.util.converter.NumberStringConverter;
  */
 public final class Main extends Application {
 
-    private final static String PATTERN_LONG_AND_LAT = "#0.00";
-    private final static String PATTERN_TIME = "HH:mm:ss";
-    private final static String UNICODE_FOR_RESET_BUT = "\uf0e2";
-    private final static String UNICODE_FOR_PLAY_BUT = "\uf04b";
-    private final static String UNICODE_FOR_PAUSE_BUT = "\uf04c";
+    private final static String PATTERN_LONG_AND_LAT   = "#0.00";
+    private final static String PATTERN_TIME           = "HH:mm:ss";
+    private final static String UNICODE_FOR_RESET_BUT  = "\uf0e2";
+    private final static String UNICODE_FOR_PLAY_BUT   = "\uf04b";
+    private final static String UNICODE_FOR_PAUSE_BUT  = "\uf04c";
     private final static String NAME_FILE_OF_ASTERISMS = "/asterisms.txt";
-    private final static String NAME_FILE_OF_STARS = "/hygdata_v3.csv";
+    private final static String NAME_FILE_OF_STARS     = "/hygdata_v3.csv";
     
     // constants for initialization
-    private final static int MINIMAL_WIDTH_STAGE = 800;
-    private final static int MINIMAL_HEIGHT_STAGE = 600;
+    private final static int MINIMAL_WIDTH_STAGE    = 800;
+    private final static int MINIMAL_HEIGHT_STAGE   = 600;
     private final static int INDEX_ACCELERATOR_X300 = 2;
-    private final static int FONT_SIZE = 15;
+    private final static int FONT_SIZE   = 15;
+    private final static int MAX_OPACITY = 1;
+    private final static int MIN_OPACITY = 0;
     
     private final static double INITIAL_FIEL_OF_VIEW_DEG = 68.4;
     private final static HorizontalCoordinates INITIAl_CENTER_OF_PROJECTION = HorizontalCoordinates.ofDeg(180 + 1.e-12, 22);
@@ -180,13 +181,13 @@ public final class Main extends Application {
         // transitions between the welcome scene to the main scene
         FadeTransition quitWlcScene = new FadeTransition(Duration.millis(400));
         quitWlcScene.setNode(wlcRoot);
-        quitWlcScene.setFromValue(1);
-        quitWlcScene.setToValue(0);
+        quitWlcScene.setFromValue(MAX_OPACITY);
+        quitWlcScene.setToValue(MIN_OPACITY);
         
         FadeTransition joinMainScene = new FadeTransition(Duration.millis(1000));
         joinMainScene.setNode(nextscene.getRoot());
-        joinMainScene.setFromValue(0);
-        joinMainScene.setToValue(1);
+        joinMainScene.setFromValue(MIN_OPACITY);
+        joinMainScene.setToValue(MAX_OPACITY);
         
         quitWlcScene.setOnFinished(e -> {
             stage.setScene(nextscene);
@@ -234,7 +235,7 @@ public final class Main extends Application {
         HBox controlBar = new HBox();
         Separator vertSeparator1 = new Separator(Orientation.VERTICAL);
         Separator vertSeparator2 = new Separator(Orientation.VERTICAL);
-        Separator vertSeparator3 = new Separator(Orientation.VERTICAL);
+        Separator vertSeparator3 = new Separator(Orientation.VERTICAL); //TODO find cleaner way
         Separator vertSeparator4 = new Separator(Orientation.VERTICAL);
 
         controlBar.getChildren().addAll(observerPosition,

@@ -9,7 +9,6 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import ch.epfl.rigel.coordinates.GeographicCoordinates;
@@ -26,19 +25,20 @@ import ch.epfl.rigel.coordinates.GeographicCoordinates;
 public final class CityCatalogue{
     
     private final static String FILE_OF_CITIES = "/worldcities.csv";
-    // city are ordered compared to their name because the user will enter a name to select a city
     private final static List<City> AVAILABLE_CITIES = load(); 
     private final static City EPFL = new City("EPFL", "Switzerland", GeographicCoordinates.ofDeg(6.57, 46.52));
 
-    /**
-     * @param AVAILABLE_CITIES
-     */
+
     private CityCatalogue() {}
     
-    private static List<City> load() {
-        try(BufferedReader reader = new BufferedReader(new InputStreamReader(CityCatalogue.class.getResourceAsStream(FILE_OF_CITIES), StandardCharsets.UTF_8))){
+    private static List<City> load() { // apostrophe not included in ASCII so use UTF-8
+        
+        try(BufferedReader reader = new BufferedReader(new InputStreamReader(
+                CityCatalogue.class.getResourceAsStream(FILE_OF_CITIES), StandardCharsets.UTF_8))){
+            
             String currentLine;
             List<City> cities = new ArrayList<>();
+            
             reader.readLine();
             while((currentLine = reader.readLine()) != null) {
                 try {
@@ -54,12 +54,13 @@ public final class CityCatalogue{
                     }
                 } catch(NumberFormatException e) {
                     //some names of cities contain comma so the line is not correctly split
-                    // and Double.ParseDouble try to read words but can't and throws NumberFormatException
+                    // and Double.ParseDouble fails when trying to read words and throws NumberFormatException
                     }
             }
-            //cities.add(epfl);$
+            //cities.add(EPFL); TODO when no commented get NullPointer don't understand why
             Collections.sort(cities);
-            return List.copyOf(cities); //TODO SORT
+            return List.copyOf(cities);
+            
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -72,6 +73,9 @@ public final class CityCatalogue{
         return AVAILABLE_CITIES;
     }
     
+    /**
+     * @return the epfl city
+     */
     public static City epfl() {
         return EPFL;
     }
