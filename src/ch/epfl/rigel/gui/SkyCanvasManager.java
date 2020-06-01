@@ -216,7 +216,6 @@ public final class SkyCanvasManager {
     }
     
     /**
-     * 
      * @return the DateTimeBean
      */
     public DateTimeBean dateTimeBean() {

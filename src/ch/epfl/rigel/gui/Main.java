@@ -255,7 +255,7 @@ public final class Main extends Application {
     private HBox starSearch() {
         HBox starSearch = new HBox();
         starSearch.setStyle("-fx-spacing: inherit;"
-                + "-fx-alignment: baseline-left;");
+                          + "-fx-alignment: baseline-left;");
 
         TextField searchBar = new TextField();
         searchBar.setMinWidth(92);
@@ -424,6 +424,7 @@ public final class Main extends Application {
     //=================================== Cities ========================================
     //===================================================================================
     private HBox cityBox() {
+        
         HBox cityBox = new HBox();
         cityBox.setStyle("-fx-spacing: inherit;"
                        + "-fx-alignment: baseline-left;");
@@ -433,13 +434,26 @@ public final class Main extends Application {
         citiesList.setItems(FXCollections.observableList(CityCatalogue.availableCities()));
         citiesList.setValue(CityCatalogue.epfl());
         citiesList.setStyle("-fx-pref-width: 180;");
+        citiesList.setPrefWidth(180);
         
         citiesList.valueProperty().addListener( (o, oV, nV) -> manager.observerLocationBean().
                 setCoordinates(nV.coordinates()));
         
+        //if coordinates of Observer Position Box don't correspond to those of the current city in the citiesList
+        manager.observerLocationBean().lonDegProperty().
+            addListener( (o, oV, nV) -> {
+                if(! (Math.abs(nV.doubleValue() - citiesList.getValue().coordinates().lonDeg()) < 1e-2))
+                    citiesList.setStyle("-fx-background-color : tomato");
+                else
+                    citiesList.setStyle("");  //take back default background color
+            });
+        
         manager.observerLocationBean().latDegProperty().
             addListener( (o, oV, nV) -> {
-                //TODO change appearance if(! (Math.abs(nV.doubleValue() - citiesList.getValue().coordinates().latDeg()) < 1e-2))
+                if(! (Math.abs(nV.doubleValue() - citiesList.getValue().coordinates().latDeg()) < 1e-2))
+                    citiesList.setStyle("-fx-background-color : tomato");
+                else
+                    citiesList.setStyle(""); //take back default background color
             });
         
         cityBox.getChildren().addAll(cityLabel, citiesList);

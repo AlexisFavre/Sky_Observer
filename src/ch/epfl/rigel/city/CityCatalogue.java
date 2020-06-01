@@ -25,8 +25,8 @@ import ch.epfl.rigel.coordinates.GeographicCoordinates;
 public final class CityCatalogue{
     
     private final static String FILE_OF_CITIES = "/worldcities.csv";
+    private final static City EPFL = new City("Epfl", "Switzerland", GeographicCoordinates.ofDeg(6.57, 46.52));
     private final static List<City> AVAILABLE_CITIES = load(); 
-    private final static City EPFL = new City("EPFL", "Switzerland", GeographicCoordinates.ofDeg(6.57, 46.52));
 
 
     private CityCatalogue() {}
@@ -38,6 +38,8 @@ public final class CityCatalogue{
             
             String currentLine;
             List<City> cities = new ArrayList<>();
+            cities.add(EPFL);
+
             
             reader.readLine();
             while((currentLine = reader.readLine()) != null) {
@@ -57,7 +59,6 @@ public final class CityCatalogue{
                     // and Double.ParseDouble fails when trying to read words and throws NumberFormatException
                     }
             }
-            //cities.add(EPFL); TODO when no commented get NullPointer don't understand why
             Collections.sort(cities);
             return List.copyOf(cities);
             
