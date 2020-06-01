@@ -1,5 +1,6 @@
 package ch.epfl.rigel.city;
 import static java.util.Objects.requireNonNull;
+
 import ch.epfl.rigel.coordinates.GeographicCoordinates;
 
 /**
@@ -17,10 +18,9 @@ public final class City implements Comparable<City>{
      * @param country
      * @param coordinates
      */
-    public City(String name, String country,
-            GeographicCoordinates coordinates) {
-        this.name = requireNonNull(name);
-        this.country = requireNonNull(country);
+    public City(String name, String country, GeographicCoordinates coordinates) {
+        this.name        = requireNonNull(name);
+        this.country     = requireNonNull(country);
         this.coordinates = requireNonNull(coordinates);
     }
 
@@ -37,14 +37,43 @@ public final class City implements Comparable<City>{
     public String country() {
         return country;
     }
-
+    
     /**
-     * @return the coordinates
+     * @return the {@link GeographicCoordinates}
      */
     public GeographicCoordinates coordinates() {
         return coordinates;
     }
     
+    @Override
+    public String toString() {
+        return String.format("%s (%s)", name, country);
+    }
+
+    @Override
+    //in our files, some cities appear several times with each time
+    // a little bit different coordinates 
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        City other = (City) obj;
+        if (country == null) {
+            if (other.country != null)
+                return false;
+        } else if (!country.equals(other.country))
+            return false;
+        if (name == null) {
+            if (other.name != null)
+                return false;
+        } else if (!name.equals(other.name))
+            return false;
+        return true;
+    }
+
     /**
      * compare object to this with their name attribute
      * @param o the object to compare with {@code this}

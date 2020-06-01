@@ -1,14 +1,16 @@
 package ch.epfl.rigel.city;
 
+import static ch.epfl.rigel.math.RightOpenInterval.SymmetricROInterOfSize360;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 import ch.epfl.rigel.coordinates.GeographicCoordinates;
 
@@ -25,15 +27,16 @@ public final class CityCatalogue{
     
     private final static String FILE_OF_CITIES = "/worldcities.csv";
     // city are ordered compared to their name because the user will enter a name to select a city
-    public final static List<City> coordinatesOfTheCity = load(); 
+    private final static List<City> AVAILABLE_CITIES = load(); 
+    private final static City EPFL = new City("EPFL", "Switzerland", GeographicCoordinates.ofDeg(6.57, 46.52));
 
     /**
-     * @param coordinatesOfTheCity
+     * @param AVAILABLE_CITIES
      */
-    public CityCatalogue() {}
+    private CityCatalogue() {}
     
     private static List<City> load() {
-        try(BufferedReader reader = new BufferedReader(new InputStreamReader(CityCatalogue.class.getResourceAsStream(FILE_OF_CITIES), StandardCharsets.US_ASCII))){
+        try(BufferedReader reader = new BufferedReader(new InputStreamReader(CityCatalogue.class.getResourceAsStream(FILE_OF_CITIES), StandardCharsets.UTF_8))){
             String currentLine;
             List<City> cities = new ArrayList<>();
             reader.readLine();
@@ -45,16 +48,17 @@ public final class CityCatalogue{
                     double longitude = (! lineInfos[3].equals("")) ? Double.parseDouble(lineInfos[3].substring(1, lineInfos[3].length()-1)) : 0;
                     String country = (! lineInfos[4].equals("")) ? lineInfos[4].substring(1, lineInfos[4].length()-1) : null;
                     if(name != null && country != null) {
-                        City c = new City(name, country, GeographicCoordinates.ofDeg(longitude, latitude));
-                        cities.add(c);
+                        City c = new City(name, country, GeographicCoordinates.ofDeg(SymmetricROInterOfSize360.reduce(longitude), latitude));
+                        if(! cities.contains(c))
+                                cities.add(c);
                     }
                 } catch(NumberFormatException e) {
                     //some names of cities contain comma so the line is not correctly split
                     // and Double.ParseDouble try to read words but can't and throws NumberFormatException
                     }
             }
-            City epfl = new City("Epfl", "Switzerland", GeographicCoordinates.ofDeg(6.57, 46.52));
-            cities.add(epfl);
+            //cities.add(epfl);$
+            Collections.sort(cities);
             return List.copyOf(cities); //TODO SORT
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -64,7 +68,11 @@ public final class CityCatalogue{
     /**
      * @return the coordinatesOfTheCity
      */
-    public List<City> coordinatesOfTheCity() {
-        return coordinatesOfTheCity;
+    public static List<City> availableCities() {
+        return AVAILABLE_CITIES;
+    }
+    
+    public static City epfl() {
+        return EPFL;
     }
 }

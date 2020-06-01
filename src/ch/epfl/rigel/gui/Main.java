@@ -33,6 +33,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.Labeled;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
@@ -74,8 +75,6 @@ public final class Main extends Application {
     private final static int INDEX_ACCELERATOR_X300 = 2;
     private final static int FONT_SIZE = 15;
     
-    private final static double EPFL_LON_DEG = 6.57;
-    private final static double EPFL_LAT_DEG = 46.52;
     private final static double INITIAL_FIEL_OF_VIEW_DEG = 68.4;
     private final static HorizontalCoordinates INITIAl_CENTER_OF_PROJECTION = HorizontalCoordinates.ofDeg(180 + 1.e-12, 22);
     
@@ -85,7 +84,7 @@ public final class Main extends Application {
     private SkyCanvasManager manager;
     private TimeAnimator animator;
     private ZonedDateTime currentInstant;
-
+    
     public static void main(String[] args) {
         launch(args);
     }
@@ -102,9 +101,7 @@ public final class Main extends Application {
         
         // Initiate sky
         DateTimeBean observationTime = new DateTimeBean(currentInstant);
-        ObserverLocationBean epfl    = new ObserverLocationBean();
-        epfl.setLonDeg(EPFL_LON_DEG);
-        epfl.setLatDeg(EPFL_LAT_DEG);
+        ObserverLocationBean epfl    = new ObserverLocationBean(CityCatalogue.epfl().coordinates());
         ViewingParametersBean view   = new ViewingParametersBean(INITIAl_CENTER_OF_PROJECTION, INITIAL_FIEL_OF_VIEW_DEG);
         animator = new TimeAnimator(observationTime);
         manager  = new SkyCanvasManager(CATALOG, observationTime, epfl, view);
@@ -119,7 +116,7 @@ public final class Main extends Application {
         BorderPane mainRoot = new BorderPane();
         mainRoot.setCenter(skyPane);
         mainRoot.setBottom(informationPane());
-        mainRoot.setTop(controlPane(observerPosition(), observationInstant(), timePassing(), starSearch()));
+        mainRoot.setTop(controlPane(observerPosition(), observationInstant(), timePassing(), starSearch(), cityBox()));
         
         primaryStage.setScene(welcomeScene(primaryStage, new Scene(mainRoot)));
         primaryStage.show();
@@ -232,19 +229,23 @@ public final class Main extends Application {
     //====================================================================================================
     
     // top sub-pane of main scene, contain observer position, observation instant and time passing modules
-    private HBox controlPane(HBox observerPosition, HBox observationInstant, HBox timePassing, HBox searchBar) {
+    private HBox controlPane(HBox observerPosition, HBox observationInstant, HBox timePassing, HBox searchBar, HBox cities) {
         
         HBox controlBar = new HBox();
         Separator vertSeparator1 = new Separator(Orientation.VERTICAL);
         Separator vertSeparator2 = new Separator(Orientation.VERTICAL);
         Separator vertSeparator3 = new Separator(Orientation.VERTICAL);
+        Separator vertSeparator4 = new Separator(Orientation.VERTICAL);
+
         controlBar.getChildren().addAll(observerPosition,
                                         vertSeparator1,
                                         observationInstant,
                                         vertSeparator2,
                                         timePassing,
                                         vertSeparator3,
-                                        searchBar);
+                                        searchBar,
+                                        vertSeparator4,
+                                        cities);
         controlBar.setStyle("-fx-spacing: 4; "
                           + "-fx-padding: 4;");
         return controlBar;
@@ -418,19 +419,33 @@ public final class Main extends Application {
         return timePassing;
     }
     
-    //city
-    private HBox city() {
-        HBox city = new HBox();
+    //===================================================================================
+    //=================================== Cities ========================================
+    //===================================================================================
+    private HBox cityBox() {
+        HBox cityBox = new HBox();
+        cityBox.setStyle("-fx-spacing: inherit;"
+                       + "-fx-alignment: baseline-left;");
         
         Label cityLabel = new Label("Ville : ");
         ComboBox<City> citiesList = new ComboBox<>();
-        citiesList.setItems(FXCollections.observableList(CityCatalogue.coordinatesOfTheCity));
+        citiesList.setItems(FXCollections.observableList(CityCatalogue.availableCities()));
+        citiesList.setValue(CityCatalogue.epfl());
         citiesList.setStyle("-fx-pref-width: 180;");
-        //manager.observerLocationBean().coordinatesProperty().
-        return null;
+        
+        citiesList.valueProperty().addListener( (o, oV, nV) -> manager.observerLocationBean().
+                setCoordinates(nV.coordinates()));
+        
+        manager.observerLocationBean().latDegProperty().
+            addListener( (o, oV, nV) -> {
+                //TODO change appearance if(! (Math.abs(nV.doubleValue() - citiesList.getValue().coordinates().latDeg()) < 1e-2))
+            });
+        
+        cityBox.getChildren().addAll(cityLabel, citiesList);
+        return cityBox;
     }
     //===================================================================================
-    //===========================Information Pane========================================
+    //=========================== Information Pane ======================================
     //===================================================================================
     
     //bottom sub-pane of the main scene, display Field of View, Closest Object to the Mouse,
