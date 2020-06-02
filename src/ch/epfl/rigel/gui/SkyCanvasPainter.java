@@ -1,6 +1,5 @@
 package ch.epfl.rigel.gui;
 
-import java.time.LocalTime;
 import java.util.Iterator;
 
 import ch.epfl.rigel.astronomy.Asterism;
@@ -71,9 +70,9 @@ public final class SkyCanvasPainter {
      * @param sky the new actual sky to draw
      * @param planeToCanvas the new actual transformation to use
      */
-    public void actualize(ObservedSky sky, Transform planeToCanvas, LocalTime localTime,
+    public void actualize(ObservedSky sky, Transform planeToCanvas, 
             boolean withStars, boolean withPlanets, boolean withSun, boolean withMoon, boolean withHorizon) {
-        clear(localTime);
+        clear();
         drawSky(sky, planeToCanvas, withStars, withPlanets, withSun, withMoon, withHorizon);
     }
 
@@ -116,11 +115,10 @@ public final class SkyCanvasPainter {
      *                                                                         *
      **************************************************************************/
     
-    /*Clear what has been drawn on the {@code Canvas} and reset it as a sky background color board
-      corresponding to the given time */
-    private void clear(LocalTime time) {
+    //Clear what has been drawn on the {@code Canvas} and reset it as a black board
+    private void clear() {
         graph2D.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        graph2D.setFill(BlackBodyColor.colorForSky(time));
+        graph2D.setFill(FONT_COLOR);
         graph2D.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
     }
 
