@@ -100,14 +100,14 @@ public final class ObservedSky {
         }
     }
 
-    public CartesianCoordinates pointIfVisible(CartesianCoordinates pointOnPlane) {
-        HorizontalCoordinates horizontalCoordinates = projection.inverseApply(pointOnPlane);
-        if(horizontalCoordinates.altDeg() > 0)
-            return pointOnPlane;
-        else
-            return null;
-    }
-
+    /**
+     * Return the screenPoint corresponding to the object of given name if it is above the horizon
+     * else it can't be observed at the actual time and it returns a null point
+     *
+     * @param name name of the object we want the screen point
+     * @return the screen point of the object or null if under the horizon
+     * @throws IllegalArgumentException when the name is unknown (no corresponding objects)
+     */
     public CartesianCoordinates pointForObjectWithName(String name) throws IllegalArgumentException {
         if(name.equals("Soleil"))
             return pointIfVisible(sunPoint);
@@ -244,5 +244,13 @@ public final class ObservedSky {
      */
     public List<Star> stars() {
         return catalog.stars();
+    }
+
+    private CartesianCoordinates pointIfVisible(CartesianCoordinates pointOnPlane) {
+        HorizontalCoordinates horizontalCoordinates = projection.inverseApply(pointOnPlane);
+        if(horizontalCoordinates.altDeg() > 0)
+            return pointOnPlane;
+        else
+            return null;
     }
 }

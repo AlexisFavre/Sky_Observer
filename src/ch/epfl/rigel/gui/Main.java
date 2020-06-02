@@ -23,6 +23,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.collections.FXCollections;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -37,11 +38,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -107,15 +104,9 @@ public final class Main extends Application {
         animator = new TimeAnimator(observationTime);
         manager  = new SkyCanvasManager(CATALOG, observationTime, epfl, view);
         
-        
-        // Pane containing the canvas where the sky is drawn
-        Pane skyPane = new Pane(manager.canvas());
-        manager.canvas().widthProperty().bind(skyPane.widthProperty());
-        manager.canvas().heightProperty().bind(skyPane.heightProperty());
-        
         // Initiate user interface
         BorderPane mainRoot = new BorderPane();
-        mainRoot.setCenter(skyPane);
+        mainRoot.setCenter(manager.skyPane());
         mainRoot.setBottom(informationPane());
         mainRoot.setTop(controlPane(observerPosition(), observationInstant(), timePassing(), starSearch()));
         
@@ -192,7 +183,7 @@ public final class Main extends Application {
         quitWlcScene.setOnFinished(e -> {
             stage.setScene(nextscene);
             joinMainScene.play();
-            manager.canvas().requestFocus();
+            manager.canvas().requestFocus();// TODO try to remove canavs getter for encapsulation
         });
         
         
