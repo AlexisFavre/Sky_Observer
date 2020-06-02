@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import ch.epfl.rigel.astronomy.AsterismLoader;
 import ch.epfl.rigel.astronomy.HygDatabaseLoader;
+import ch.epfl.rigel.astronomy.Planet;
 import ch.epfl.rigel.astronomy.StarCatalogue;
 import ch.epfl.rigel.coordinates.GeographicCoordinates;
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
@@ -119,7 +120,7 @@ public final class Main extends Application {
         mainRoot.setBottom(informationPane());
         mainRoot.setTop(controlPane(observerPosition(), observationInstant(), timePassing(), starSearch()));
         
-        primaryStage.setScene(welcomeScene(primaryStage, new Scene(mainRoot)));
+        primaryStage.setScene(welcomeSceneTo(new Scene(mainRoot), primaryStage));
         primaryStage.show();
     }
     
@@ -135,90 +136,116 @@ public final class Main extends Application {
     //====================================================================================================
     
     //scene that the user see when he loads the application
-    private Scene welcomeScene(Stage stage, Scene nextscene) {
-        StackPane wlcRoot = new StackPane();
-        Scene scene       = new Scene(wlcRoot);
-        ImageView imgV    = new ImageView(loadWelcomeImage()); //TODO find a way to bind size
-        BorderPane presentationPane = new BorderPane(); 
+    private Scene welcomeSceneTo(Scene mainScene, Stage stage) {
+        StackPane welcomeRoot = new StackPane();
+        Scene scene       = new Scene(welcomeRoot);
+        ImageView background   = new ImageView(loadWelcomeImage()); //TODO find a way to bind size
+        background.fitWidthProperty().bind(welcomeRoot.widthProperty());
+        background.fitHeightProperty().bind(welcomeRoot.heightProperty());
+        BorderPane presentationPane = new BorderPane();
         //TODO when we will have finish control bar, must put the same size of window
         
         
         //box used to select celestial objects to draw
-        VBox selectionBox = new VBox(40);
-        selectionBox.setAlignment(Pos.CENTER_RIGHT);
+        HBox selectionBox = new HBox(40);
+        selectionBox.setAlignment(Pos.CENTER);
+        selectionBox.setSpacing(50);
         
-        Text drawingTxt   = new Text("Voulez vous observez le ciel");
+        Text drawingTxt   = new Text("Pick up what you want to observe in the sky");
         drawingTxt.setFill(Color.GHOSTWHITE);
         drawingTxt.setFont(Font.font(20));
         drawingTxt.setWrappingWidth(180);  //TODO should use CSS ??
         drawingTxt.setTextAlignment(TextAlignment.CENTER);
-        
-        selectionBox.getChildren().addAll(
-                drawingTxt,
-                butToDrawCelestailObjects("avec les étoiles   ",    manager.drawWithStars()),
-                butToDrawCelestailObjects("avec les planètes",      manager.drawWithPlanets()),
-                butToDrawCelestailObjects("avec le Soleil       ",  manager.drawWithSun()), //TODO better way to align
-                butToDrawCelestailObjects("avec la Lune       ",    manager.drawWithMoon()),
-                butToDrawCelestailObjects("avec l'horizon     ",    manager.drawWithHorizon()));
+
+        RadioButton starSelector = butToDrawCelestailObjects("stars", manager.drawWithStars(), true);
+        RadioButton planetSelector = butToDrawCelestailObjects("planets",      manager.drawWithPlanets(), false);
+        RadioButton asterismsSelector = butToDrawCelestailObjects("asterims", manager.drawWithAsterisms(), false);
+        starSelector.selectedProperty().addListener(e -> {
+            if(!planetSelector.selectedProperty().get()) {
+                starSelector.selectedProperty().setValue(true);
+            }
+            if(!starSelector.selectedProperty().get()) {
+                asterismsSelector.selectedProperty().setValue(false);
+            }
+        });
+        planetSelector.selectedProperty().addListener(e -> {
+            if(!starSelector.selectedProperty().get()) {
+                planetSelector.selectedProperty().setValue(true);
+            }
+        });
+        asterismsSelector.selectedProperty().addListener(e -> {
+            if(!starSelector.selectedProperty().get()) {
+                asterismsSelector.selectedProperty().setValue(false);
+            }
+        });
+
+        selectionBox.getChildren().addAll(starSelector, planetSelector, asterismsSelector,
+                butToDrawCelestailObjects("sun",  manager.drawWithSun(), false), //TODO better way to align
+                butToDrawCelestailObjects("moon",    manager.drawWithMoon(), false),
+                butToDrawCelestailObjects("with horizon & cardinals",    manager.drawWithHorizon(), true));
         
         
         //box used to present welcome text
-        VBox wlcBox   = new VBox(40);
-        wlcBox.setAlignment(Pos.CENTER);                  
+        VBox welcomeBox   = new VBox(40);
+        welcomeBox.setAlignment(Pos.CENTER);
             
         //presentation texts
-        Text wlcTxt   = new Text("Bienvenue");
-        wlcTxt.setFill(Color.GHOSTWHITE);
-        wlcTxt.setFont(Font.font(90));
+        Text welcomeText   = new Text("Welcome");
+        welcomeText.setFill(Color.GHOSTWHITE);
+        welcomeText.setFont(Font.font(90));
         
-        Text readyTxt = new Text("Prêt à découvrir de nouveaux asterisms, étoiles et planètes ?");
-        readyTxt.setWrappingWidth(700);
-        readyTxt.setTextAlignment(TextAlignment.CENTER);
-        readyTxt.setFill(Color.GHOSTWHITE);
-        readyTxt.setFont(Font.font(40));
+        Text readyText = new Text("Ready to discover stars, planets and asterisms ?");
+        readyText.setWrappingWidth(700);
+        readyText.setTextAlignment(TextAlignment.CENTER);
+        readyText.setFill(Color.GHOSTWHITE);
+        readyText.setFont(Font.font(40));
         
         
         // transitions between the welcome scene to the main scene
-        FadeTransition quitWlcScene = new FadeTransition(Duration.millis(400));
-        quitWlcScene.setNode(wlcRoot);
-        quitWlcScene.setFromValue(1);
-        quitWlcScene.setToValue(0);
+        FadeTransition quitWelcomeScene = new FadeTransition(Duration.millis(800));
+        quitWelcomeScene.setNode(welcomeRoot);
+        quitWelcomeScene.setFromValue(1);
+        quitWelcomeScene.setToValue(0);
         
-        FadeTransition joinMainScene = new FadeTransition(Duration.millis(1000));
-        joinMainScene.setNode(nextscene.getRoot());
-        joinMainScene.setFromValue(0);
+        FadeTransition joinMainScene = new FadeTransition(Duration.millis(1400));
+        joinMainScene.setNode(mainScene.getRoot());
+        joinMainScene.setFromValue(0.1);
         joinMainScene.setToValue(1);
         
-        quitWlcScene.setOnFinished(e -> {
-            stage.setScene(nextscene);
+        quitWelcomeScene.setOnFinished(e -> {
             joinMainScene.play();
+            stage.setScene(mainScene);
+            // TODO put same dimensions to mainScene
+            /*manager.canvas().widthProperty().setValue(welcomeRoot.getWidth());
+            manager.canvas().heightProperty().setValue(welcomeRoot.getHeight());*/
             manager.canvas().requestFocus();
         });
+        quitWelcomeScene.cycleCountProperty();
         
         
         //button to switch to main scene
-        Button switchBut = new Button("Commencer l'observation");
+        Button switchBut = new Button("Start observation");
         switchBut.minWidth(150);
-        switchBut.setOnAction(e -> quitWlcScene.play());
+        switchBut.setOnAction(e -> quitWelcomeScene.play());
         
         
-        wlcBox.getChildren().addAll(wlcTxt, readyTxt, switchBut);
-        wlcBox.setAlignment(Pos.CENTER);
+        welcomeBox.getChildren().addAll(welcomeText, readyText, drawingTxt, selectionBox, switchBut);
+        welcomeBox.setAlignment(Pos.CENTER);
         
-        presentationPane.setCenter(wlcBox);
-        presentationPane.setRight(selectionBox);
+        presentationPane.setCenter(welcomeBox);
+        //presentationPane.setRight(selectionBox);
         
-        wlcRoot.getChildren().addAll(imgV, presentationPane);
+        welcomeRoot.getChildren().addAll(background, presentationPane);
         
         return scene;
     }
     
     // used to make selection buttons with enable to select what we want to draw in the sky
-    private RadioButton butToDrawCelestailObjects(String name, BooleanProperty propertyToBind) {    // TODO find better names
+    private RadioButton butToDrawCelestailObjects(String name, BooleanProperty propertyToBind, boolean preSelect) {    // TODO find better names
         
         RadioButton but = new RadioButton(name);
         but.setAlignment(Pos.TOP_LEFT);
-        but.setSelected(true);
+        but.setSelected(preSelect);
         but.setTextFill(Color.GHOSTWHITE);
         but.setFont(Font.font(15));
         

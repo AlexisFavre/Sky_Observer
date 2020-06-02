@@ -53,6 +53,7 @@ public final class SkyCanvasManager {
     private final BooleanProperty drawWithStars;
     private final BooleanProperty drawWithHorizon;
     private final BooleanProperty drawWithPlanets;
+    private final BooleanProperty drawWithAsterisms;
     private final BooleanProperty drawWithSun;
     private final BooleanProperty drawWithMoon;
     
@@ -89,6 +90,7 @@ public final class SkyCanvasManager {
         
         drawWithStars   = new SimpleBooleanProperty();
         drawWithPlanets = new SimpleBooleanProperty();
+        drawWithAsterisms = new SimpleBooleanProperty();
         drawWithSun     = new SimpleBooleanProperty();
         drawWithMoon    = new SimpleBooleanProperty();
         drawWithHorizon = new SimpleBooleanProperty();
@@ -133,11 +135,11 @@ public final class SkyCanvasManager {
 
         //RE_DRAW SKY VIA LISTENER ==================================================================
         sky.addListener(e -> painter.actualize(sky.get(), planeToCanvas.get(), 
-                drawWithStars.get(), drawWithPlanets.get(), drawWithSun.get(),
+                drawWithStars.get(), drawWithPlanets.get(), drawWithAsterisms.get(), drawWithSun.get(),
                 drawWithMoon.get(), drawWithHorizon.get()));
         
         planeToCanvas.addListener(e -> painter.actualize(sky.get(), planeToCanvas.get(), 
-                drawWithStars.get(), drawWithPlanets.get(), drawWithSun.get(),
+                drawWithStars.get(), drawWithPlanets.get(), drawWithAsterisms.get(), drawWithSun.get(),
                 drawWithMoon.get(), drawWithHorizon.get()));
 
         //KEYBOARD LISTENER ==============================================================================
@@ -283,6 +285,13 @@ public final class SkyCanvasManager {
      */
     public BooleanProperty drawWithPlanets() {
         return drawWithPlanets;
+    }
+
+    /**
+     * @return the drawWithPlanets property
+     */
+    public BooleanProperty drawWithAsterisms() {
+        return drawWithAsterisms;
     }
 
 
