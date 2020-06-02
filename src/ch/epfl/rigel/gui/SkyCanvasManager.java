@@ -132,11 +132,11 @@ public final class SkyCanvasManager {
 
 
         //RE_DRAW SKY VIA LISTENER ==================================================================
-        sky.addListener(e -> painter.actualize(sky.get(), planeToCanvas.get(), 
+        sky.addListener(e -> painter.actualize(sky.get(), planeToCanvas.get(), dtb.getTime(),
                 drawWithStars.get(), drawWithPlanets.get(), drawWithSun.get(),
                 drawWithMoon.get(), drawWithHorizon.get()));
         
-        planeToCanvas.addListener(e -> painter.actualize(sky.get(), planeToCanvas.get(), 
+        planeToCanvas.addListener(e -> painter.actualize(sky.get(), planeToCanvas.get(), dtb.getTime(),
                 drawWithStars.get(), drawWithPlanets.get(), drawWithSun.get(),
                 drawWithMoon.get(), drawWithHorizon.get()));
 
