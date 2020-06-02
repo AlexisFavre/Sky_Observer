@@ -70,9 +70,10 @@ public final class SkyCanvasPainter {
      * @param sky the new actual sky to draw
      * @param planeToCanvas the new actual transformation to use
      */
-    public void actualize(ObservedSky sky, Transform planeToCanvas) {
+    public void actualize(ObservedSky sky, Transform planeToCanvas, 
+            boolean withStars, boolean withPlanets, boolean withSun, boolean withMoon, boolean withHorizon) {
         clear();
-        drawSky(sky, planeToCanvas);
+        drawSky(sky, planeToCanvas, withStars, withPlanets, withSun, withMoon, withHorizon);
     }
 
 
@@ -83,7 +84,7 @@ public final class SkyCanvasPainter {
      * @param planeToCanvas transformation used for matching projection(observed sky) to the computer screen
      *                      (scaling, translation)
      */
-    public void drawSky(ObservedSky sky, Transform planeToCanvas) {
+    public void drawSky(ObservedSky sky, Transform planeToCanvas) { //TODO remove if still unused
         drawSky(sky, planeToCanvas, true, true, true, true, true);
     }
 

@@ -17,26 +17,37 @@ import ch.epfl.rigel.astronomy.HygDatabaseLoader;
 import ch.epfl.rigel.astronomy.StarCatalogue;
 import ch.epfl.rigel.coordinates.GeographicCoordinates;
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
+import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import javafx.util.converter.LocalTimeStringConverter;
 import javafx.util.converter.NumberStringConverter;
 
@@ -89,12 +100,12 @@ public final class Main extends Application {
         
         // Initiate sky
         DateTimeBean observationTime = new DateTimeBean(currentInstant);
-        ObserverLocationBean epfl = new ObserverLocationBean();
+        ObserverLocationBean epfl    = new ObserverLocationBean();
         epfl.setLonDeg(EPFL_LON_DEG);
         epfl.setLatDeg(EPFL_LAT_DEG);
-        ViewingParametersBean view = new ViewingParametersBean(INITIAl_CENTER_OF_PROJECTION, INITIAL_FIEL_OF_VIEW_DEG);
+        ViewingParametersBean view   = new ViewingParametersBean(INITIAl_CENTER_OF_PROJECTION, INITIAL_FIEL_OF_VIEW_DEG);
         animator = new TimeAnimator(observationTime);
-        manager = new SkyCanvasManager(CATALOG, observationTime, epfl, view);
+        manager  = new SkyCanvasManager(CATALOG, observationTime, epfl, view);
         
         
         // Pane containing the canvas where the sky is drawn
@@ -103,15 +114,13 @@ public final class Main extends Application {
         manager.canvas().heightProperty().bind(skyPane.heightProperty());
         
         // Initiate user interface
-        BorderPane root = new BorderPane();
-        root.setCenter(skyPane);
-        root.setBottom(informationPane());
-        root.setTop(controlBar(observerPosition(), observationInstant(), timePassing(), starSearch()));
+        BorderPane mainRoot = new BorderPane();
+        mainRoot.setCenter(skyPane);
+        mainRoot.setBottom(informationPane());
+        mainRoot.setTop(controlPane(observerPosition(), observationInstant(), timePassing(), starSearch()));
         
-        
-        primaryStage.setScene(new Scene(root));
+        primaryStage.setScene(welcomeScene(primaryStage, new Scene(mainRoot)));
         primaryStage.show();
-        manager.canvas().requestFocus();
     }
     
     /* *************************************************************************
@@ -120,17 +129,119 @@ public final class Main extends Application {
      *                                                                         *
      **************************************************************************/
     
-    // top module, contain observer position, observation instant and time passing modules
-    private HBox controlBar(HBox observerPosition, HBox observationInstant, HBox timePassing, HBox searchBar) {
+    
+    //====================================================================================================
+    //==================================== Welcome Scene =================================================
+    //====================================================================================================
+    
+    //scene that the user see when he loads the application
+    private Scene welcomeScene(Stage stage, Scene nextscene) {
+        StackPane wlcRoot = new StackPane();
+        Scene scene       = new Scene(wlcRoot);
+        ImageView imgV    = new ImageView(loadWelcomeImage()); //TODO find a way to bind size
+        BorderPane presentationPane = new BorderPane(); 
+        //TODO when we will have finish control bar, must put the same size of window
+        
+        
+        //box used to select celestial objects to draw
+        VBox selectionBox = new VBox(40);
+        selectionBox.setAlignment(Pos.CENTER_RIGHT);
+        
+        Text drawingTxt   = new Text("Voulez vous observez le ciel");
+        drawingTxt.setFill(Color.GHOSTWHITE);
+        drawingTxt.setFont(Font.font(20));
+        drawingTxt.setWrappingWidth(180);  //TODO should use CSS ??
+        drawingTxt.setTextAlignment(TextAlignment.CENTER);
+        
+        selectionBox.getChildren().addAll(
+                drawingTxt,
+                butToDrawCelestailObjects("avec les étoiles   ",    manager.drawWithStars()),
+                butToDrawCelestailObjects("avec les planètes",      manager.drawWithPlanets()),
+                butToDrawCelestailObjects("avec le Soleil       ",  manager.drawWithSun()), //TODO better way to align
+                butToDrawCelestailObjects("avec la Lune       ",    manager.drawWithMoon()),
+                butToDrawCelestailObjects("avec l'horizon     ",    manager.drawWithHorizon()));
+        
+        
+        //box used to present welcome text
+        VBox wlcBox   = new VBox(40);
+        wlcBox.setAlignment(Pos.CENTER);                  
+            
+        //presentation texts
+        Text wlcTxt   = new Text("Bienvenue");
+        wlcTxt.setFill(Color.GHOSTWHITE);
+        wlcTxt.setFont(Font.font(90));
+        
+        Text readyTxt = new Text("Prêt à découvrir de nouveaux asterisms, étoiles et planètes ?");
+        readyTxt.setWrappingWidth(700);
+        readyTxt.setTextAlignment(TextAlignment.CENTER);
+        readyTxt.setFill(Color.GHOSTWHITE);
+        readyTxt.setFont(Font.font(40));
+        
+        
+        // transitions between the welcome scene to the main scene
+        FadeTransition quitWlcScene = new FadeTransition(Duration.millis(400));
+        quitWlcScene.setNode(wlcRoot);
+        quitWlcScene.setFromValue(1);
+        quitWlcScene.setToValue(0);
+        
+        FadeTransition joinMainScene = new FadeTransition(Duration.millis(1000));
+        joinMainScene.setNode(nextscene.getRoot());
+        joinMainScene.setFromValue(0);
+        joinMainScene.setToValue(1);
+        
+        quitWlcScene.setOnFinished(e -> {
+            stage.setScene(nextscene);
+            joinMainScene.play();
+            manager.canvas().requestFocus();
+        });
+        
+        
+        //button to switch to main scene
+        Button switchBut = new Button("Commencer l'observation");
+        switchBut.minWidth(150);
+        switchBut.setOnAction(e -> quitWlcScene.play());
+        
+        
+        wlcBox.getChildren().addAll(wlcTxt, readyTxt, switchBut);
+        wlcBox.setAlignment(Pos.CENTER);
+        
+        presentationPane.setCenter(wlcBox);
+        presentationPane.setRight(selectionBox);
+        
+        wlcRoot.getChildren().addAll(imgV, presentationPane);
+        
+        return scene;
+    }
+    
+    // used to make selection buttons with enable to select what we want to draw in the sky
+    private RadioButton butToDrawCelestailObjects(String name, BooleanProperty propertyToBind) {    // TODO find better names
+        
+        RadioButton but = new RadioButton(name);
+        but.setAlignment(Pos.TOP_LEFT);
+        but.setSelected(true);
+        but.setTextFill(Color.GHOSTWHITE);
+        but.setFont(Font.font(15));
+        
+        propertyToBind.bind(but.selectedProperty());
+        return but;
+    }
+    //====================================================================================================
+    //====================================== Control Pane =================================================
+    //====================================================================================================
+    
+    // top sub-pane of main scene, contain observer position, observation instant and time passing modules
+    private HBox controlPane(HBox observerPosition, HBox observationInstant, HBox timePassing, HBox searchBar) {
         
         HBox controlBar = new HBox();
         Separator vertSeparator1 = new Separator(Orientation.VERTICAL);
         Separator vertSeparator2 = new Separator(Orientation.VERTICAL);
+        Separator vertSeparator3 = new Separator(Orientation.VERTICAL);
         controlBar.getChildren().addAll(observerPosition,
                                         vertSeparator1,
                                         observationInstant,
                                         vertSeparator2,
                                         timePassing,
+                                        vertSeparator3,
                                         searchBar);
         controlBar.setStyle("-fx-spacing: 4; "
                           + "-fx-padding: 4;");
@@ -155,7 +266,9 @@ public final class Main extends Application {
         return starSearch;
     }
     
-    // observer Position ==================================================================================
+    //====================================================================================================
+    //================================ Observer Position Box =============================================
+    //====================================================================================================
     private HBox observerPosition() {
         
         HBox observerPosition = new HBox();
@@ -208,7 +321,9 @@ public final class Main extends Application {
         return coordinateDisplay;
     }
     
-    // observation instant ==============================================================
+    //====================================================================================================
+    //================================ Observation Instant Box ===========================================
+    //====================================================================================================
     private HBox observationInstant() {
         
         HBox observationInstant = new HBox();
@@ -254,7 +369,9 @@ public final class Main extends Application {
         return timeDisplay;
     }
     
-    // timePassing=======================================================================
+    //====================================================================================================
+    //==================================== Time Passing Box ==============================================
+    //====================================================================================================
     private HBox timePassing() {
         
         HBox timePassing = new HBox();
@@ -299,7 +416,12 @@ public final class Main extends Application {
         return timePassing;
     }
     
-    // Information Pane===================================================================
+    //====================================================================================================
+    //=================================== Information Pane ===============================================
+    //====================================================================================================
+    
+    //bottom sub-pane of the main scene, display Field of View, Closest Object to the Mouse,
+    // and horizontal coordinates of the mouse
     private BorderPane informationPane() {
         
         BorderPane infoPane = new BorderPane();
@@ -333,7 +455,9 @@ public final class Main extends Application {
         return infoPane;
     }
 
-    // additional methods=================================================================
+    //====================================================================================================
+    //==================================== Additional Methods ============================================
+    //====================================================================================================
     private static StarCatalogue initCatalog() {
         
         try (InputStream hygStream = Main.class.getResourceAsStream(NAME_FILE_OF_STARS);
@@ -350,8 +474,17 @@ public final class Main extends Application {
     }
     
     private static Font loadFontAwesome() {
-        try(InputStream fontStream = Main.class.getResourceAsStream("/Font Awesome 5 Free-Solid-900.otf");){
+        try(InputStream fontStream = Main.class.getResourceAsStream("/Font Awesome 5 Free-Solid-900.otf")){
             return Font.loadFont(fontStream, FONT_SIZE);
+            
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+    
+    private static Image loadWelcomeImage() {
+        try(InputStream imgStream = Main.class.getResourceAsStream("/Sky Image.jpg")) {
+            return new Image(imgStream);
             
         } catch (IOException e) {
             throw new UncheckedIOException(e);
