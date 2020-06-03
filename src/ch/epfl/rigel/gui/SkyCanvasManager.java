@@ -27,6 +27,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Polygon;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Transform;
 
@@ -51,8 +52,7 @@ public final class SkyCanvasManager {
 
     private final static double INFO_BOX_WIDTH = 60;
     private final static double INFO_BOX_HEIGTH = 30;
-    private final static double INFO_BOX_SPACING = 10;
-    private final static double INFO_BOX_DOWN_OFFSET = 10;
+    private final static double INFO_BOX_SPACING = 5;
 
     private final Canvas canvas;
     private final SkyCanvasPainter painter;
@@ -72,8 +72,9 @@ public final class SkyCanvasManager {
     private final ObjectProperty<CartesianCoordinates> mousePosition;
     private final ObjectBinding<HorizontalCoordinates> mouseHorizontalPosition;
     private final ObjectBinding<Optional<CelestialObject>> objectUnderMouse;
-    private final ObjectProperty<HorizontalCoordinates> informedObjectPoint;
-    private final ObjectBinding<Optional<CartesianCoordinates>> infoPaneScreenPoint;
+    private final ObjectProperty<HorizontalCoordinates> selectedObjectPoint;
+    private final ObjectBinding<Optional<CartesianCoordinates>> selectedScreenPoint;
+    private String selectedObjectName;
 
     private final DoubleBinding scaleOfView;
     private final ObjectBinding<ObservedSky> sky;
@@ -81,7 +82,6 @@ public final class SkyCanvasManager {
     private final ObjectBinding<Transform> planeToCanvas;
 
     private final ViewAnimator centerAnimator;
-    private CelestialObject objectOfDisplayBox;
 
     
     /**
@@ -94,7 +94,6 @@ public final class SkyCanvasManager {
     public SkyCanvasManager(StarCatalogue catalog, DateTimeBean dtb, ObserverLocationBean olb, ViewingParametersBean vpb) {
 
         centerAnimator = new ViewAnimator(vpb);
-        objectOfDisplayBox = null;
 
         canvas = new Canvas();
         painter = new SkyCanvasPainter(canvas);
@@ -106,7 +105,8 @@ public final class SkyCanvasManager {
         this.vpb = vpb;
 
         mousePosition = new SimpleObjectProperty<>(INITIAL_POS_MOUSE);
-        informedObjectPoint = new SimpleObjectProperty<>(null);
+        selectedObjectPoint = new SimpleObjectProperty<>(null);
+        selectedObjectName = "";
         
         drawWithStars   = new SimpleBooleanProperty();
         drawWithPlanets = new SimpleBooleanProperty();
@@ -151,11 +151,10 @@ public final class SkyCanvasManager {
                 objectClosestTo(mousePosition.get(), MAX_DISTANCE_FOR_CLOSEST_OBJECT_TO/scaleOfView.get()),
                     mousePosition, planeToCanvas, sky);
 
-        infoPaneScreenPoint = Bindings.createObjectBinding(
+        selectedScreenPoint = Bindings.createObjectBinding(
                 () -> {
-                    System.out.println("update");
-                    return infoScreenPoint(informedObjectPoint.get());
-                }, informedObjectPoint);
+                    return screenPointFor(selectedObjectPoint.get());
+                }, planeToCanvas, sky, selectedObjectPoint);
 
 
         //RE_DRAW SKY VIA LISTENER ==================================================================
@@ -167,12 +166,12 @@ public final class SkyCanvasManager {
                 drawWithStars.get(), drawWithPlanets.get(), drawWithSun.get(),
                 drawWithMoon.get(), drawWithHorizon.get()));
 
-        infoPaneScreenPoint.addListener(e -> {
-            if(objectUnderMouse.get().isPresent() && infoPaneScreenPoint.get().isPresent()) {
-                CartesianCoordinates ip = infoPaneScreenPoint.get().get();
+        selectedScreenPoint.addListener(e -> {
+            if(selectedScreenPoint.get().isPresent()) {
+                CartesianCoordinates ip = selectedScreenPoint.get().get();
                 if(ip.x() > INFO_BOX_WIDTH/2 && ip.x() < canvas.getWidth() - INFO_BOX_WIDTH/2
                         && ip.y() < canvas.getHeight() - INFO_BOX_HEIGTH) {
-                    showInfoBoxWith(objectUnderMouse.get().get().name());
+                    showInfoBoxWith(selectedObjectName);
                 } else {
                     System.out.println("too close from the edge");
                 }
@@ -204,26 +203,32 @@ public final class SkyCanvasManager {
         canvas.setOnMousePressed((e -> {
             if(e.isPrimaryButtonDown()) {
                 int size = skyPane.getChildren().size();
-                if(objectUnderMouse.get().isPresent() && canvas.isFocused()) {
-                    HorizontalCoordinates mh = mouseHorizontalPosition.get();
-                    if(objectOfDisplayBox != objectUnderMouse.get().get()) {
-                        informedObjectPoint.setValue(mh);
-                        objectOfDisplayBox = objectUnderMouse.get().get();
-                    } else {
-                        centerAnimator.setDestination(CINTER_0TO360.reduce(mh.azDeg()), RANGE_OBSERVABLE_ALTITUDES.clip(mh.altDeg()));
-                        centerAnimator.start();
-                        if(size > 1) {
-                            objectOfDisplayBox = null;
+                if(canvas.isFocused()) {
+                    if(objectUnderMouse.get().isEmpty()) {
+                        if (size > 1) {
+                            selectedObjectPoint.setValue(null);
                             skyPane.getChildren().remove(size - 1); // TODO duplicate
+                        }
+                    } else {
+                        HorizontalCoordinates mh = mouseHorizontalPosition.get();
+                        boolean newSelection = selectedObjectPoint.get() == null
+                                || selectedObjectPoint.get().angularDistanceTo(mh) > MAX_DISTANCE_FOR_CLOSEST_OBJECT_TO/scaleOfView.get();//TODO empty check
+                        if (newSelection) {
+                            System.out.println("set");
+                            selectedObjectName = objectUnderMouse.get().get().name();
+                            selectedObjectPoint.setValue(mh);
+                        } else {
+                            centerAnimator.setDestination(CINTER_0TO360.reduce(mh.azDeg()), RANGE_OBSERVABLE_ALTITUDES.clip(mh.altDeg()));
+                            centerAnimator.start();
+                            /*if (size > 1) {
+                                objectOfDisplayBox = null;
+                                skyPane.getChildren().remove(size - 1); // TODO duplicate
+                            }*/
                         }
                     }
                 } else {
-                    if(size > 1) {
-                        objectOfDisplayBox = null;
-                        skyPane.getChildren().remove(size - 1); // TODO duplicate
-                    }
+                    canvas.requestFocus();
                 }
-                canvas.requestFocus();
             }
             e.consume();
         }));
@@ -251,16 +256,19 @@ public final class SkyCanvasManager {
         
     } //End Constructor
 
-    private Optional<CartesianCoordinates> infoScreenPoint(HorizontalCoordinates informedPoint) {
-        CartesianCoordinates infoScreenPoint = null;
-        if(informedPoint != null) {
-            HorizontalCoordinates infoPoint = HorizontalCoordinates.of(informedPoint.az(), informedPoint.alt());
+    private Optional<CartesianCoordinates> screenPointFor(HorizontalCoordinates hp) {
+        //CartesianCoordinates infoScreenPoint = null;
+        //if(informedPoint != null) {
+        if(hp == null){
+            return Optional.empty();
+        }
+            HorizontalCoordinates infoPoint = HorizontalCoordinates.of(hp.az(), hp.alt());
             CartesianCoordinates planePoint = projection.get().apply(infoPoint);
             Point2D screenPoint = planeToCanvas.get().transform(planePoint.x(), planePoint.y());
-            infoScreenPoint = CartesianCoordinates.of(screenPoint.getX(), screenPoint.getY());
-        }
-        System.out.println(infoScreenPoint);
-        return Optional.ofNullable(infoScreenPoint);
+            return Optional.of(CartesianCoordinates.of(screenPoint.getX(), screenPoint.getY()));
+        //}
+        //System.out.println(infoScreenPoint);
+        //return Optional.ofNullable(infoScreenPoint);
     }
 
     protected void goToDestinationWithName(String destination) {
@@ -278,19 +286,26 @@ public final class SkyCanvasManager {
     }
 
     private void showInfoBoxWith(String objectName) {
-        if(infoPaneScreenPoint.get().isPresent()) {
+        if(selectedScreenPoint.get().isPresent()) {
             HBox infoBox = new HBox();
-            infoBox.relocate(infoPaneScreenPoint.get().get().x() - INFO_BOX_WIDTH/2 - INFO_BOX_SPACING,
-                    infoPaneScreenPoint.get().get().y() + INFO_BOX_DOWN_OFFSET);
+            /*Polygon triangle = new Polygon();
+            triangle.getPoints().addAll(-20.0, 0.0, 15.0, 0.0, 7.5, -10.0);
+            triangle.setFill(Color.RED);
+            triangle.setStroke(Color.GRAY);
+            triangle.relocate(60.0, 60.0);*/
+
+            infoBox.relocate(selectedScreenPoint.get().get().x() - INFO_BOX_WIDTH/2 - INFO_BOX_SPACING,
+                    selectedScreenPoint.get().get().y() + 10);
             infoBox.setSpacing(INFO_BOX_SPACING);
             infoBox.setPadding(new Insets(INFO_BOX_SPACING));
-            infoBox.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
+            infoBox.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,
+                    CornerRadii.EMPTY, Insets.EMPTY)));
             Label name = new Label(objectName);
             name.setMinWidth(INFO_BOX_WIDTH);
             name.setMinHeight(INFO_BOX_HEIGTH);
             name.setAlignment(Pos.CENTER);
             infoBox.getChildren().addAll(name);
-            skyPane.getChildren().add(infoBox);
+            skyPane.getChildren().addAll(infoBox);
             int size = skyPane.getChildren().size();
             if (size > 2) {
                 skyPane.getChildren().remove(size - 2);
