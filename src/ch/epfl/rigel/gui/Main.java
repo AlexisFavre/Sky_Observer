@@ -151,15 +151,15 @@ public final class Main extends Application {
         selectionBox.setAlignment(Pos.CENTER);
         selectionBox.setSpacing(50);
         
-        Text drawingTxt   = new Text("Pick up what you want to observe in the sky");
+        Text drawingTxt   = new Text("Choisir les éléments à ajouter à l'observation");
         drawingTxt.setFill(Color.GHOSTWHITE);
         drawingTxt.setFont(Font.font(20));
         drawingTxt.setWrappingWidth(180);  //TODO should use CSS ??
         drawingTxt.setTextAlignment(TextAlignment.CENTER);
 
-        RadioButton starSelector = butToDrawCelestailObjects("stars", manager.drawWithStars(), true);
-        RadioButton planetSelector = butToDrawCelestailObjects("planets",      manager.drawWithPlanets(), false);
-        RadioButton asterismsSelector = butToDrawCelestailObjects("asterims", manager.drawWithAsterisms(), false);
+        RadioButton starSelector = butToDrawCelestailObjects("étoiles", manager.drawWithStars(), true);
+        RadioButton planetSelector = butToDrawCelestailObjects("planètes",      manager.drawWithPlanets(), false);
+        RadioButton asterismsSelector = butToDrawCelestailObjects("asterimes", manager.drawWithAsterisms(), false);
         starSelector.selectedProperty().addListener(e -> {
             if(!planetSelector.selectedProperty().get()) {
                 starSelector.selectedProperty().setValue(true);
@@ -180,9 +180,9 @@ public final class Main extends Application {
         });
 
         selectionBox.getChildren().addAll(starSelector, planetSelector, asterismsSelector,
-                butToDrawCelestailObjects("sun",  manager.drawWithSun(), false), //TODO better way to align
-                butToDrawCelestailObjects("moon",    manager.drawWithMoon(), false),
-                butToDrawCelestailObjects("with horizon & cardinals",    manager.drawWithHorizon(), true));
+                butToDrawCelestailObjects("soleil",  manager.drawWithSun(), false), //TODO better way to align
+                butToDrawCelestailObjects("lune",    manager.drawWithMoon(), false),
+                butToDrawCelestailObjects("horizon & cardinaux",    manager.drawWithHorizon(), true));
         
         
         //box used to present welcome text
@@ -190,11 +190,11 @@ public final class Main extends Application {
         welcomeBox.setAlignment(Pos.CENTER);
             
         //presentation texts
-        Text welcomeText   = new Text("Welcome");
+        Text welcomeText   = new Text("Bienvenue");
         welcomeText.setFill(Color.GHOSTWHITE);
         welcomeText.setFont(Font.font(90));
         
-        Text readyText = new Text("Ready to discover stars, planets and asterisms ?");
+        Text readyText = new Text("Prêt à découvrir les étoiles, planètes et asterismes ?");
         readyText.setWrappingWidth(700);
         readyText.setTextAlignment(TextAlignment.CENTER);
         readyText.setFill(Color.GHOSTWHITE);
@@ -224,7 +224,7 @@ public final class Main extends Application {
         
         
         //button to switch to main scene
-        Button switchBut = new Button("Start observation");
+        Button switchBut = new Button("Commencer l'observation");
         switchBut.minWidth(150);
         switchBut.setOnAction(e -> quitWelcomeScene.play());
         

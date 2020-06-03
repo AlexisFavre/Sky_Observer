@@ -40,8 +40,8 @@ public final class SkyCanvasManager {
     private final static ClosedInterval RANGE_FIELD_OF_VIEW_DEG = ClosedInterval.of(30, 150);
     private final static RightOpenInterval CINTER_0TO360 = RightOpenInterval.of(0, 360);
     private final static int MAX_DISTANCE_FOR_CLOSEST_OBJECT_TO = 10;
-    private final static int CHANGE_OF_AZIMUT_WHEN_KEY_PRESSED = 10;
-    private final static int CHANGE_OF_ALTITUDE_WHEN_KEY_PRESSED = 5;
+    private final static int CHANGE_OF_AZIMUT_WHEN_KEY_PRESSED = 2;
+    private final static int CHANGE_OF_ALTITUDE_WHEN_KEY_PRESSED = 1;
     private final static CartesianCoordinates INITIAL_POS_MOUSE = CartesianCoordinates.of(0, 0);
 
     private final Canvas canvas;
