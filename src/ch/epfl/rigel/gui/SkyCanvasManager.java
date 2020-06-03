@@ -221,7 +221,6 @@ public final class SkyCanvasManager {
                                 mouseScreen = screenPointFor(mh).get();
                             }
                             if(isInCanvasLimits(mouseScreen)) {
-                                System.out.println("created");
                                 selectedObjectName = objectUnderMouse.get().get().name();
                                 selectedDistances = objectUnderMouse.get().get().distances();
                                 selectedObjectPoint.setValue(mh);
@@ -286,7 +285,6 @@ public final class SkyCanvasManager {
         int size = skyPane.getChildren().size();
         if (size > index) {
             skyPane.getChildren().remove(size - index);
-            //selectedObjectPoint.setValue(null);
         }
     }
 
@@ -345,8 +343,8 @@ public final class SkyCanvasManager {
     public void removeInfoPanes() {
         while(skyPane.getChildren().size() > 1) {
             popBackBoxAt(1);
-
         }
+        selectedObjectPoint.setValue(null);
     }
     
     // getters ======================================================================================
