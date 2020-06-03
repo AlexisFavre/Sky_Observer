@@ -129,21 +129,21 @@ public final class ObservedSky {
      */
     public CartesianCoordinates pointForObjectWithName(String name) throws IllegalArgumentException {
         if(name.equals("Soleil"))
-            return pointIfVisible(sunPoint) ? sunPoint : null;
+            return isVisible(sunPoint) ? sunPoint : null;
         if(name.equals("Lune"))
-            return pointIfVisible(moonPoint) ? moonPoint : null;
+            return isVisible(moonPoint) ? moonPoint : null;
         for(Planet p: planets) {
             if(p.name().equalsIgnoreCase(name)) {
                 int i = planets.indexOf(p);
                 CartesianCoordinates point = CartesianCoordinates.of(planetPointsRefs[2*i], planetPointsRefs[2*i + 1]);
-                return pointIfVisible(point) ? point : null;
+                return isVisible(point) ? point : null;
             }
         }
         for(Star s: stars()) {
             if(s.name().equalsIgnoreCase(name)) {
                 int i = stars().indexOf(s);
                 CartesianCoordinates point = CartesianCoordinates.of(starPointsRefs[2*i], starPointsRefs[2*i + 1]);
-                return pointIfVisible(point) ? point : null;
+                return isVisible(point) ? point : null;
             }
         }
         throw new IllegalArgumentException("unknown object");
@@ -178,6 +178,17 @@ public final class ObservedSky {
             }
         }
         return Optional.ofNullable(closestObject);
+    }
+
+    /**
+     * Insured that the given point on plane is visible
+     *
+     * @param pointOnPlane
+     * @return
+     */
+    public boolean isVisible(CartesianCoordinates pointOnPlane) {
+        HorizontalCoordinates horizontalCoordinates = projection.inverseApply(pointOnPlane);
+        return horizontalCoordinates.altDeg() > 0;
     }
     
     //getters====================================================================================
@@ -265,16 +276,5 @@ public final class ObservedSky {
      */
     public List<Star> stars() {
         return catalog.stars();
-    }
-
-    /**
-     * Insured that the given point on plane is visible
-     *
-     * @param pointOnPlane
-     * @return
-     */
-    protected boolean pointIfVisible(CartesianCoordinates pointOnPlane) {
-        HorizontalCoordinates horizontalCoordinates = projection.inverseApply(pointOnPlane);
-        return horizontalCoordinates.altDeg() > 0;
     }
 }

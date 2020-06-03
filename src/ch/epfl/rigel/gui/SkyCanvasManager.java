@@ -218,10 +218,10 @@ public final class SkyCanvasManager {
         canvas.setOnMousePressed((e -> {
             if(e.isPrimaryButtonDown()) {
                 if(canvas.isFocused()) {
-                    if(objectUnderMouse.get().isEmpty()) {
+                    HorizontalCoordinates mh = mouseHorizontalPosition.get();
+                    if(objectUnderMouse.get().isEmpty() || !sky.get().isVisible(projection.get().apply(mh))) {
                         removeInfoPanes();
                     } else {
-                        HorizontalCoordinates mh = mouseHorizontalPosition.get();
                         boolean newSelection = selectedObjectPoint.get() == null
                                 || selectedObjectPoint.get().angularDistanceTo(mh)
                                 > MAX_DISTANCE_FOR_CLOSEST_OBJECT_TO/scaleOfView.get();
