@@ -100,6 +100,25 @@ public final class ObservedSky {
         }
     }
 
+    // TODO too much duplicate code
+    public CelestialObject objectAssociatedToName(String name) throws IllegalArgumentException {
+        if(name.equals("Soleil"))
+            return sun;
+        if(name.equals("Lune"))
+            return moon;
+        for(Planet p: planets) {
+            if(p.name().equalsIgnoreCase(name)) {
+                return p;
+            }
+        }
+        for(Star s: stars()) {
+            if(s.name().equalsIgnoreCase(name)) {
+                return s;
+            }
+        }
+        throw new IllegalArgumentException("unknown object");
+    }
+
     /**
      * Return the screenPoint corresponding to the object of given name if it is above the horizon
      * else it can't be observed at the actual time and it returns a null point
@@ -110,19 +129,21 @@ public final class ObservedSky {
      */
     public CartesianCoordinates pointForObjectWithName(String name) throws IllegalArgumentException {
         if(name.equals("Soleil"))
-            return pointIfVisible(sunPoint);
+            return pointIfVisible(sunPoint) ? sunPoint : null;
         if(name.equals("Lune"))
-            return pointIfVisible(moonPoint);
+            return pointIfVisible(moonPoint) ? moonPoint : null;
         for(Planet p: planets) {
             if(p.name().equalsIgnoreCase(name)) {
                 int i = planets.indexOf(p);
-                return pointIfVisible(CartesianCoordinates.of(planetPointsRefs[2*i], planetPointsRefs[2*i + 1]));
+                CartesianCoordinates point = CartesianCoordinates.of(planetPointsRefs[2*i], planetPointsRefs[2*i + 1]);
+                return pointIfVisible(point) ? point : null;
             }
         }
         for(Star s: stars()) {
             if(s.name().equalsIgnoreCase(name)) {
                 int i = stars().indexOf(s);
-                return pointIfVisible(CartesianCoordinates.of(starPointsRefs[2*i], starPointsRefs[2*i + 1]));
+                CartesianCoordinates point = CartesianCoordinates.of(starPointsRefs[2*i], starPointsRefs[2*i + 1]);
+                return pointIfVisible(point) ? point : null;
             }
         }
         throw new IllegalArgumentException("unknown object");
@@ -246,11 +267,14 @@ public final class ObservedSky {
         return catalog.stars();
     }
 
-    private CartesianCoordinates pointIfVisible(CartesianCoordinates pointOnPlane) {
+    /**
+     * Insured that the given point on plane is visible
+     *
+     * @param pointOnPlane
+     * @return
+     */
+    protected boolean pointIfVisible(CartesianCoordinates pointOnPlane) {
         HorizontalCoordinates horizontalCoordinates = projection.inverseApply(pointOnPlane);
-        if(horizontalCoordinates.altDeg() > 0)
-            return pointOnPlane;
-        else
-            return null;
+        return horizontalCoordinates.altDeg() > 0;
     }
 }

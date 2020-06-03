@@ -16,6 +16,7 @@ import ch.epfl.rigel.math.RightOpenInterval;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.binding.ObjectBinding;
+import javafx.beans.binding.StringBinding;
 import javafx.beans.property.*;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
@@ -111,6 +112,7 @@ public final class SkyCanvasManager {
         selectedObjectPoint = new SimpleObjectProperty<>(null);
         errorMessage = new SimpleStringProperty("");
         selectedObjectName = "";
+        selectedDistances = new double[3];
         
         drawWithStars   = new SimpleBooleanProperty();
         drawWithPlanets = new SimpleBooleanProperty();
@@ -178,7 +180,7 @@ public final class SkyCanvasManager {
                 drawWithStars.get(), drawWithPlanets.get(), drawWithAsterisms.get(), drawWithSun.get(),
                 drawWithMoon.get(), drawWithHorizon.get()));
 
-        selectedScreenPoint.addListener(e -> showInfoBoxWith(selectedObjectName, 0));
+        selectedScreenPoint.addListener(e -> showInfoBoxWith(selectedObjectName, selectedDistances));
 
         //KEYBOARD LISTENER ==============================================================================
         canvas.setOnKeyPressed(e -> {
@@ -229,14 +231,9 @@ public final class SkyCanvasManager {
                                 mouseScreen = screenPointFor(mh).get();
                             }
                             if(isInCanvasLimits(mouseScreen)) {
-                                selectedObjectName = objectUnderMouse.get().get().name();
-                                selectedDistances = objectUnderMouse.get().get().distances();
-                                selectedObjectPoint.setValue(mh);
+                                createInfoPointOn(mh, objectUnderMouse.get().get());
                             } else {
                                 errorMessage.setValue("limite atteinte - bordure visuel");
-                            }
-                            if(!overlapingInfos) {
-                                cleanOverlappedInfoPanes();
                             }
                         } else {
                             centerAnimator.setDestination(CINTER_0TO360.reduce(mh.azDeg()),
@@ -297,24 +294,24 @@ public final class SkyCanvasManager {
         }
     }
 
-
-    private void showInfoBoxWith(String objectName, double angularSize) {
+    private void showInfoBoxWith(String objectName, double[] distances) {
         if(selectedScreenPoint.get().isPresent()) {
             Polygon triangle = new Polygon();
-            triangle.getPoints().addAll(0.0, 0.0, 10.0, 0.0, 5.0, -5.0);
+            triangle.getPoints().addAll(0.0, 0.0, INFO_BOX_DOWN_SHIFT, 0.0,
+                    INFO_BOX_DOWN_SHIFT/2, -INFO_BOX_DOWN_SHIFT/2);
             triangle.setFill(Color.LIGHTGRAY);
 
             Label name = new Label(objectName);
             name.setFont(Font.font("Verdana", FontWeight.BOLD, 13));
             Label dist = new Label("distance: ");
-            dist.setFont(new Font(11));
-            /*Label distValue = new Label(String.valueOf(angularSize));
-            size.setFont(new Font(7));*/
+            dist.setFont(Font.font("Verdana", FontWeight.LIGHT, 11));
+            Label average = new Label(String.valueOf(distances[2]));
+            average.setFont(new Font(11));
 
             VBox textBox = new VBox();
             textBox.setAlignment(Pos.TOP_CENTER);
-            textBox.setMinWidth(INFO_BOX_WIDTH - 10);
-            textBox.setMinHeight(INFO_BOX_HEIGTH - 10); //TODO value with triangle
+            textBox.setMinWidth(INFO_BOX_WIDTH);
+            textBox.setMinHeight(INFO_BOX_HEIGTH - INFO_BOX_DOWN_SHIFT);
             textBox.setStyle("-fx-background-color: lightgray;" + "-fx-padding: 5;"
                     + "-fx-background-radius: 2;");
             textBox.getChildren().addAll(triangle, name, dist);
@@ -338,14 +335,40 @@ public final class SkyCanvasManager {
         }
     }
 
+    private void cleanOverlappedInfoPanes() {
+        while(skyPane.getChildren().size() > 2) {
+            popBackBoxAt(1);
+        }
+    }
+
+    private void createInfoPointOn(HorizontalCoordinates point, CelestialObject object) {
+        selectedObjectName = object.name();
+        selectedDistances = object.distances();
+        selectedObjectPoint.setValue(point);
+        if(!overlapingInfos) {
+            cleanOverlappedInfoPanes();
+        }
+    }
+
+    private void cleanErrors() {
+        errorMessage.setValue("");
+    }
+
+    /**
+     * Make a look (projection center) travelling to the object corresponding to the destination name
+     * if it exists and is visible in the sky
+     *
+     * @param destination to look (with travelling)
+     */
     protected void goToDestinationWithName(String destination) {
         try {
             CartesianCoordinates destinationOnPlane = sky.get().pointForObjectWithName(destination);
             if (destinationOnPlane != null) {
                 HorizontalCoordinates coordinates = projection.get().inverseApply(destinationOnPlane);
                 centerAnimator.setDestination(coordinates.azDeg(), coordinates.altDeg());
+                createInfoPointOn(coordinates, sky.get().objectAssociatedToName(destination));
                 centerAnimator.start();
-                errorMessage.setValue("");
+                cleanErrors();
             } else
                 errorMessage.setValue("position géographique invalide pour visualiser cet astre");
         } catch (IllegalArgumentException e) {
@@ -353,12 +376,9 @@ public final class SkyCanvasManager {
         }
     }
 
-    private void cleanOverlappedInfoPanes() {
-        while(skyPane.getChildren().size() > 2) {
-            popBackBoxAt(1);
-        }
-    }
-
+    /**
+     * Remove all the info actual dropped info boxes all over the sky
+     */
     public void removeInfoPanes() {
         cleanOverlappedInfoPanes();
         popBackBoxAt(1);
