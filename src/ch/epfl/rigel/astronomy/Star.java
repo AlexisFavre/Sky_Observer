@@ -28,8 +28,8 @@ public final class Star extends CelestialObject {
      * @throws IllegalArgumentException if the hipparcosId < 0 or the colorIndex is not in [-0.5, +5.5]
      */
     public Star(int hipparcosId, String name, EquatorialCoordinates equatorialPos,
-                float magnitude, float colorIndex) throws IllegalArgumentException {
-        super(name, equatorialPos, 0, magnitude);
+                float magnitude, float colorIndex, float distance) throws IllegalArgumentException {
+        super(name, equatorialPos, 0, magnitude, distance, distance, distance);
         checkArgument(hipparcosId >= 0);
         checkInInterval(RANGE_OF_MAGNITUDE, colorIndex);
         this.hipparcosId = hipparcosId;

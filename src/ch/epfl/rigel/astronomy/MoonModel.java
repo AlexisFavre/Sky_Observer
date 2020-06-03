@@ -73,6 +73,7 @@ public enum MoonModel implements CelestialObjectModel<Moon>{
         /*-----*/ double phase = (1 - Math.cos(orb_longitude - SunModel.SUN.longEcliptic(daysSinceJ2010))) / 2;
         /*-----*/ double angularSize = Angle.ofDeg(0.5181) / p;
         
-        return new Moon(eclipticToEquatorialConversion.apply(position), (float)angularSize, (float)0, (float)phase);
+        return new Moon(eclipticToEquatorialConversion.apply(position), (float)angularSize, (float)0, (float)phase,
+                363000, 405000, 384000);
     }
 }

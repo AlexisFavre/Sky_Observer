@@ -428,6 +428,7 @@ public final class Main extends Application {
             if( !animator.runningProperty().get()) {
                 playButton.setText(UNICODE_FOR_PAUSE_BUT);
                 animator.start();
+                manager.removeInfoPanes();
             
             } else {                                 
                 playButton.setText(UNICODE_FOR_PLAY_BUT);
