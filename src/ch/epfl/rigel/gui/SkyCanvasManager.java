@@ -4,7 +4,6 @@ import static ch.epfl.rigel.math.RightOpenInterval.ROInter_0To360;
 
 import java.util.Optional;
 
-import ch.epfl.rigel.Preconditions;
 import ch.epfl.rigel.astronomy.CelestialObject;
 import ch.epfl.rigel.astronomy.ObservedSky;
 import ch.epfl.rigel.astronomy.StarCatalogue;
@@ -13,18 +12,16 @@ import ch.epfl.rigel.coordinates.HorizontalCoordinates;
 import ch.epfl.rigel.coordinates.StereographicProjection;
 import ch.epfl.rigel.math.Angle;
 import ch.epfl.rigel.math.ClosedInterval;
-import ch.epfl.rigel.math.Interval;
 import ch.epfl.rigel.math.RightOpenInterval;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.binding.ObjectBinding;
-import javafx.beans.binding.StringBinding;
 import javafx.beans.property.*;
-import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
@@ -52,8 +49,8 @@ public final class SkyCanvasManager {
     private final static int CHANGE_OF_ALTITUDE_WHEN_KEY_PRESSED = 5;
     private final static CartesianCoordinates INITIAL_POS_MOUSE = CartesianCoordinates.of(0, 0);
 
-    private final static double INFO_BOX_WIDTH = 90;
-    private final static double INFO_BOX_HEIGTH = 60;
+    private final static double INFO_BOX_WIDTH = 100;
+    private final static double INFO_BOX_HEIGTH = 70;
     private final static double INFO_BOX_DOWN_SHIFT = 10;
 
     private final Canvas canvas;
@@ -78,6 +75,7 @@ public final class SkyCanvasManager {
     private final ObjectProperty<HorizontalCoordinates> selectedObjectPoint;
     private final ObjectBinding<Optional<CartesianCoordinates>> selectedScreenPoint;
     private final StringProperty errorMessage;
+    private boolean overlapingInfos;
     private String selectedObjectName;
     private double[] selectedDistances;
 
@@ -199,7 +197,17 @@ public final class SkyCanvasManager {
                 case LEFT:
                     vpb.setCenter(HorizontalCoordinates.ofDeg(ROInter_0To360.reduce( az - CHANGE_OF_AZIMUT_WHEN_KEY_PRESSED), alt));
                     break;
+                case COMMAND:
+                    overlapingInfos = true;//TODO Find a way to move with several objects
+                    break;
                 default:
+            }
+            e.consume();
+        });
+
+        canvas.setOnKeyReleased(e -> {
+            if(e.getCode() == KeyCode.COMMAND) {
+                overlapingInfos = false;
             }
             e.consume();
         });
@@ -226,8 +234,9 @@ public final class SkyCanvasManager {
                                 selectedObjectPoint.setValue(mh);
                             } else {
                                 errorMessage.setValue("limite atteinte - bordure visuel");
-                                selectedObjectPoint.setValue(null);
-                                popBackBoxAt(1);
+                            }
+                            if(!overlapingInfos) {
+                                cleanOverlappedInfoPanes();
                             }
                         } else {
                             centerAnimator.setDestination(CINTER_0TO360.reduce(mh.azDeg()),
@@ -311,6 +320,7 @@ public final class SkyCanvasManager {
             textBox.getChildren().addAll(triangle, name, dist);
 
             VBox infoBox = new VBox();
+            //TODO find a way for one box place per object
             infoBox.relocate(selectedScreenPoint.get().get().x() - INFO_BOX_WIDTH/2 + 4, //TODO value
                     selectedScreenPoint.get().get().y() + 4);
             infoBox.setStyle("-fx-background-color: rgba(0, 0, 0, 0);" + "-fx-padding: 0;");
@@ -318,7 +328,10 @@ public final class SkyCanvasManager {
             infoBox.setMaxWidth(INFO_BOX_WIDTH);
             infoBox.setMaxHeight(INFO_BOX_HEIGTH);
 
-            popBackBoxAt(1);
+            if(!overlapingInfos || centerAnimator.runningProperty().getValue()) {
+                cleanOverlappedInfoPanes();
+                popBackBoxAt(1);
+            }
 
             infoBox.getChildren().addAll(triangle, textBox);
             skyPane.getChildren().addAll(infoBox);
@@ -340,10 +353,15 @@ public final class SkyCanvasManager {
         }
     }
 
-    public void removeInfoPanes() {
-        while(skyPane.getChildren().size() > 1) {
+    private void cleanOverlappedInfoPanes() {
+        while(skyPane.getChildren().size() > 2) {
             popBackBoxAt(1);
         }
+    }
+
+    public void removeInfoPanes() {
+        cleanOverlappedInfoPanes();
+        popBackBoxAt(1);
         selectedObjectPoint.setValue(null);
     }
     
