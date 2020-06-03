@@ -4,6 +4,7 @@ import static ch.epfl.rigel.math.RightOpenInterval.ROInter_0To360;
 
 import java.util.Optional;
 
+import ch.epfl.rigel.Preconditions;
 import ch.epfl.rigel.astronomy.CelestialObject;
 import ch.epfl.rigel.astronomy.ObservedSky;
 import ch.epfl.rigel.astronomy.StarCatalogue;
@@ -12,14 +13,13 @@ import ch.epfl.rigel.coordinates.HorizontalCoordinates;
 import ch.epfl.rigel.coordinates.StereographicProjection;
 import ch.epfl.rigel.math.Angle;
 import ch.epfl.rigel.math.ClosedInterval;
+import ch.epfl.rigel.math.Interval;
 import ch.epfl.rigel.math.RightOpenInterval;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.binding.ObjectBinding;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.binding.StringBinding;
+import javafx.beans.property.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
@@ -28,6 +28,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
+import javafx.scene.text.Font;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Transform;
 
@@ -51,8 +52,9 @@ public final class SkyCanvasManager {
     private final static CartesianCoordinates INITIAL_POS_MOUSE = CartesianCoordinates.of(0, 0);
 
     private final static double INFO_BOX_WIDTH = 60;
-    private final static double INFO_BOX_HEIGTH = 30;
-    private final static double INFO_BOX_SPACING = 5;
+    private final static double INFO_BOX_HEIGTH = 40;
+    private final static double INFO_BOX_DOWN_SHIFT = 5;
+    private final static double INFO_BOX_SPACING = 1;
 
     private final Canvas canvas;
     private final SkyCanvasPainter painter;
@@ -75,7 +77,9 @@ public final class SkyCanvasManager {
     private final ObjectBinding<Optional<CelestialObject>> objectUnderMouse;
     private final ObjectProperty<HorizontalCoordinates> selectedObjectPoint;
     private final ObjectBinding<Optional<CartesianCoordinates>> selectedScreenPoint;
+    private final StringProperty errorMessage;
     private String selectedObjectName;
+    private double selectedObjectAngSize;
 
     private final DoubleBinding scaleOfView;
     private final ObjectBinding<ObservedSky> sky;
@@ -107,6 +111,7 @@ public final class SkyCanvasManager {
 
         mousePosition = new SimpleObjectProperty<>(INITIAL_POS_MOUSE);
         selectedObjectPoint = new SimpleObjectProperty<>(null);
+        errorMessage = new SimpleStringProperty("");
         selectedObjectName = "";
         
         drawWithStars   = new SimpleBooleanProperty();
@@ -155,7 +160,14 @@ public final class SkyCanvasManager {
 
         selectedScreenPoint = Bindings.createObjectBinding(
                 () -> {
-                    return screenPointFor(selectedObjectPoint.get());
+                    if(screenPointFor(selectedObjectPoint.get()).isPresent()) {
+                        CartesianCoordinates sp = screenPointFor(selectedObjectPoint.get()).get();
+                        if(isInCanvasLimits(sp)) {
+                            return screenPointFor(selectedObjectPoint.get());
+                        }
+                    }
+                    popBackBoxAt(1);
+                    return Optional.empty();
                 }, planeToCanvas, sky, selectedObjectPoint);
 
 
@@ -168,16 +180,7 @@ public final class SkyCanvasManager {
                 drawWithStars.get(), drawWithPlanets.get(), drawWithAsterisms.get(), drawWithSun.get(),
                 drawWithMoon.get(), drawWithHorizon.get()));
 
-        selectedScreenPoint.addListener(e -> {
-            if(selectedScreenPoint.get().isPresent()) {
-                CartesianCoordinates ip = selectedScreenPoint.get().get();
-                if(ip.x() > INFO_BOX_WIDTH/2 && ip.x() < canvas.getWidth() - INFO_BOX_WIDTH/2
-                        && ip.y() < canvas.getHeight() - INFO_BOX_HEIGTH) {
-                    showInfoBoxWith(selectedObjectName);
-                } else {
-                    System.out.println("too close from the edge");
-                }
-            } });
+        selectedScreenPoint.addListener(e -> showInfoBoxWith(selectedObjectName, selectedObjectAngSize));
 
         //KEYBOARD LISTENER ==============================================================================
         canvas.setOnKeyPressed(e -> {
@@ -204,28 +207,32 @@ public final class SkyCanvasManager {
         //MOUSE CLICKED LISTENER ======================================================================
         canvas.setOnMousePressed((e -> {
             if(e.isPrimaryButtonDown()) {
-                int size = skyPane.getChildren().size();
                 if(canvas.isFocused()) {
                     if(objectUnderMouse.get().isEmpty()) {
-                        if (size > 1) {
-                            selectedObjectPoint.setValue(null);
-                            skyPane.getChildren().remove(size - 1); // TODO duplicate
-                        }
+                        popBackBoxAt(1);
                     } else {
                         HorizontalCoordinates mh = mouseHorizontalPosition.get();
                         boolean newSelection = selectedObjectPoint.get() == null
-                                || selectedObjectPoint.get().angularDistanceTo(mh) > MAX_DISTANCE_FOR_CLOSEST_OBJECT_TO/scaleOfView.get();//TODO empty check
+                                || selectedObjectPoint.get().angularDistanceTo(mh)
+                                > MAX_DISTANCE_FOR_CLOSEST_OBJECT_TO/scaleOfView.get();
                         if (newSelection) {
-                            System.out.println("set");
-                            selectedObjectName = objectUnderMouse.get().get().name();
-                            selectedObjectPoint.setValue(mh);
+                            CartesianCoordinates mouseScreen = INITIAL_POS_MOUSE;
+                            if(screenPointFor(mh).isPresent()) {
+                                mouseScreen = screenPointFor(mh).get();
+                            }
+                            if(isInCanvasLimits(mouseScreen)) {
+                                selectedObjectName = objectUnderMouse.get().get().name();
+                                selectedObjectAngSize = objectUnderMouse.get().get().angularSize();
+                                selectedObjectPoint.setValue(mh);
+                            } else {
+                                errorMessage.setValue("too close from the edge");
+                                selectedObjectPoint.setValue(null);
+                                popBackBoxAt(1);
+                            }
                         } else {
-                            centerAnimator.setDestination(CINTER_0TO360.reduce(mh.azDeg()), RANGE_OBSERVABLE_ALTITUDES.clip(mh.altDeg()));
+                            centerAnimator.setDestination(CINTER_0TO360.reduce(mh.azDeg()),
+                                    RANGE_OBSERVABLE_ALTITUDES.clip(mh.altDeg()));
                             centerAnimator.start();
-                            /*if (size > 1) {
-                                objectOfDisplayBox = null;
-                                skyPane.getChildren().remove(size - 1); // TODO duplicate
-                            }*/
                         }
                     }
                 } else {
@@ -242,7 +249,7 @@ public final class SkyCanvasManager {
                 mousePosition.setValue(CartesianCoordinates.of(mp.getX(), mp.getY()));
 
             } catch (NonInvertibleTransformException error) {
-                System.out.println("un-computable mouse coordinates on plane; cause: non invertible transformation");
+                errorMessage.setValue("un-computable mouse coordinates on plane; cause: non invertible transformation");
             }
             e.consume();
         }));
@@ -258,19 +265,20 @@ public final class SkyCanvasManager {
         
     } //End Constructor
 
+    private boolean isInCanvasLimits(CartesianCoordinates screenPoint) {
+       // System.out.println(screenPoint.y() < canvas.getHeight() - INFO_BOX_HEIGTH - INFO_BOX_SPACING);
+        // TODO magic number and graphic values
+        return screenPoint.x() > INFO_BOX_WIDTH/2 && screenPoint.x() < canvas.getWidth() - INFO_BOX_WIDTH/2
+                && screenPoint.y() < canvas.getHeight() - INFO_BOX_HEIGTH - INFO_BOX_DOWN_SHIFT && screenPoint.y() > 0;
+    }
+
     private Optional<CartesianCoordinates> screenPointFor(HorizontalCoordinates hp) {
-        //CartesianCoordinates infoScreenPoint = null;
-        //if(informedPoint != null) {
         if(hp == null){
             return Optional.empty();
         }
-            HorizontalCoordinates infoPoint = HorizontalCoordinates.of(hp.az(), hp.alt());
-            CartesianCoordinates planePoint = projection.get().apply(infoPoint);
-            Point2D screenPoint = planeToCanvas.get().transform(planePoint.x(), planePoint.y());
-            return Optional.of(CartesianCoordinates.of(screenPoint.getX(), screenPoint.getY()));
-        //}
-        //System.out.println(infoScreenPoint);
-        //return Optional.ofNullable(infoScreenPoint);
+        CartesianCoordinates planePoint = projection.get().apply(hp);
+        Point2D screenPoint = planeToCanvas.get().transform(planePoint.x(), planePoint.y());
+        return Optional.of(CartesianCoordinates.of(screenPoint.getX(), screenPoint.getY()));
     }
 
     protected void goToDestinationWithName(String destination) {
@@ -280,38 +288,52 @@ public final class SkyCanvasManager {
                 HorizontalCoordinates coordinates = projection.get().inverseApply(destinationOnPlane);
                 centerAnimator.setDestination(coordinates.azDeg(), coordinates.altDeg());
                 centerAnimator.start();
+                errorMessage.setValue("");
             } else
-                System.out.println("Votre position sur la terre ne vous permet pas de voir cet astre");
+                errorMessage.setValue("Votre position sur la terre ne vous permet pas de voir cet astre");
         } catch (IllegalArgumentException e) {
-            System.out.println("Cet astre n'est pas référencé");
+            errorMessage.setValue("Cet astre n'est pas référencé");
         }
     }
 
-    private void showInfoBoxWith(String objectName) {
+    private void popBackBoxAt(int index) {
+        int size = skyPane.getChildren().size();
+        if (size > index) {
+            skyPane.getChildren().remove(size - index);
+        }
+    }
+
+    private void showInfoBoxWith(String objectName, double angularSize) {
         if(selectedScreenPoint.get().isPresent()) {
-            HBox infoBox = new HBox();
+            VBox infoBox = new VBox();
             /*Polygon triangle = new Polygon();
             triangle.getPoints().addAll(-20.0, 0.0, 15.0, 0.0, 7.5, -10.0);
             triangle.setFill(Color.RED);
             triangle.setStroke(Color.GRAY);
             triangle.relocate(60.0, 60.0);*/
-
-            infoBox.relocate(selectedScreenPoint.get().get().x() - INFO_BOX_WIDTH/2 - INFO_BOX_SPACING,
-                    selectedScreenPoint.get().get().y() + 10);
+            infoBox.relocate(selectedScreenPoint.get().get().x() - INFO_BOX_WIDTH/2,
+                    selectedScreenPoint.get().get().y() + INFO_BOX_DOWN_SHIFT);
             infoBox.setSpacing(INFO_BOX_SPACING);
             infoBox.setPadding(new Insets(INFO_BOX_SPACING));
             infoBox.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY,
                     CornerRadii.EMPTY, Insets.EMPTY)));
+
             Label name = new Label(objectName);
-            name.setMinWidth(INFO_BOX_WIDTH);
-            name.setMinHeight(INFO_BOX_HEIGTH);
-            name.setAlignment(Pos.CENTER);
-            infoBox.getChildren().addAll(name);
+            name.setFont(new Font(12));
+            Label angular = new Label("taille angulaire: ");
+            angular.setFont(new Font(8));
+            Label size = new Label(String.valueOf(angularSize));
+            size.setFont(new Font(7));
+
+            infoBox.setAlignment(Pos.CENTER);
+            infoBox.setMinWidth(INFO_BOX_WIDTH);
+            infoBox.setMinHeight(INFO_BOX_HEIGTH);
+            infoBox.setMaxWidth(INFO_BOX_WIDTH);
+            infoBox.setMaxHeight(INFO_BOX_HEIGTH);
+
+            infoBox.getChildren().addAll(name, angular, size);
             skyPane.getChildren().addAll(infoBox);
-            int size = skyPane.getChildren().size();
-            if (size > 2) {
-                skyPane.getChildren().remove(size - 2);
-            }
+            popBackBoxAt(2);
         }
     }
     
@@ -350,6 +372,13 @@ public final class SkyCanvasManager {
      */
     public ViewingParametersBean viewingParameterBean() {
         return vpb;
+    }
+
+    /**
+     * @return the errorMessage of the manager
+     */
+    public StringProperty errorMessage() {
+        return errorMessage;
     }
 
     /**

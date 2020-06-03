@@ -111,7 +111,7 @@ public final class Main extends Application {
         mainRoot.setBottom(informationPane());
         mainRoot.setTop(controlPane(observerPosition(), observationInstant(), timePassing(), starSearch()));
         
-        primaryStage.setScene(welcomeSceneTo(new Scene(mainRoot), primaryStage));
+        primaryStage.setScene(welcomeSceneTo(mainRoot, primaryStage));
         primaryStage.show();
     }
     
@@ -127,12 +127,15 @@ public final class Main extends Application {
     //====================================================================================================
     
     //scene that the user see when he loads the application
-    private Scene welcomeSceneTo(Scene mainScene, Stage stage) {
+    private Scene welcomeSceneTo(Pane mainRoot, Stage stage) {
         StackPane welcomeRoot = new StackPane();
+        Scene mainScene = new Scene(mainRoot);
         Scene scene       = new Scene(welcomeRoot);
         ImageView background   = new ImageView(loadWelcomeImage()); //TODO find a way to bind size
         background.fitWidthProperty().bind(welcomeRoot.widthProperty());
         background.fitHeightProperty().bind(welcomeRoot.heightProperty());
+        welcomeRoot.setMinWidth(1400); //TODO find better
+        welcomeRoot.setMinHeight(800);
         BorderPane presentationPane = new BorderPane();
         //TODO when we will have finish control bar, must put the same size of window
         
@@ -209,6 +212,8 @@ public final class Main extends Application {
             // TODO put same dimensions to mainScene
             /*manager.canvas().widthProperty().setValue(welcomeRoot.getWidth());
             manager.canvas().heightProperty().setValue(welcomeRoot.getHeight());*/
+            //mainRoot.minWidth(welcomeRoot.getWidth()); // TODO size adjustments!!!!
+            //mainRoot.minHeight(welcomeRoot.getHeight());
             manager.canvas().requestFocus();
         });
         quitWelcomeScene.cycleCountProperty();
@@ -451,14 +456,9 @@ public final class Main extends Application {
                 Bindings.format("Champ de vue : %.1f°", 
                         manager.viewingParameterBean().fieldOfViewDegProperty())); 
 
-        Text closestObjectText = new Text();
-        closestObjectText.textProperty().bind(Bindings.createStringBinding(
-                () -> {
-                        if (manager.objectUnderMouse().get().isPresent())  
-                            return manager.objectUnderMouse().get().get().info();
-                        return "";
-                     }, 
-                manager.objectUnderMouse()));
+        Text errorLog = new Text();
+        errorLog.textProperty().bind(manager.errorMessage());
+        errorLog.setFill(Color.CRIMSON);
                     
         
         Text observerLookText = new Text();
@@ -467,7 +467,7 @@ public final class Main extends Application {
                 manager.mouseAzDeg(), manager.mouseAltDeg()));
         
         infoPane.setLeft(fieldOfViewText);
-        infoPane.setCenter(closestObjectText);
+        infoPane.setCenter(errorLog);
         infoPane.setRight(observerLookText);
         
         return infoPane;
