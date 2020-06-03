@@ -47,7 +47,7 @@ public final class SkyCanvasPainter {
     private final static Color FONT_COLOR          = Color.BLACK;
     private final static Color PLANET_COLOR        = Color.LIGHTGRAY;
     private final static Color ASTERISM_LINE_COLOR = Color.BLUE;
-    private final static Color HORIZON_COLOR       = Color.RED;
+    private final static Color HORIZON_COLOR       = Color.FIREBRICK;
     private final static String SUN_MAIN_COLOR     = "yellow";
     private final static String BASIC_COLOR        = "white";
 
@@ -71,9 +71,9 @@ public final class SkyCanvasPainter {
      * @param planeToCanvas the new actual transformation to use
      */
     public void actualize(ObservedSky sky, Transform planeToCanvas, 
-            boolean withStars, boolean withPlanets, boolean withSun, boolean withMoon, boolean withHorizon) {
+            boolean withStars, boolean withPlanets, boolean withAsterisms, boolean withSun, boolean withMoon, boolean withHorizon) {
         clear();
-        drawSky(sky, planeToCanvas, withStars, withPlanets, withSun, withMoon, withHorizon);
+        drawSky(sky, planeToCanvas, withStars, withPlanets,withAsterisms, withSun, withMoon, withHorizon);
     }
 
 
@@ -85,7 +85,7 @@ public final class SkyCanvasPainter {
      *                      (scaling, translation)
      */
     public void drawSky(ObservedSky sky, Transform planeToCanvas) { //TODO remove if still unused
-        drawSky(sky, planeToCanvas, true, true, true, true, true);
+        drawSky(sky, planeToCanvas, true, true, true, true, true, true);
     }
 
     /**
@@ -96,7 +96,10 @@ public final class SkyCanvasPainter {
      *                      (scaling, translation)
      */
     public void drawSky(ObservedSky sky, Transform planeToCanvas,
-                        boolean withStars, boolean withPlanets, boolean withSun, boolean withMoon, boolean withHorizon) {
+                        boolean withStars, boolean withPlanets, boolean withAsterisms,
+                        boolean withSun, boolean withMoon, boolean withHorizon) {
+        if(withAsterisms)
+            drawAsterisms(sky, planeToCanvas);
         if(withStars)
             drawStars(sky, planeToCanvas);
         if(withPlanets)
@@ -122,7 +125,7 @@ public final class SkyCanvasPainter {
         graph2D.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
     }
 
-    private void drawStars(ObservedSky sky, Transform planeToCanvas) {
+    private void drawAsterisms(ObservedSky sky, Transform planeToCanvas) {
         int length = sky.starPointsRefs().length;
         double[] screenPoints = new double[length];
         planeToCanvas.transform2DPoints(sky.starPointsRefs(), 0, screenPoints, 0, length/2);
@@ -130,20 +133,20 @@ public final class SkyCanvasPainter {
         graph2D.setLineWidth(ASTERISM_LINE_WIDTH);
         graph2D.beginPath();
         graph2D.setStroke(ASTERISM_LINE_COLOR);
-        
+
         for(Asterism a: sky.asterisms()) {
-            
+
             Iterator<Integer> iteratorOverID = sky.asterismIndices(a).iterator();
             int idOfStarFrom = iteratorOverID.next();
-            
+
             while(iteratorOverID.hasNext()) {
-                
+
                 int idOfStarTo = iteratorOverID.next();
                 double xFr = screenPoints[2*idOfStarFrom];
                 double yFr = screenPoints[2*idOfStarFrom+1];
                 double xTo = screenPoints[2*idOfStarTo];
                 double yTo = screenPoints[2*idOfStarTo+1];
-                
+
                 if(canvas.getBoundsInLocal().contains(xFr, yFr) || canvas.getBoundsInLocal().contains(xTo, yTo)) {
                     graph2D.moveTo(xFr, yFr);
                     graph2D.lineTo(xTo, yTo);
@@ -153,6 +156,12 @@ public final class SkyCanvasPainter {
         }
         graph2D.stroke();
         graph2D.closePath();
+    }
+
+    private void drawStars(ObservedSky sky, Transform planeToCanvas) {
+        int length = sky.starPointsRefs().length;
+        double[] screenPoints = new double[length];
+        planeToCanvas.transform2DPoints(sky.starPointsRefs(), 0, screenPoints, 0, length/2);
 
         int i = 0;
         for(Star s: sky.stars()) {
