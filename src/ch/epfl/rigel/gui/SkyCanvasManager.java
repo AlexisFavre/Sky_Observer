@@ -40,8 +40,8 @@ public final class SkyCanvasManager {
     private final static ClosedInterval RANGE_FIELD_OF_VIEW_DEG = ClosedInterval.of(30, 150);
     private final static RightOpenInterval CINTER_0TO360 = RightOpenInterval.of(0, 360);
     private final static int MAX_DISTANCE_FOR_CLOSEST_OBJECT_TO = 10;
-    private final static int CHANGE_OF_AZIMUT_WHEN_KEY_PRESSED = 10;
-    private final static int CHANGE_OF_ALTITUDE_WHEN_KEY_PRESSED = 5;
+    private final static int CHANGE_OF_AZIMUT_WHEN_KEY_PRESSED = 2;
+    private final static int CHANGE_OF_ALTITUDE_WHEN_KEY_PRESSED = 1;
     private final static CartesianCoordinates INITIAL_POS_MOUSE = CartesianCoordinates.of(0, 0);
 
     private final Canvas canvas;
@@ -53,6 +53,7 @@ public final class SkyCanvasManager {
     private final BooleanProperty drawWithStars;
     private final BooleanProperty drawWithHorizon;
     private final BooleanProperty drawWithPlanets;
+    private final BooleanProperty drawWithAsterisms;
     private final BooleanProperty drawWithSun;
     private final BooleanProperty drawWithMoon;
     
@@ -89,6 +90,7 @@ public final class SkyCanvasManager {
         
         drawWithStars   = new SimpleBooleanProperty();
         drawWithPlanets = new SimpleBooleanProperty();
+        drawWithAsterisms = new SimpleBooleanProperty();
         drawWithSun     = new SimpleBooleanProperty();
         drawWithMoon    = new SimpleBooleanProperty();
         drawWithHorizon = new SimpleBooleanProperty();
@@ -133,11 +135,11 @@ public final class SkyCanvasManager {
 
         //RE_DRAW SKY VIA LISTENER ==================================================================
         sky.addListener(e -> painter.actualize(sky.get(), planeToCanvas.get(), 
-                drawWithStars.get(), drawWithPlanets.get(), drawWithSun.get(),
+                drawWithStars.get(), drawWithPlanets.get(), drawWithAsterisms.get(), drawWithSun.get(),
                 drawWithMoon.get(), drawWithHorizon.get()));
         
         planeToCanvas.addListener(e -> painter.actualize(sky.get(), planeToCanvas.get(), 
-                drawWithStars.get(), drawWithPlanets.get(), drawWithSun.get(),
+                drawWithStars.get(), drawWithPlanets.get(), drawWithAsterisms.get(), drawWithSun.get(),
                 drawWithMoon.get(), drawWithHorizon.get()));
 
         //KEYBOARD LISTENER ==============================================================================
@@ -282,6 +284,13 @@ public final class SkyCanvasManager {
      */
     public BooleanProperty drawWithPlanets() {
         return drawWithPlanets;
+    }
+
+    /**
+     * @return the drawWithPlanets property
+     */
+    public BooleanProperty drawWithAsterisms() {
+        return drawWithAsterisms;
     }
 
 
