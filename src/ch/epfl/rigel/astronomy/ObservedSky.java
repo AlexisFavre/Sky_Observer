@@ -1,5 +1,6 @@
 package ch.epfl.rigel.astronomy;
 
+import java.io.OptionalDataException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -99,35 +100,7 @@ public final class ObservedSky {
             starPointsRefs[indexTab++] = point.y();
         }
     }
-
-    public CartesianCoordinates pointIfVisible(CartesianCoordinates pointOnPlane) {
-        HorizontalCoordinates horizontalCoordinates = projection.inverseApply(pointOnPlane);
-        if(horizontalCoordinates.altDeg() > 0)
-            return pointOnPlane;
-        else
-            return null;
-    }
-
-    public CartesianCoordinates pointForObjectWithName(String name) throws IllegalArgumentException {
-        if(name.equals("Soleil"))
-            return pointIfVisible(sunPoint);
-        if(name.equals("Lune"))
-            return pointIfVisible(moonPoint);
-        for(Planet p: planets) {
-            if(p.name().equalsIgnoreCase(name)) {
-                int i = planets.indexOf(p);
-                return pointIfVisible(CartesianCoordinates.of(planetPointsRefs[2*i], planetPointsRefs[2*i + 1]));
-            }
-        }
-        for(Star s: stars()) {
-            if(s.name().equalsIgnoreCase(name)) {
-                int i = stars().indexOf(s);
-                return pointIfVisible(CartesianCoordinates.of(starPointsRefs[2*i], starPointsRefs[2*i + 1]));
-            }
-        }
-        throw new IllegalArgumentException("unknown object");
-    }
-
+    
     /**
      * Gives the closest sky object from the place corresponding to the given plan point
      * if there exists one that is closer to the given maximal distance
@@ -145,7 +118,7 @@ public final class ObservedSky {
             CartesianCoordinates c = skyObjects.get(p);
             
             if(Math.abs(c.x() - point.x()) < actualBestDist   //make preliminary selection
-            && Math.abs(c.y() - point.y()) < actualBestDist) {
+                    && Math.abs(c.y() - point.y()) < actualBestDist) {
                 
                 double distanceFromCurrentCelestialObject = point.distance(c);
                 
@@ -158,6 +131,42 @@ public final class ObservedSky {
         }
         return Optional.ofNullable(closestObject);
     }
+
+    /**
+     * @param name of the celestial object
+     * @return an Optional containing the celestial object Cartesian coordinates with the given name
+     *      if it is visible, otherwise return an {@code Optional.Empty}
+     * @throws IllegalArgumentException if no such object is found
+     */
+    public Optional<CartesianCoordinates> pointForObjectWithName(String name) throws IllegalArgumentException {
+        if(name.equalsIgnoreCase("Soleil"))
+            return pointIfVisible(sunPoint);
+        if(name.equalsIgnoreCase("Lune"))
+            return pointIfVisible(moonPoint);
+        for(Planet p: planets) {
+            if(p.name().equalsIgnoreCase(name)) {
+                int i = planets.indexOf(p);
+                return pointIfVisible(CartesianCoordinates.of(planetPointsRefs[2*i], planetPointsRefs[2*i + 1]));
+            }
+        }
+        for(Star s: stars()) {
+            if(s.name().equalsIgnoreCase(name)) {
+                int i = stars().indexOf(s);
+                return pointIfVisible(CartesianCoordinates.of(starPointsRefs[2*i], starPointsRefs[2*i + 1]));
+            }
+        }
+        throw new IllegalArgumentException("unknown object");
+    }
+    
+    
+    private Optional<CartesianCoordinates> pointIfVisible(CartesianCoordinates pointOnPlane) {
+        HorizontalCoordinates horizontalCoordinates = projection.inverseApply(pointOnPlane);
+        if(horizontalCoordinates.altDeg() > 0)
+            return Optional.of(pointOnPlane);
+        else
+            return Optional.empty();
+    }
+
     
     //getters====================================================================================
 

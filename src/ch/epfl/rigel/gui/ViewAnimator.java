@@ -1,20 +1,26 @@
 package ch.epfl.rigel.gui;
 
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
-import ch.epfl.rigel.math.Angle;
 import ch.epfl.rigel.math.RightOpenInterval;
 import javafx.animation.AnimationTimer;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-// TODO Rise between north edge without making tour
+
+/**
+ * to make animation of the sky
+ * @author Augustin ALLARD (299918)
+ */
 public class ViewAnimator extends AnimationTimer {
 
     private final static double HANDLES_PER_RISING = 40;
+    private final static double MIN_DISTANCE_TO_CONSIDER_DESTIANTION_REACHED = 1e-7;
     private final static RightOpenInterval CINTER_0TO360 = RightOpenInterval.of(0, 360);
-    private ViewingParametersBean vpb;
-    private SimpleBooleanProperty running;
-    private Double azDegDest = null;
-    private Double altDegDest = null;
+    
+    private final ViewingParametersBean vpb;
+    private final SimpleBooleanProperty running;
+    
+    private Double azDegDest;
+    private Double altDegDest;
     private double azDegStep;
     private double altDegStep;
 
@@ -23,20 +29,25 @@ public class ViewAnimator extends AnimationTimer {
      */
     public ViewAnimator(ViewingParametersBean vpb) {
         this.vpb = vpb;
-        running = new SimpleBooleanProperty(false);
+        running  = new SimpleBooleanProperty(false);
     }
 
     public void setDestination(double az, double alt) {
-        azDegDest = az;
+        azDegDest  = az;
         altDegDest = alt;
         // TODO Check border (360/0 pile)
         double azDist = azDegDest - vpb.getCenter().azDeg();
         if(azDist > 180)
-            azDist = -360 + azDist;
+            azDist = -360 + azDist; //TODO MAGIC NUMBERS
         else if (azDist < -180)
             azDist = 360 - Math.abs(azDist);
-        azDegStep = azDist / HANDLES_PER_RISING;
+        azDegStep  = azDist / HANDLES_PER_RISING;
         altDegStep = (altDegDest - vpb.getCenter().altDeg()) / HANDLES_PER_RISING;
+    }
+    
+    private boolean destinationIsReached() {
+        return Math.abs(azDegDest  - vpb.getCenter().azDeg())  < MIN_DISTANCE_TO_CONSIDER_DESTIANTION_REACHED
+            && Math.abs(altDegDest - vpb.getCenter().altDeg()) < MIN_DISTANCE_TO_CONSIDER_DESTIANTION_REACHED;
     }
 
     /**
@@ -48,11 +59,6 @@ public class ViewAnimator extends AnimationTimer {
             running.setValue(true);
             super.start();
         }
-    }
-
-    private boolean destinationIsReached() {
-        return Math.abs(azDegDest - vpb.getCenter().azDeg()) < 1.0e-7
-                && Math.abs(altDegDest - vpb.getCenter().altDeg()) < 1.0e-7;
     }
 
     /**

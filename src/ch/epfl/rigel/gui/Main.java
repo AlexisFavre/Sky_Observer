@@ -79,7 +79,7 @@ public final class Main extends Application {
     private final static double INITIAL_FIEL_OF_VIEW_DEG = 68.4;
     private final static HorizontalCoordinates INITIAl_CENTER_OF_PROJECTION = HorizontalCoordinates.ofDeg(180 + 1.e-12, 22);
     
-    private final static Font FONT_AWESOME = loadFontAwesome();
+    private final static Font FONT_AWESOME     = loadFontAwesome();
     private final static StarCatalogue CATALOG = initCatalog();
     
     private SkyCanvasManager manager;
@@ -234,19 +234,15 @@ public final class Main extends Application {
     private HBox controlPane(HBox observerPosition, HBox observationInstant, HBox timePassing, HBox searchBar, HBox cities) {
         
         HBox controlBar = new HBox();
-        Separator vertSeparator1 = new Separator(Orientation.VERTICAL);
-        Separator vertSeparator2 = new Separator(Orientation.VERTICAL);
-        Separator vertSeparator3 = new Separator(Orientation.VERTICAL); //TODO find cleaner way
-        Separator vertSeparator4 = new Separator(Orientation.VERTICAL);
 
         controlBar.getChildren().addAll(observerPosition,
-                                        vertSeparator1,
+                                        new Separator(Orientation.VERTICAL),
                                         observationInstant,
-                                        vertSeparator2,
+                                        new Separator(Orientation.VERTICAL),
                                         timePassing,
-                                        vertSeparator3,
+                                        new Separator(Orientation.VERTICAL),
                                         searchBar,
-                                        vertSeparator4,
+                                        new Separator(Orientation.VERTICAL),
                                         cities);
         controlBar.setStyle("-fx-spacing: 4; "
                           + "-fx-padding: 4;");
@@ -260,7 +256,7 @@ public final class Main extends Application {
 
         TextField searchBar = new TextField();
         searchBar.setMinWidth(92);
-        searchBar.setPromptText("search a star");
+        searchBar.setPromptText("rechercher un astre");
         searchBar.setOnAction(event -> {
             String destination = searchBar.getText();
             searchBar.deleteText(0, searchBar.getLength());

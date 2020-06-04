@@ -32,7 +32,7 @@ public final class SkyCanvasPainter {
     private final static HorizontalCoordinates CENTER_OF_HORIZON_CIRCLE = HorizontalCoordinates.ofDeg(0, 0);
     private final static ClosedInterval RANGE_OF_MAGNITUDE = ClosedInterval.of(-2, 5);
     
-    private final static double DIAMETER_FACTOR    = Math.tan(Angle.ofDeg(0.5)/4.0);
+    private final static double DIAMETER_FACTOR     = Math.tan(Angle.ofDeg(0.5)/4.0);
     private final static double INFLUENCE_FACT_OF_MAG_ON_SIZE  = 17d / 140d;
     private final static double SIZE_FACTOR_FOR_ZERO_MAGNITUDE = 99d / 140d;
     private final static double SUN_HALO_SCALE_FACT = 2.2;
@@ -42,14 +42,14 @@ public final class SkyCanvasPainter {
     private final static double SUN_HALO_OPACITY    = 0.25;
     private final static double BASIC_OPACITY       = 1;
 
-    private final static int ASTERISM_LINE_WIDTH   = 1;
-    private final static int HORIZON_LINE_WIDTH    = 2;
-    private final static Color FONT_COLOR          = Color.BLACK;
-    private final static Color PLANET_COLOR        = Color.LIGHTGRAY;
-    private final static Color ASTERISM_LINE_COLOR = Color.BLUE;
-    private final static Color HORIZON_COLOR       = Color.FIREBRICK;
-    private final static String SUN_MAIN_COLOR     = "yellow";
-    private final static String BASIC_COLOR        = "white";
+    private final static int ASTERISM_LINE_WIDTH    = 1;
+    private final static int HORIZON_LINE_WIDTH     = 2;
+    private final static Color FONT_COLOR           = Color.BLACK;
+    private final static Color PLANET_COLOR         = Color.LIGHTGRAY;
+    private final static Color ASTERISM_LINE_COLOR  = Color.BLUE;
+    private final static Color HORIZON_COLOR        = Color.FIREBRICK;
+    private final static String SUN_MAIN_COLOR      = "yellow";
+    private final static String BASIC_COLOR         = "white";
 
     
     private final Canvas canvas;
@@ -74,18 +74,6 @@ public final class SkyCanvasPainter {
             boolean withStars, boolean withPlanets, boolean withAsterisms, boolean withSun, boolean withMoon, boolean withHorizon) {
         clear();
         drawSky(sky, planeToCanvas, withStars, withPlanets,withAsterisms, withSun, withMoon, withHorizon);
-    }
-
-
-    /**
-     * Draw the sky on the canvas with all its elements apparent
-     *
-     * @param sky that is drawn
-     * @param planeToCanvas transformation used for matching projection(observed sky) to the computer screen
-     *                      (scaling, translation)
-     */
-    public void drawSky(ObservedSky sky, Transform planeToCanvas) { //TODO remove if still unused
-        drawSky(sky, planeToCanvas, true, true, true, true, true, true);
     }
 
     /**

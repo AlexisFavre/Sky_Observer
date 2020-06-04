@@ -36,13 +36,13 @@ import javafx.scene.transform.Transform;
  */
 public final class SkyCanvasManager {
     
-    private final static ClosedInterval RANGE_OBSERVABLE_ALTITUDES   = ClosedInterval.of(5, 90);
-    private final static ClosedInterval RANGE_FIELD_OF_VIEW_DEG = ClosedInterval.of(30, 150);
     private final static RightOpenInterval CINTER_0TO360 = RightOpenInterval.of(0, 360);
-    private final static int MAX_DISTANCE_FOR_CLOSEST_OBJECT_TO = 10;
-    private final static int CHANGE_OF_AZIMUT_WHEN_KEY_PRESSED = 2;
+    private final static ClosedInterval RANGE_OBSERVABLE_ALTITUDES   = ClosedInterval.of(5, 90);
+    private final static ClosedInterval RANGE_FIELD_OF_VIEW_DEG      = ClosedInterval.of(30, 150);
+    private final static int MAX_DISTANCE_FOR_CLOSEST_OBJECT_TO  = 10;
+    private final static int CHANGE_OF_AZIMUT_WHEN_KEY_PRESSED   = 2;
     private final static int CHANGE_OF_ALTITUDE_WHEN_KEY_PRESSED = 1;
-    private final static CartesianCoordinates INITIAL_POS_MOUSE = CartesianCoordinates.of(0, 0);
+    private final static CartesianCoordinates INITIAL_POS_MOUSE  = CartesianCoordinates.of(0, 0);
 
     private final Canvas canvas;
     private final SkyCanvasPainter painter;
@@ -165,7 +165,7 @@ public final class SkyCanvasManager {
         canvas.setOnMousePressed((e -> {
             if(e.isPrimaryButtonDown()) {
                 if(objectUnderMouse.get().isPresent() && canvas.isFocused()) {
-                    //make coordinates of the closest object the coordinates of the new center of preojection
+                    //make coordinates of the closest object the coordinates of the new center of projection
                     HorizontalCoordinates mh = mouseHorizontalPosition.get();
                     centerAnimator.setDestination(CINTER_0TO360.reduce(mh.azDeg()), RANGE_OBSERVABLE_ALTITUDES.clip(mh.altDeg()));
                     centerAnimator.start();
@@ -251,9 +251,9 @@ public final class SkyCanvasManager {
 
     protected void goToDestinationWithName(String destination) {
         try {
-            CartesianCoordinates destinationOnPlane = sky.get().pointForObjectWithName(destination);
-            if (destinationOnPlane != null) {
-                HorizontalCoordinates coordinates = projection.get().inverseApply(destinationOnPlane);
+            Optional<CartesianCoordinates> destinationOnPlane = sky.get().pointForObjectWithName(destination);
+            if (! destinationOnPlane.isEmpty()) {
+                HorizontalCoordinates coordinates = projection.get().inverseApply(destinationOnPlane.get());
                 centerAnimator.setDestination(coordinates.azDeg(), coordinates.altDeg());
                 centerAnimator.start();
             } else
