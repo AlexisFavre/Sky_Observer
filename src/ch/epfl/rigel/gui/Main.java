@@ -259,6 +259,12 @@ public final class Main extends Application {
         Separator vertSeparator1 = new Separator(Orientation.VERTICAL);
         Separator vertSeparator2 = new Separator(Orientation.VERTICAL);
         Separator vertSeparator3 = new Separator(Orientation.VERTICAL);
+        controlBar.focusedProperty().addListener(e -> { // TODO something like this but working to avoid duplicate
+            if(controlBar.focusedProperty().get()) {
+                System.out.println("hello");
+                manager.removeInfoPanes();
+            }
+        });
         controlBar.getChildren().addAll(observerPosition,
                                         vertSeparator1,
                                         observationInstant,
@@ -428,8 +434,6 @@ public final class Main extends Application {
             if( !animator.runningProperty().get()) {
                 playButton.setText(UNICODE_FOR_PAUSE_BUT);
                 animator.start();
-                manager.removeInfoPanes();
-            
             } else {                                 
                 playButton.setText(UNICODE_FOR_PLAY_BUT);
                 animator.stop();

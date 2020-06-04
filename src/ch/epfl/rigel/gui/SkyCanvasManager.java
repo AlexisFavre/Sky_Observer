@@ -22,6 +22,9 @@ import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -77,6 +80,7 @@ public final class SkyCanvasManager {
     private final ObjectBinding<Optional<CartesianCoordinates>> selectedScreenPoint;
     private final StringProperty errorMessage;
     private boolean overlapingInfos;
+    private HorizontalCoordinates previousPoint;
     private String selectedObjectName;
     private double[] selectedDistances;
 
@@ -111,6 +115,7 @@ public final class SkyCanvasManager {
         mousePosition = new SimpleObjectProperty<>(INITIAL_POS_MOUSE);
         selectedObjectPoint = new SimpleObjectProperty<>(null);
         errorMessage = new SimpleStringProperty("");
+        previousPoint = null;
         selectedObjectName = "";
         selectedDistances = new double[3];
         
@@ -202,6 +207,18 @@ public final class SkyCanvasManager {
                 case COMMAND:
                     overlapingInfos = true;//TODO Find a way to move with several objects
                     break;
+                case BACK_SPACE:
+                    if(skyPane.getChildren().size() > 2) {
+                        popBackBoxAt(1);// return to previous
+                        //TODO Find a better solution than always use inverse conversion (stocking) or Do when list of selected
+                        Optional<CelestialObject> previousObject = sky.get().objectClosestTo(projection.get().apply(previousPoint),
+                                MAX_DISTANCE_FOR_CLOSEST_OBJECT_TO/scaleOfView.get());
+                        if(previousObject.isPresent()) {
+                            selectedObjectName = previousObject.get().name();
+                            selectedDistances = previousObject.get().distances();
+                        }
+                        selectedObjectPoint.setValue(previousPoint);
+                    }
                 default:
             }
             e.consume();
@@ -303,10 +320,12 @@ public final class SkyCanvasManager {
 
             Label name = new Label(objectName);
             name.setFont(Font.font("Verdana", FontWeight.BOLD, 13));
-            Label dist = new Label("distance: ");
+            Label dist = new Label();
+            Label ids = new Label();
+            Label values = new Label();
             dist.setFont(Font.font("Verdana", FontWeight.LIGHT, 11));
-            Label average = new Label(String.valueOf(distances[2]));
-            average.setFont(new Font(11));
+            ids.setFont(new Font(11));
+            values.setFont(Font.font("Verdana", FontWeight.BOLD, 11));
 
             VBox textBox = new VBox();
             textBox.setAlignment(Pos.TOP_CENTER);
@@ -315,6 +334,25 @@ public final class SkyCanvasManager {
             textBox.setStyle("-fx-background-color: lightgray;" + "-fx-padding: 5;"
                     + "-fx-background-radius: 2;");
             textBox.getChildren().addAll(triangle, name, dist);
+
+            if((distances[2] == distances[1]) && (distances[1] == distances [0])) {
+                String val = String.valueOf(distances[0]);
+                if(val.length() > 5) {
+                    dist.setText("distance en A.L"); // TODO not for sun
+                    values.setText(val.substring(0, 5));
+                } else {
+                    dist.setText("distance en UA"); // TODO not for sun
+                    values.setText(val);
+                }
+            } else {
+                dist.setText("dist en UA"); // TODO not for moon
+                ids.setText("Mini   Maxi   Moy");
+                values.setText(String.valueOf(distances[0]).substring(0, 4) + " "
+                        + String.valueOf(distances[1]).substring(0, 4) + " "
+                        + String.valueOf(distances[2]).substring(0, 4));
+                textBox.getChildren().add(ids);
+            }
+            textBox.getChildren().add(values);
 
             VBox infoBox = new VBox();
             //TODO find a way for one box place per object
@@ -344,6 +382,7 @@ public final class SkyCanvasManager {
     private void createInfoPointOn(HorizontalCoordinates point, CelestialObject object) {
         selectedObjectName = object.name();
         selectedDistances = object.distances();
+        previousPoint = selectedObjectPoint.get();
         selectedObjectPoint.setValue(point);
         if(!overlapingInfos) {
             cleanOverlappedInfoPanes();
