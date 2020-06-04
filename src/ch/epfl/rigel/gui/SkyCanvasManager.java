@@ -204,6 +204,7 @@ public final class SkyCanvasManager {
                 case LEFT:
                     vpb.setCenter(HorizontalCoordinates.ofDeg(ROInter_0To360.reduce( az - CHANGE_OF_AZIMUT_WHEN_KEY_PRESSED), alt));
                     break;
+                case CONTROL:
                 case COMMAND:
                     overlapingInfos = true;//TODO Find a way to move with several objects
                     break;
