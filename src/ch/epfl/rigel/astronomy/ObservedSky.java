@@ -131,32 +131,14 @@ public final class ObservedSky {
         return Optional.ofNullable(closestObject);
     }
 
-    // TODO too much duplicate code
-    public CelestialObject objectAssociatedToName(String name) throws IllegalArgumentException {
-        if(name.equals("Soleil"))
-            return sun;
-        if(name.equals("Lune"))
-            return moon;
-        for(Planet p: planets) {
-            if(p.name().equalsIgnoreCase(name)) {
-                return p;
-            }
-        }
-        for(Star s: stars()) {
-            if(s.name().equalsIgnoreCase(name)) {
-                return s;
-            }
-        }
-        throw new IllegalArgumentException("unknown object");
-    }
-
+    // TODO too much duplicate
     public HorizontalCoordinates horizontalPointOf(CelestialObject object) throws  IllegalArgumentException {
-        if(object == sun)
+        if(object.name().equalsIgnoreCase("Soleil"))
             return isVisible(sunPoint) ? projection.inverseApply(sunPoint) : null;
-        if(object == moon)
+        if(object.name().equalsIgnoreCase("Lune"))
             return isVisible(moonPoint) ? projection.inverseApply(moonPoint) : null;
         for(Planet p: planets) {
-            if(object == p) {
+            if(object.name().equalsIgnoreCase(p.name())) {
                 int i = planets.indexOf(p);
                 CartesianCoordinates point = CartesianCoordinates.of(planetPointsRefs[2*i], planetPointsRefs[2*i + 1]);
                 return isVisible(point) ? projection.inverseApply(point) : null;
@@ -180,23 +162,24 @@ public final class ObservedSky {
      * @return the screen point of the object or null if under the horizon
      * @throws IllegalArgumentException when the name is unknown (no corresponding objects)
      */
-    public CartesianCoordinates planePointForObjectNamed(String name) throws IllegalArgumentException {
-        if(name.equals("Soleil"))
-            return isVisible(sunPoint) ? sunPoint : null;
-        if(name.equals("Lune"))
-            return isVisible(moonPoint) ? moonPoint : null;
+    // TODO javadoc
+    public HorizontalCoordinates availableDestinationForObjectNamed(String name) throws IllegalArgumentException {
+        if(name.equalsIgnoreCase("Soleil"))
+            return isVisible(sunPoint) ? projection.inverseApply(sunPoint) : null;
+        if(name.equalsIgnoreCase("Lune"))
+            return isVisible(moonPoint) ? projection.inverseApply(moonPoint) : null;
         for(Planet p: planets) {
             if(p.name().equalsIgnoreCase(name)) {
                 int i = planets.indexOf(p);
                 CartesianCoordinates point = CartesianCoordinates.of(planetPointsRefs[2*i], planetPointsRefs[2*i + 1]);
-                return isVisible(point) ? point : null;
+                return isVisible(point) ? projection.inverseApply(point) : null;
             }
         }
         for(Star s: stars()) {
             if(s.name().equalsIgnoreCase(name)) {
                 int i = stars().indexOf(s);
                 CartesianCoordinates point = CartesianCoordinates.of(starPointsRefs[2*i], starPointsRefs[2*i + 1]);
-                return isVisible(point) ? point : null;
+                return isVisible(point) ? projection.inverseApply(point) : null;
             }
         }
         throw new IllegalArgumentException("unknown object");

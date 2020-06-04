@@ -260,10 +260,10 @@ public final class Main extends Application {
         Separator vertSeparator2 = new Separator(Orientation.VERTICAL);
         Separator vertSeparator3 = new Separator(Orientation.VERTICAL);
         controlBar.focusedProperty().addListener(e -> { // TODO something like this but working to avoid duplicate
-            if(controlBar.focusedProperty().get()) {
+            /*if(controlBar.focusedProperty().get()) {
                 System.out.println("hello");
                 manager.removeInfoPanes();
-            }
+            }*/
         });
         controlBar.getChildren().addAll(observerPosition,
                                         vertSeparator1,
