@@ -80,20 +80,20 @@ public final class SkyCanvasManager {
     public SkyCanvasManager(StarCatalogue catalog, DateTimeBean dtb, ObserverLocationBean olb, ViewingParametersBean vpb) {
 
         centerAnimator = new ViewAnimator(vpb);
-        canvas = new Canvas();
-        painter = new SkyCanvasPainter(canvas);
+        canvas   = new Canvas();
+        painter  = new SkyCanvasPainter(canvas);
         this.olb = olb;
         this.dtb = dtb;
         this.vpb = vpb;
         
         mousePosition = new SimpleObjectProperty<>(INITIAL_POS_MOUSE);
         
-        drawWithStars   = new SimpleBooleanProperty();
-        drawWithPlanets = new SimpleBooleanProperty();
+        drawWithStars     = new SimpleBooleanProperty();
+        drawWithPlanets   = new SimpleBooleanProperty();
         drawWithAsterisms = new SimpleBooleanProperty();
-        drawWithSun     = new SimpleBooleanProperty();
-        drawWithMoon    = new SimpleBooleanProperty();
-        drawWithHorizon = new SimpleBooleanProperty();
+        drawWithSun       = new SimpleBooleanProperty();
+        drawWithMoon      = new SimpleBooleanProperty();
+        drawWithHorizon   = new SimpleBooleanProperty();
 
         //BINDINGS =====================================================================================
         projection = Bindings.createObjectBinding(
@@ -134,18 +134,15 @@ public final class SkyCanvasManager {
 
 
         //RE_DRAW SKY VIA LISTENER ==================================================================
-        sky.addListener(e -> painter.actualize(sky.get(), planeToCanvas.get(), 
-                drawWithStars.get(), drawWithPlanets.get(), drawWithAsterisms.get(), drawWithSun.get(),
-                drawWithMoon.get(), drawWithHorizon.get()));
+        sky.addListener(e           -> actualizePainterWithCurrentParameters());
         
-        planeToCanvas.addListener(e -> painter.actualize(sky.get(), planeToCanvas.get(), 
-                drawWithStars.get(), drawWithPlanets.get(), drawWithAsterisms.get(), drawWithSun.get(),
-                drawWithMoon.get(), drawWithHorizon.get()));
+        planeToCanvas.addListener(e -> actualizePainterWithCurrentParameters());
 
         //KEYBOARD LISTENER ==============================================================================
         canvas.setOnKeyPressed(e -> {
             double az  = vpb.getCenter().azDeg();
             double alt = vpb.getCenter().altDeg();
+            
             switch (e.getCode()) {
                 case UP:
                     vpb.setCenter(HorizontalCoordinates.ofDeg(az, RANGE_OBSERVABLE_ALTITUDES.clip( alt + CHANGE_OF_ALTITUDE_WHEN_KEY_PRESSED)));
@@ -168,9 +165,11 @@ public final class SkyCanvasManager {
         canvas.setOnMousePressed((e -> {
             if(e.isPrimaryButtonDown()) {
                 if(objectUnderMouse.get().isPresent() && canvas.isFocused()) {
+                    //make coordinates of the closest object the coordinates of the new center of preojection
                     HorizontalCoordinates mh = mouseHorizontalPosition.get();
                     centerAnimator.setDestination(CINTER_0TO360.reduce(mh.azDeg()), RANGE_OBSERVABLE_ALTITUDES.clip(mh.altDeg()));
                     centerAnimator.start();
+                
                 } else {
                     canvas.requestFocus();
                 }
@@ -195,6 +194,7 @@ public final class SkyCanvasManager {
             double delta = (Math.abs(e.getDeltaX()) > Math.abs(e.getDeltaY())) 
                             ? e.getDeltaX() 
                             : e.getDeltaY();
+                            
             vpb.setFieldOfViewDeg(RANGE_FIELD_OF_VIEW_DEG.clip(vpb.getFieldOfViewDeg() + delta));
             e.consume();
         });
@@ -218,7 +218,6 @@ public final class SkyCanvasManager {
     }
     
     /**
-     * 
      * @return the DateTimeBean
      */
     public DateTimeBean dateTimeBean() {
@@ -262,6 +261,13 @@ public final class SkyCanvasManager {
         } catch (IllegalArgumentException e) {
             System.out.println("Cet astre n'est pas référencé");
         }
+    }
+    
+    private void actualizePainterWithCurrentParameters() {
+        painter.actualize(sky.get(), planeToCanvas.get(), 
+                drawWithStars.get(), drawWithPlanets.get(),
+                drawWithAsterisms.get(), drawWithSun.get(),
+                drawWithMoon.get(), drawWithHorizon.get());
     }
 
     /**

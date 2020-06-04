@@ -1,12 +1,15 @@
 package ch.epfl.rigel.city;
 
+import static ch.epfl.rigel.math.RightOpenInterval.SymmetricROInterOfSize360;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import ch.epfl.rigel.coordinates.GeographicCoordinates;
 
@@ -22,38 +25,43 @@ import ch.epfl.rigel.coordinates.GeographicCoordinates;
 public final class CityCatalogue{
     
     private final static String FILE_OF_CITIES = "/worldcities.csv";
-    private final Map<String, GeographicCoordinates> coordinatesOfTheCity;
+    private final static City EPFL = new City("Epfl", "Switzerland", GeographicCoordinates.ofDeg(6.57, 46.52));
+    private final static List<City> AVAILABLE_CITIES = load(); 
 
-    /**
-     * @param coordinatesOfTheCity
-     */
-    public CityCatalogue() {
-        this.coordinatesOfTheCity = load();
-    }
+
+    private CityCatalogue() {}
     
-    private Map<String, GeographicCoordinates> load() {
-        try(BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(FILE_OF_CITIES), StandardCharsets.US_ASCII))){
+    private static List<City> load() { // apostrophe not included in ASCII so use UTF-8
+        
+        try(BufferedReader reader = new BufferedReader(new InputStreamReader(
+                CityCatalogue.class.getResourceAsStream(FILE_OF_CITIES), StandardCharsets.UTF_8))){
+            
             String currentLine;
-            TreeMap<String, GeographicCoordinates> coordinatesOfTheCity = new TreeMap<>();
+            List<City> cities = new ArrayList<>();
+            cities.add(EPFL);
+
+            
             reader.readLine();
             while((currentLine = reader.readLine()) != null) {
                 try {
-                String[] lineInfos = currentLine.split(",");
-                String name = (! lineInfos[1].equals("")) ? lineInfos[1].substring(1, lineInfos[1].length()-1) : null;
-                double latitude = (! lineInfos[2].equals("")) ? Double.parseDouble(lineInfos[2].substring(1, lineInfos[2].length()-1)) : 0;
-                double longitude = (! lineInfos[3].equals("")) ? Double.parseDouble(lineInfos[3].substring(1, lineInfos[3].length()-1)) : 0;
-                String country = (! lineInfos[4].equals("")) ? lineInfos[4].substring(1, lineInfos[4].length()-1) : null;
-                if(name != null && country != null) {
-                    StringBuilder sb = new StringBuilder();
-                    sb.append(name).append(" (").append(country).append(")");
-                    GeographicCoordinates coordinates = GeographicCoordinates.ofDeg(longitude, latitude);
-                    coordinatesOfTheCity.put(sb.toString(), coordinates);
-                }
-                } catch(Exception e) {
-                    // many differents types of errors can occurs
-                }
+                    String[] lineInfos = currentLine.split(",");
+                    String name = (! lineInfos[1].equals("")) ? lineInfos[1].substring(1, lineInfos[1].length()-1) : null;
+                    double latitude = (! lineInfos[2].equals("")) ? Double.parseDouble(lineInfos[2].substring(1, lineInfos[2].length()-1)) : 0;
+                    double longitude = (! lineInfos[3].equals("")) ? Double.parseDouble(lineInfos[3].substring(1, lineInfos[3].length()-1)) : 0;
+                    String country = (! lineInfos[4].equals("")) ? lineInfos[4].substring(1, lineInfos[4].length()-1) : null;
+                    if(name != null && country != null) {
+                        City c = new City(name, country, GeographicCoordinates.ofDeg(SymmetricROInterOfSize360.reduce(longitude), latitude));
+                        if(! cities.contains(c))
+                                cities.add(c);
+                    }
+                } catch(NumberFormatException e) {
+                    //some names of cities contain comma so the line is not correctly split
+                    // and Double.ParseDouble fails when trying to read words and throws NumberFormatException
+                    }
             }
-            return Map.copyOf(coordinatesOfTheCity);
+            Collections.sort(cities);
+            return List.copyOf(cities);
+            
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -62,7 +70,14 @@ public final class CityCatalogue{
     /**
      * @return the coordinatesOfTheCity
      */
-    public Map<String, GeographicCoordinates> coordinatesOfTheCity() {
-        return coordinatesOfTheCity;
+    public static List<City> availableCities() {
+        return AVAILABLE_CITIES;
+    }
+    
+    /**
+     * @return the epfl city
+     */
+    public static City epfl() {
+        return EPFL;
     }
 }

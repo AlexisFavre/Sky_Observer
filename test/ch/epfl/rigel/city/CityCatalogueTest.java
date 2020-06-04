@@ -7,7 +7,6 @@ import java.util.Map;
 
 
 import ch.epfl.rigel.coordinates.GeographicCoordinates;
-import ch.epfl.rigel.math.Angle;
 
 public class CityCatalogueTest {
     
@@ -16,30 +15,34 @@ public class CityCatalogueTest {
 
     @Test
     public void testSizeOfMap() throws Exception {
-        assertEquals(13878, map.size());
+        assertEquals(13481, set.size());
     }
     
     @Test
-    public void printKeys() throws Exception {
-        for (String s : map.keySet()) {
-            System.out.println(s);
+    public void printNamesAndCountry() throws Exception {
+        for (City c : set) {
+            System.out.printf("name : %s  country : %s %n", c.name(), c.country());
         }
     }
     
     @Test
     public void testClairtonLat() throws Exception {
-        assertEquals( Angle.ofDeg(40.291165502), map.get("Clairton (United States)").lat(), 1e-1);
+        Object[] tab = set.stream().filter(c -> c.name().equals(c1.name())).toArray();
+        City myC = (City) tab[0];
+        assertEquals( c1.coordinates().lat(), myC.coordinates().lat(), 1e-1);
     }
     
     @Test
     public void testClairtonLong() throws Exception {
-        assertEquals( Angle.ofDeg(-79.88), map.get("Clairton (United States)").lon(), 1e-1);
-    }
+        Object[] tab = set.stream().filter(c -> c.name().equals(c1.name())).toArray();
+        City myC = (City) tab[0];
+        assertEquals( c1.coordinates().lon(), myC.coordinates().lon(), 1e-1);    }
     
     @Test
     public void testPenolaLat() throws Exception {
-        assertEquals( Angle.ofDeg(-37.36), map.get("Penola (Australia)").lat(), 1e-1);
-    }
+        Object[] tab = set.stream().filter(c -> c.name().equals(c2.name())).toArray();
+        City myC = (City) tab[0];
+        assertEquals( c2.coordinates().lat(), myC.coordinates().lat(), 1e-1);    }
     
     @Test
     public void testPenolaLong() throws Exception {

@@ -27,7 +27,12 @@ public final class ObserverLocationBean {
         this.coordinates = Bindings.createObjectBinding(
                 () -> GeographicCoordinates.ofDeg(lonDeg.get(), latDeg.get()) , latDeg, lonDeg);
     }
-
+    
+    public ObserverLocationBean(GeographicCoordinates coordinates) {
+        this();
+        setLonDeg(coordinates.lonDeg());
+        setLatDeg(coordinates.latDeg());
+    }
     //lonDeg ================================================================
     /**
      * @return the property lonDeg that can be visualized

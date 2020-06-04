@@ -2,11 +2,11 @@ package ch.epfl.rigel.coordinates;
 
 import static ch.epfl.rigel.Preconditions.checkArgument;
 import static ch.epfl.rigel.math.ClosedInterval.CSymmetricInterOfSize180;
+import static ch.epfl.rigel.math.RightOpenInterval.SymmetricROInterOfSize360;
 
 import java.util.Locale;
 
 import ch.epfl.rigel.math.Angle;
-import ch.epfl.rigel.math.RightOpenInterval;
 
 /**
  * Type of spherical coordinates that describe a point on the earth where
@@ -18,7 +18,6 @@ import ch.epfl.rigel.math.RightOpenInterval;
  */
 public final class GeographicCoordinates extends SphericalCoordinates {
     
-    private final static RightOpenInterval SymmetricROInterOfSize360 = RightOpenInterval.of(-180, 180);
 
     private GeographicCoordinates(double longitude, double latitude) {
         super(longitude, latitude);
