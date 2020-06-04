@@ -45,24 +45,20 @@ import javafx.scene.transform.Transform;
  */
 public final class SkyCanvasManager {
     
-    private final static ClosedInterval RANGE_OBSERVABLE_ALTITUDES   = ClosedInterval.of(5, 90);
-    private final static ClosedInterval RANGE_FIELD_OF_VIEW_DEG = ClosedInterval.of(30, 150);
+    private final static ClosedInterval ALTITUDE_RANGE  = ClosedInterval.of(5, 90);
+    private final static ClosedInterval ZOOM_RANGE= ClosedInterval.of(30, 150);
     private final static RightOpenInterval CINTER_0TO360 = RightOpenInterval.of(0, 360);
-    private final static int MAX_DISTANCE_FOR_CLOSEST_OBJECT_TO = 10;
-    private final static int CHANGE_OF_AZIMUT_WHEN_KEY_PRESSED = 2;
-    private final static int CHANGE_OF_ALTITUDE_WHEN_KEY_PRESSED = 1;
-    private final static CartesianCoordinates INITIAL_POS_MOUSE = CartesianCoordinates.of(0, 0);
-
+    private final static int TOLERANCE_FOR_OBJ_DETECTION = 10;
+    private final static int AZIMUT_MOVE_STEP = 2;
+    private final static int ALTITUDE_MOVE_STEP = 1;
+    private final static CartesianCoordinates ZERO_POSITION = CartesianCoordinates.of(0, 0);
+    //--------------------------------------------------------------------------------------------
     private final static double INFO_BOX_WIDTH = 100;
     private final static double INFO_BOX_HEIGTH = 70;
     private final static double INFO_BOX_DOWN_SHIFT = 10;
 
     private final Canvas canvas;
     private final SkyCanvasPainter painter;
-    private final Pane skyPane;
-    private final ObserverLocationBean olb;
-    private final DateTimeBean dtb;
-    private final ViewingParametersBean vpb;
     
     private final BooleanProperty drawWithStars;
     private final BooleanProperty drawWithHorizon;
@@ -70,12 +66,24 @@ public final class SkyCanvasManager {
     private final BooleanProperty drawWithAsterisms;
     private final BooleanProperty drawWithSun;
     private final BooleanProperty drawWithMoon;
-    
+
+    private final ObserverLocationBean olb;
+    private final DateTimeBean dtb;
+    private final ViewingParametersBean vpb;
     private final DoubleBinding mouseAzDeg;
     private final DoubleBinding mouseAltDeg;
     private final ObjectProperty<CartesianCoordinates> mousePosition;
     private final ObjectBinding<HorizontalCoordinates> mouseHorizontalPosition;
     private final ObjectBinding<Optional<CelestialObject>> objectUnderMouse;
+
+    private final ObjectBinding<ObservedSky> sky;
+    private final ObjectBinding<StereographicProjection> projection;
+    private final DoubleBinding scaleOfView;
+    private final ObjectBinding<Transform> planeToCanvas;
+    //--------------------------------------------------------------------------------------------
+    private final ViewAnimator centerAnimator;
+
+    private final Pane skyPane;
     private final ObjectProperty<HorizontalCoordinates> selectedObjectPoint;
     private final ObjectBinding<Optional<CartesianCoordinates>> selectedScreenPoint;
     private final StringProperty errorMessage;
@@ -83,14 +91,6 @@ public final class SkyCanvasManager {
     private HorizontalCoordinates previousPoint;
     private String selectedObjectName;
     private double[] selectedDistances;
-
-    private final DoubleBinding scaleOfView;
-    private final ObjectBinding<ObservedSky> sky;
-    private final ObjectBinding<StereographicProjection> projection;
-    private final ObjectBinding<Transform> planeToCanvas;
-
-    private final ViewAnimator centerAnimator;
-
     
     /**
      *
@@ -101,30 +101,31 @@ public final class SkyCanvasManager {
      */
     public SkyCanvasManager(StarCatalogue catalog, DateTimeBean dtb, ObserverLocationBean olb, ViewingParametersBean vpb) {
 
-        centerAnimator = new ViewAnimator(vpb);
-
         canvas = new Canvas();
         painter = new SkyCanvasPainter(canvas);
-        skyPane = new AnchorPane(canvas);
-        canvas.widthProperty().bind(skyPane.widthProperty());
-        canvas.heightProperty().bind(skyPane.heightProperty());
-        this.olb = olb;
-        this.dtb = dtb;
-        this.vpb = vpb;
 
-        mousePosition = new SimpleObjectProperty<>(INITIAL_POS_MOUSE);
-        selectedObjectPoint = new SimpleObjectProperty<>(null);
-        errorMessage = new SimpleStringProperty("");
-        previousPoint = null;
-        selectedObjectName = "";
-        selectedDistances = new double[3];
-        
         drawWithStars   = new SimpleBooleanProperty();
         drawWithPlanets = new SimpleBooleanProperty();
         drawWithAsterisms = new SimpleBooleanProperty();
         drawWithSun     = new SimpleBooleanProperty();
         drawWithMoon    = new SimpleBooleanProperty();
         drawWithHorizon = new SimpleBooleanProperty();
+
+        this.olb = olb;
+        this.dtb = dtb;
+        this.vpb = vpb;
+        mousePosition = new SimpleObjectProperty<>(ZERO_POSITION);
+
+        //--------------------------------------------------------------------------------------------
+        centerAnimator = new ViewAnimator(vpb);
+        skyPane = new AnchorPane(canvas);
+        canvas.widthProperty().bind(skyPane.widthProperty());
+        canvas.heightProperty().bind(skyPane.heightProperty());
+        selectedObjectPoint = new SimpleObjectProperty<>(null);
+        errorMessage = new SimpleStringProperty("");
+        previousPoint = null;
+        selectedObjectName = "";
+        selectedDistances = new double[3];
 
         //BINDINGS =====================================================================================
         projection = Bindings.createObjectBinding(
@@ -160,9 +161,10 @@ public final class SkyCanvasManager {
 
         objectUnderMouse = Bindings.createObjectBinding(
                 () -> sky.get().
-                objectClosestTo(mousePosition.get(), MAX_DISTANCE_FOR_CLOSEST_OBJECT_TO/scaleOfView.get()),
+                objectClosestTo(mousePosition.get(), TOLERANCE_FOR_OBJ_DETECTION/scaleOfView.get()),
                     mousePosition, planeToCanvas, sky);
 
+        //--------------------------------------------------------------------------------------------
         selectedScreenPoint = Bindings.createObjectBinding(
                 () -> {
                     if(screenPointFor(selectedObjectPoint.get()).isPresent()) {
@@ -185,24 +187,25 @@ public final class SkyCanvasManager {
                 drawWithStars.get(), drawWithPlanets.get(), drawWithAsterisms.get(), drawWithSun.get(),
                 drawWithMoon.get(), drawWithHorizon.get()));
 
+        //--------------------------------------------------------------------------------------------
         selectedScreenPoint.addListener(e -> showInfoBoxWith(selectedObjectName, selectedDistances));
 
-        //KEYBOARD LISTENER ==============================================================================
+        //KEYBOARD PRESS LISTENER ====================================================================
         canvas.setOnKeyPressed(e -> {
             double az  = vpb.getCenter().azDeg();
             double alt = vpb.getCenter().altDeg();
             switch (e.getCode()) {
                 case UP:
-                    vpb.setCenter(HorizontalCoordinates.ofDeg(az, RANGE_OBSERVABLE_ALTITUDES.clip( alt + CHANGE_OF_ALTITUDE_WHEN_KEY_PRESSED)));
+                    vpb.setCenter(HorizontalCoordinates.ofDeg(az, ALTITUDE_RANGE.clip( alt + ALTITUDE_MOVE_STEP)));
                     break;
                 case DOWN:
-                    vpb.setCenter(HorizontalCoordinates.ofDeg(az, RANGE_OBSERVABLE_ALTITUDES.clip( alt - CHANGE_OF_ALTITUDE_WHEN_KEY_PRESSED)));
+                    vpb.setCenter(HorizontalCoordinates.ofDeg(az, ALTITUDE_RANGE.clip( alt - ALTITUDE_MOVE_STEP)));
                     break;
                 case RIGHT:
-                    vpb.setCenter(HorizontalCoordinates.ofDeg(ROInter_0To360.reduce( az + CHANGE_OF_AZIMUT_WHEN_KEY_PRESSED), alt));
+                    vpb.setCenter(HorizontalCoordinates.ofDeg(ROInter_0To360.reduce( az + AZIMUT_MOVE_STEP), alt));
                     break;
                 case LEFT:
-                    vpb.setCenter(HorizontalCoordinates.ofDeg(ROInter_0To360.reduce( az - CHANGE_OF_AZIMUT_WHEN_KEY_PRESSED), alt));
+                    vpb.setCenter(HorizontalCoordinates.ofDeg(ROInter_0To360.reduce( az - AZIMUT_MOVE_STEP), alt));
                     break;
                 case CONTROL:
                 case COMMAND:
@@ -213,7 +216,7 @@ public final class SkyCanvasManager {
                         popBackBoxAt(1);// return to previous
                         //TODO Find a better solution than always use inverse conversion (stocking) or Do when list of selected
                         Optional<CelestialObject> previousObject = sky.get().objectClosestTo(projection.get().apply(previousPoint),
-                                MAX_DISTANCE_FOR_CLOSEST_OBJECT_TO/scaleOfView.get());
+                                TOLERANCE_FOR_OBJ_DETECTION/scaleOfView.get());
                         if(previousObject.isPresent()) {
                             selectedObjectName = previousObject.get().name();
                             selectedDistances = previousObject.get().distances();
@@ -225,6 +228,7 @@ public final class SkyCanvasManager {
             e.consume();
         });
 
+        //KEYBOARD RELEASE LISTENER ==================================================================
         canvas.setOnKeyReleased(e -> {
             if(e.getCode() == KeyCode.COMMAND) {
                 overlapingInfos = false;
@@ -242,9 +246,9 @@ public final class SkyCanvasManager {
                     } else {
                         boolean newSelection = selectedObjectPoint.get() == null
                                 || selectedObjectPoint.get().angularDistanceTo(mh)
-                                > MAX_DISTANCE_FOR_CLOSEST_OBJECT_TO/scaleOfView.get();
+                                > TOLERANCE_FOR_OBJ_DETECTION/scaleOfView.get();
                         if (newSelection) {
-                            CartesianCoordinates mouseScreen = INITIAL_POS_MOUSE;
+                            CartesianCoordinates mouseScreen = ZERO_POSITION;
                             if(screenPointFor(mh).isPresent()) {
                                 mouseScreen = screenPointFor(mh).get();
                             }
@@ -255,7 +259,7 @@ public final class SkyCanvasManager {
                             }
                         } else {
                             centerAnimator.setDestination(CINTER_0TO360.reduce(mh.azDeg()),
-                                    RANGE_OBSERVABLE_ALTITUDES.clip(mh.altDeg()));
+                                    ALTITUDE_RANGE.clip(mh.altDeg()));
                             centerAnimator.start();
                         }
                     }
@@ -283,11 +287,14 @@ public final class SkyCanvasManager {
             double delta = (Math.abs(e.getDeltaX()) > Math.abs(e.getDeltaY())) 
                             ? e.getDeltaX() 
                             : e.getDeltaY();
-            vpb.setFieldOfViewDeg(RANGE_FIELD_OF_VIEW_DEG.clip(vpb.getFieldOfViewDeg() + delta));
+            vpb.setFieldOfViewDeg(ZOOM_RANGE.clip(vpb.getFieldOfViewDeg() + delta));
             e.consume();
         });
-        
-    } //End Constructor
+    }
+
+    //====================================================================================================
+    //=================================== IMPLEMENTATION STUFF ===========================================
+    //====================================================================================================
 
     private boolean isInCanvasLimits(CartesianCoordinates screenPoint) {
        // System.out.println(screenPoint.y() < canvas.getHeight() - INFO_BOX_HEIGTH - INFO_BOX_SPACING);
@@ -394,15 +401,19 @@ public final class SkyCanvasManager {
         errorMessage.setValue("");
     }
 
+    //====================================================================================================
+    //=================================== PUBLIC INTERFACE ===============================================
+    //====================================================================================================
+
     /**
      * Make a look (projection center) travelling to the object corresponding to the destination name
      * if it exists and is visible in the sky
      *
      * @param destination to look (with travelling)
      */
-    protected void goToDestinationWithName(String destination) {
+    public void goToDestinationWithName(String destination) {
         try {
-            CartesianCoordinates destinationOnPlane = sky.get().pointForObjectWithName(destination);
+            CartesianCoordinates destinationOnPlane = sky.get().planePointForObjectNamed(destination);
             if (destinationOnPlane != null) {
                 HorizontalCoordinates coordinates = projection.get().inverseApply(destinationOnPlane);
                 centerAnimator.setDestination(coordinates.azDeg(), coordinates.altDeg());

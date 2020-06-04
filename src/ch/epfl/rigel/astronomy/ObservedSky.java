@@ -100,6 +100,37 @@ public final class ObservedSky {
         }
     }
 
+    /**
+     * Gives the closest sky object from the place corresponding to the given plan point
+     * if there exists one that is closer to the given maximal distance
+     *
+     * @param point the point from which we want the closest object
+     * @param maximalDistance distance on the map corresponding to the radius of search
+     * @return an {@code Optional} containing the closest object if there exist one in the maximal distance disc
+     * and {@code Optional.empty} if no enough closed objects have been found
+     */
+    public Optional<CelestialObject> objectClosestTo(CartesianCoordinates point, double maximalDistance) {
+        CelestialObject closestObject = null;
+        double actualBestDist         = maximalDistance;
+
+        for(CelestialObject p : skyObjects.keySet()) {
+            CartesianCoordinates c = skyObjects.get(p);
+
+            if(Math.abs(c.x() - point.x()) < actualBestDist   //make preliminary selection
+                    && Math.abs(c.y() - point.y()) < actualBestDist) {
+
+                double distanceFromCurrentCelestialObject = point.distance(c);
+
+                if(distanceFromCurrentCelestialObject < actualBestDist) {
+
+                    actualBestDist = distanceFromCurrentCelestialObject;
+                    closestObject  = p;
+                }
+            }
+        }
+        return Optional.ofNullable(closestObject);
+    }
+
     // TODO too much duplicate code
     public CelestialObject objectAssociatedToName(String name) throws IllegalArgumentException {
         if(name.equals("Soleil"))
@@ -119,6 +150,28 @@ public final class ObservedSky {
         throw new IllegalArgumentException("unknown object");
     }
 
+    public HorizontalCoordinates horizontalPointOf(CelestialObject object) throws  IllegalArgumentException {
+        if(object == sun)
+            return isVisible(sunPoint) ? projection.inverseApply(sunPoint) : null;
+        if(object == moon)
+            return isVisible(moonPoint) ? projection.inverseApply(moonPoint) : null;
+        for(Planet p: planets) {
+            if(object == p) {
+                int i = planets.indexOf(p);
+                CartesianCoordinates point = CartesianCoordinates.of(planetPointsRefs[2*i], planetPointsRefs[2*i + 1]);
+                return isVisible(point) ? projection.inverseApply(point) : null;
+            }
+        }
+        for(Star s: stars()) {
+            if(object == s) {
+                int i = stars().indexOf(s);
+                CartesianCoordinates point = CartesianCoordinates.of(starPointsRefs[2*i], starPointsRefs[2*i + 1]);
+                return isVisible(point) ? projection.inverseApply(point) : null;
+            }
+        }
+        throw new IllegalArgumentException("unknown object");
+    }
+
     /**
      * Return the screenPoint corresponding to the object of given name if it is above the horizon
      * else it can't be observed at the actual time and it returns a null point
@@ -127,7 +180,7 @@ public final class ObservedSky {
      * @return the screen point of the object or null if under the horizon
      * @throws IllegalArgumentException when the name is unknown (no corresponding objects)
      */
-    public CartesianCoordinates pointForObjectWithName(String name) throws IllegalArgumentException {
+    public CartesianCoordinates planePointForObjectNamed(String name) throws IllegalArgumentException {
         if(name.equals("Soleil"))
             return isVisible(sunPoint) ? sunPoint : null;
         if(name.equals("Lune"))
@@ -147,37 +200,6 @@ public final class ObservedSky {
             }
         }
         throw new IllegalArgumentException("unknown object");
-    }
-
-    /**
-     * Gives the closest sky object from the place corresponding to the given plan point
-     * if there exists one that is closer to the given maximal distance
-     *
-     * @param point the point from which we want the closest object
-     * @param maximalDistance distance on the map corresponding to the radius of search
-     * @return an {@code Optional} containing the closest object if there exist one in the maximal distance disc 
-     * and {@code Optional.empty} if no enough closed objects have been found
-     */
-    public Optional<CelestialObject> objectClosestTo(CartesianCoordinates point, double maximalDistance) {
-        CelestialObject closestObject = null;
-        double actualBestDist         = maximalDistance;
-        
-        for(CelestialObject p : skyObjects.keySet()) {
-            CartesianCoordinates c = skyObjects.get(p);
-            
-            if(Math.abs(c.x() - point.x()) < actualBestDist   //make preliminary selection
-            && Math.abs(c.y() - point.y()) < actualBestDist) {
-                
-                double distanceFromCurrentCelestialObject = point.distance(c);
-                
-                if(distanceFromCurrentCelestialObject < actualBestDist) {
-                    
-                    actualBestDist = distanceFromCurrentCelestialObject;
-                    closestObject  = p;
-                }
-            }
-        }
-        return Optional.ofNullable(closestObject);
     }
 
     /**
