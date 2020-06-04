@@ -71,21 +71,14 @@ public final class SkyCanvasPainter {
      * @param planeToCanvas the new actual transformation to use
      */
     public void actualize(ObservedSky sky, Transform planeToCanvas, 
-            boolean withStars, boolean withPlanets, boolean withAsterisms, boolean withSun, boolean withMoon, boolean withHorizon) {
+            boolean withStars, boolean withPlanets, boolean withAsterisms, 
+            boolean withSun, boolean withMoon, boolean withHorizon,
+            double maxMagnitude) {
         clear();
-        drawSky(sky, planeToCanvas, withStars, withPlanets,withAsterisms, withSun, withMoon, withHorizon);
-    }
-
-
-    /**
-     * Draw the sky on the canvas with all its elements apparent
-     *
-     * @param sky that is drawn
-     * @param planeToCanvas transformation used for matching projection(observed sky) to the computer screen
-     *                      (scaling, translation)
-     */
-    public void drawSky(ObservedSky sky, Transform planeToCanvas) { //TODO remove if still unused
-        drawSky(sky, planeToCanvas, true, true, true, true, true, true);
+        drawSky(sky, planeToCanvas,
+                withStars, withPlanets,withAsterisms,
+                withSun, withMoon, withHorizon,
+                maxMagnitude);
     }
 
     /**
@@ -97,11 +90,12 @@ public final class SkyCanvasPainter {
      */
     public void drawSky(ObservedSky sky, Transform planeToCanvas,
                         boolean withStars, boolean withPlanets, boolean withAsterisms,
-                        boolean withSun, boolean withMoon, boolean withHorizon) {
+                        boolean withSun, boolean withMoon, boolean withHorizon,
+                        double maxMagnitude) {
         if(withAsterisms)
             drawAsterisms(sky, planeToCanvas);
         if(withStars)
-            drawStars(sky, planeToCanvas);
+            drawStars(sky, planeToCanvas, maxMagnitude);
         if(withPlanets)
             drawPlanets(sky, planeToCanvas);
         if(withSun)
@@ -158,15 +152,16 @@ public final class SkyCanvasPainter {
         graph2D.closePath();
     }
 
-    private void drawStars(ObservedSky sky, Transform planeToCanvas) {
+    private void drawStars(ObservedSky sky, Transform planeToCanvas, double maxMagnitude) {
         int length = sky.starPointsRefs().length;
         double[] screenPoints = new double[length];
         planeToCanvas.transform2DPoints(sky.starPointsRefs(), 0, screenPoints, 0, length/2);
 
         int i = 0;
         for(Star s: sky.stars()) {
-            drawEllipseOf(BlackBodyColor.colorForTemperature(s.colorTemperature()),
-                    screenPoints[i], screenPoints[i + 1], s.magnitude(), planeToCanvas);
+            if(s.magnitude() <= maxMagnitude)
+                drawEllipseOf(BlackBodyColor.colorForTemperature(s.colorTemperature()),
+                        screenPoints[i], screenPoints[i + 1], s.magnitude(), planeToCanvas);
             i += 2;
         }
     }

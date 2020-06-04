@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 import ch.epfl.rigel.astronomy.AsterismLoader;
 import ch.epfl.rigel.astronomy.HygDatabaseLoader;
-import ch.epfl.rigel.astronomy.Planet;
 import ch.epfl.rigel.astronomy.StarCatalogue;
 import ch.epfl.rigel.coordinates.GeographicCoordinates;
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
@@ -34,6 +33,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Separator;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.image.Image;
@@ -73,8 +73,12 @@ public final class Main extends Application {
     private final static int INDEX_ACCELERATOR_X300 = 2;
     private final static int FONT_SIZE = 15;
     
-    private final static double EPFL_LON_DEG = 6.57;
-    private final static double EPFL_LAT_DEG = 46.52;
+    private final static double MIN_MAGNITUDE = -0.5;
+    private final static double MAX_MAGNITUDE =  5.5;
+    private final static double INCREMENT_MAGNITUDE = (MAX_MAGNITUDE - MIN_MAGNITUDE)/10d;
+    
+    private final static double EPFL_LON_DEG  =  6.57;
+    private final static double EPFL_LAT_DEG  =  46.52;
     private final static double INITIAL_FIEL_OF_VIEW_DEG = 68.4;
     private final static HorizontalCoordinates INITIAl_CENTER_OF_PROJECTION = HorizontalCoordinates.ofDeg(180 + 1.e-12, 22);
     
@@ -118,7 +122,7 @@ public final class Main extends Application {
         BorderPane mainRoot = new BorderPane();
         mainRoot.setCenter(skyPane);
         mainRoot.setBottom(informationPane());
-        mainRoot.setTop(controlPane(observerPosition(), observationInstant(), timePassing(), starSearch()));
+        mainRoot.setTop(controlPane(observerPosition(), observationInstant(), timePassing(), starSearch(), starsSlecetion()));
         
         primaryStage.setScene(welcomeSceneTo(new Scene(mainRoot), primaryStage));
         primaryStage.show();
@@ -257,19 +261,23 @@ public final class Main extends Application {
     //====================================================================================================
     
     // top sub-pane of main scene, contain observer position, observation instant and time passing modules
-    private HBox controlPane(HBox observerPosition, HBox observationInstant, HBox timePassing, HBox searchBar) {
+    private HBox controlPane(HBox observerPosition, HBox observationInstant, HBox timePassing, HBox searchBar, Slider starselection) {
         
         HBox controlBar = new HBox();
         Separator vertSeparator1 = new Separator(Orientation.VERTICAL);
         Separator vertSeparator2 = new Separator(Orientation.VERTICAL);
         Separator vertSeparator3 = new Separator(Orientation.VERTICAL);
+        Separator vertSeparator4 = new Separator(Orientation.VERTICAL);
+
         controlBar.getChildren().addAll(observerPosition,
                                         vertSeparator1,
                                         observationInstant,
                                         vertSeparator2,
                                         timePassing,
                                         vertSeparator3,
-                                        searchBar);
+                                        searchBar,
+                                        vertSeparator4,
+                                        starselection);
         controlBar.setStyle("-fx-spacing: 4; "
                           + "-fx-padding: 4;");
         return controlBar;
@@ -442,6 +450,20 @@ public final class Main extends Application {
         timePassing.getChildren().addAll(accelerators, resetButton, playButton);
         return timePassing;
     }
+    //====================================================================================================
+    //=================================== Select star to draw // magnitude================================
+    //====================================================================================================
+    private Slider starsSlecetion() {
+        
+        Slider slider = new Slider(MIN_MAGNITUDE, MAX_MAGNITUDE, MAX_MAGNITUDE);
+        slider.setMajorTickUnit((MAX_MAGNITUDE - MIN_MAGNITUDE)/2d);
+        slider.setBlockIncrement(INCREMENT_MAGNITUDE);
+        slider.setShowTickLabels(true);
+        manager.maxMagnitude().bind(slider.valueProperty());
+        
+        return slider;
+    }
+    
     
     //====================================================================================================
     //=================================== Information Pane ===============================================
