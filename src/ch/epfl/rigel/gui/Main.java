@@ -143,13 +143,32 @@ public final class Main extends Application {
         selectionBox.setAlignment(Pos.CENTER);
         selectionBox.setSpacing(50);
         
-        selectionBox.getChildren().addAll(
-                butToDrawCelestailObjects("étoiles",        manager.drawWithStars(), true),
-                butToDrawCelestailObjects("planètes",       manager.drawWithPlanets(), false),
-                butToDrawCelestailObjects("asterimes",      manager.drawWithAsterisms(), false),
-                butToDrawCelestailObjects("soleil",         manager.drawWithSun(), false),
-                butToDrawCelestailObjects("lune",           manager.drawWithMoon(), false),
-                butToDrawCelestailObjects("horizon & cardinaux",    manager.drawWithHorizon(), true));
+        RadioButton starSelector      = butToDrawCelestailObjects("étoiles",   manager.drawWithStars(), true);
+        RadioButton planetSelector    = butToDrawCelestailObjects("planètes",  manager.drawWithPlanets(), false);
+        RadioButton asterismsSelector = butToDrawCelestailObjects("asterimes", manager.drawWithAsterisms(), false);
+        starSelector.selectedProperty().addListener(e -> {
+            if(!planetSelector.selectedProperty().get()) {
+                starSelector.selectedProperty().setValue(true);
+            }
+            if(!starSelector.selectedProperty().get()) {
+                asterismsSelector.selectedProperty().setValue(false);
+            }
+        });
+        planetSelector.selectedProperty().addListener(e -> {
+            if(!starSelector.selectedProperty().get()) {
+                planetSelector.selectedProperty().setValue(true);
+            }
+        });
+        asterismsSelector.selectedProperty().addListener(e -> {
+            if(!starSelector.selectedProperty().get()) {
+                asterismsSelector.selectedProperty().setValue(false);
+            }
+        });
+
+        selectionBox.getChildren().addAll(starSelector, planetSelector, asterismsSelector,
+                butToDrawCelestailObjects("soleil",  manager.drawWithSun(), false),
+                butToDrawCelestailObjects("lune",    manager.drawWithMoon(), false),
+                butToDrawCelestailObjects("horizon & cardinaux", manager.drawWithHorizon(), true));
         
         Text drawingTxt   = new Text("Choisir les éléments à ajouter à l'observation");
         drawingTxt.setFill(Color.GHOSTWHITE);
