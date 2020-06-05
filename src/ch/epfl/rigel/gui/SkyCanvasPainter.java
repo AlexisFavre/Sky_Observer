@@ -1,6 +1,10 @@
 package ch.epfl.rigel.gui;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
 
 import ch.epfl.rigel.astronomy.Asterism;
 import ch.epfl.rigel.astronomy.ObservedSky;
@@ -54,6 +58,12 @@ public final class SkyCanvasPainter {
     
     private final Canvas canvas;
     private final GraphicsContext graph2D;
+    
+    private final List<Double> xPos = new ArrayList<>();
+    private final List<Double> yPos = new ArrayList<>();
+    private HorizontalCoordinates pointOfAlt0;
+    private CartesianCoordinates pointOfAlt0inCartesian;
+    private Point2D pointOfAlt0inCanvasRef;
 
     /**
      *
@@ -73,6 +83,7 @@ public final class SkyCanvasPainter {
     public void actualize(ObservedSky sky, Transform planeToCanvas, 
             boolean withStars, boolean withPlanets, boolean withAsterisms, boolean withSun, boolean withMoon, boolean withHorizon) {
         clear();
+        coordinatesHorizonPointsConstruct(sky, planeToCanvas);
         drawSky(sky, planeToCanvas, withStars, withPlanets,withAsterisms, withSun, withMoon, withHorizon);
     }
 
@@ -112,6 +123,22 @@ public final class SkyCanvasPainter {
         graph2D.setFill(FONT_COLOR);
         graph2D.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
     }
+    
+    private void coordinatesHorizonPointsConstruct(ObservedSky sky, Transform planeToCanvas) {
+        xPos.clear();
+        yPos.clear();
+        for (int k = 0; k < 64; k++) {
+            pointOfAlt0 = HorizontalCoordinates.ofDeg(k*360/64, 0);
+            pointOfAlt0inCartesian = sky.projection().apply(pointOfAlt0);
+            pointOfAlt0inCanvasRef = 
+                    planeToCanvas.transform(
+                            pointOfAlt0inCartesian.x(),
+                            pointOfAlt0inCartesian.y());
+            
+            xPos.add(pointOfAlt0inCanvasRef.getX());
+            yPos.add(pointOfAlt0inCanvasRef.getY());
+        }
+    }
 
     private void drawAsterisms(ObservedSky sky, Transform planeToCanvas) {
         int length = sky.starPointsRefs().length;
@@ -147,12 +174,6 @@ public final class SkyCanvasPainter {
     }
 
     private void drawStars(ObservedSky sky, Transform planeToCanvas) {
-        HorizontalCoordinates pointOfAlt0 = HorizontalCoordinates.of(0, 0);
-        CartesianCoordinates pointOfAlt0inCartesian = sky.projection().apply(pointOfAlt0);
-        Point2D pointOfAlt0inCanvasRef = planeToCanvas.transform(
-                pointOfAlt0inCartesian.x(),
-                pointOfAlt0inCartesian.y());
-        double altOfHorizonInCanvas = pointOfAlt0inCanvasRef.getY();
         
         int length = sky.starPointsRefs().length;
         double[] screenPoints = new double[length];
@@ -160,7 +181,7 @@ public final class SkyCanvasPainter {
 
         int i = 0;
         for(Star s: sky.stars()) {
-            drawEllipseOf(BlackBodyColor.colorForTemperature(s.colorTemperature(), screenPoints[i+1] < altOfHorizonInCanvas),
+            drawEllipseOf(BlackBodyColor.colorForTemperature(s.colorTemperature(), screenPoints[i+1] < altOfHorizonInCanvasCoodinates(sky, planeToCanvas, screenPoints[i])),
                     screenPoints[i], screenPoints[i + 1], s.magnitude(), planeToCanvas);
             i += 2;
         }
@@ -196,7 +217,7 @@ public final class SkyCanvasPainter {
     }
 
     private void drawHorizon(StereographicProjection projection, Transform planeToCanvas) {
-        CartesianCoordinates center = projection.circleCenterForParallel(CENTER_OF_HORIZON_CIRCLE);
+        CartesianCoordinates center  = projection.circleCenterForParallel(CENTER_OF_HORIZON_CIRCLE);
         Point2D screenPointForCenter = planeToCanvas.transform(center.x(), center.y());
         
         double radius = projection.circleRadiusForParallel(CENTER_OF_HORIZON_CIRCLE) * planeToCanvas.getMxx();
@@ -218,6 +239,7 @@ public final class SkyCanvasPainter {
             StereographicProjection projection, Transform planeToCanvas) {
         CartesianCoordinates s = projection.apply(c);
         Point2D screenPoint = planeToCanvas.transform(s.x(), s.y());
+        System.out.println(screenPoint.getX());
         graph2D.strokeText(text, screenPoint.getX(), screenPoint.getY());
     }
 
@@ -246,7 +268,19 @@ public final class SkyCanvasPainter {
         graph2D.fillOval(planeX - radius, planeY - radius, diameter, diameter);
     }
     
-//    private double altOfHorizonInCanvasCoodinates(ObservedSky sky, Transform planeToCanvas) {
-//        
-//    }
+    private double altOfHorizonInCanvasCoodinates(ObservedSky sky, Transform planeToCanvas, double xPosStar) {
+              
+        Optional<Double> o = xPos.
+                             stream().
+                             map(x -> Math.abs(x - xPosStar)).
+                             min(Comparator.naturalOrder());
+       double possibleVal1 = -o.get() + xPosStar;
+       double possibleVal2 =  o.get() + xPosStar;
+       int index = -2;
+       if(xPos.contains(possibleVal1))
+           index = xPos.lastIndexOf(possibleVal1);
+       else
+           index = xPos.lastIndexOf(possibleVal2);
+       return yPos.get(index);
+    }
 }
