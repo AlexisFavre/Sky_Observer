@@ -57,6 +57,8 @@ public final class SkyCanvasManager {
     private final static double INFO_BOX_HEIGTH = 70;
     private final static double INFO_BOX_DOWN_SHIFT = 5;
     private final static double POINTER_SIZE = 10;
+    private final static double DEG_BORDER_MARGIN = 0.3;
+    private final static double CONSTANT_SHIFT_AT_DOWN_BORDER = 4.0/68.4;
 
     private final Canvas canvas;
     private final SkyCanvasPainter painter;
@@ -246,12 +248,15 @@ public final class SkyCanvasManager {
                                 double deltaAz = 0;
                                 double deltaAlt = 0;
                                 CartesianCoordinates sp = screenPointFor(mh);
-                                if(sp.x() <= INFO_BOX_WIDTH/2)
-                                    deltaAz -= 3.5;
-                                else if(sp.x() >= canvas.getWidth() - INFO_BOX_WIDTH/2)
-                                    deltaAz += 3.5;
+                                if (sp.x() <= INFO_BOX_WIDTH / 2) {
+                                    deltaAz -= (INFO_BOX_WIDTH / 2 - sp.x()) * vpb.getFieldOfViewDeg() / canvas.getWidth()
+                                            + DEG_BORDER_MARGIN;
+                                } else if (sp.x() >= canvas.getWidth() - INFO_BOX_WIDTH / 2) {
+                                    deltaAz += (INFO_BOX_WIDTH / 2 + sp.x() - canvas.getWidth())
+                                            * vpb.getFieldOfViewDeg() / canvas.getWidth() + DEG_BORDER_MARGIN;
+                                }
                                 if(sp.y() >= canvas.getHeight() - INFO_BOX_HEIGTH)
-                                    deltaAlt -= 5;
+                                    deltaAlt -= CONSTANT_SHIFT_AT_DOWN_BORDER*vpb.getFieldOfViewDeg();
                                 centerAnimator.setDestination(
                                         CINTER_0TO360.reduce(vpb.getCenter().azDeg() + deltaAz),
                                         ALTITUDE_RANGE.clip(vpb.getCenter().altDeg() + deltaAlt));
