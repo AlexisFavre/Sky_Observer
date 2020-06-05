@@ -25,6 +25,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.collections.FXCollections;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -39,11 +40,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -76,7 +73,9 @@ public final class Main extends Application {
     private final static int MAX_OPACITY = 1;
     private final static int MIN_OPACITY = 0;
     
-    private final static double INITIAL_FIEL_OF_VIEW_DEG = 68.4;
+    private final static double EPFL_LON_DEG = 6.57;
+    private final static double EPFL_LAT_DEG = 46.52;
+    private final static double INITIAL_FIELD_OF_VIEW_DEG = 68.4;
     private final static HorizontalCoordinates INITIAl_CENTER_OF_PROJECTION = HorizontalCoordinates.ofDeg(180 + 1.e-12, 22);
     
     private final static Font FONT_AWESOME     = loadFontAwesome();
@@ -107,19 +106,13 @@ public final class Main extends Application {
         animator = new TimeAnimator(observationTime);
         manager  = new SkyCanvasManager(CATALOG, observationTime, epfl, view);
         
-        
-        // Pane containing the canvas where the sky is drawn
-        Pane skyPane = new Pane(manager.canvas());
-        manager.canvas().widthProperty().bind(skyPane.widthProperty());
-        manager.canvas().heightProperty().bind(skyPane.heightProperty());
-        
         // Initiate user interface
         BorderPane mainRoot = new BorderPane();
-        mainRoot.setCenter(skyPane);
+        mainRoot.setCenter(manager.skyPane());
         mainRoot.setBottom(informationPane());
         mainRoot.setTop(controlPane(observerPosition(), observationInstant(), timePassing(), starSearch(), cityBox()));
         
-        primaryStage.setScene(welcomeSceneTo(new Scene(mainRoot), primaryStage));
+        primaryStage.setScene(welcomeSceneTo(mainRoot, primaryStage));
         primaryStage.show();
     }
     
@@ -406,7 +399,6 @@ public final class Main extends Application {
             if( !animator.runningProperty().get()) {
                 playButton.setText(UNICODE_FOR_PAUSE_BUT);
                 animator.start();
-            
             } else {                                 
                 playButton.setText(UNICODE_FOR_PLAY_BUT);
                 animator.stop();
@@ -479,14 +471,9 @@ public final class Main extends Application {
                 Bindings.format("Champ de vue : %.1f°", 
                         manager.viewingParameterBean().fieldOfViewDegProperty())); 
 
-        Text closestObjectText = new Text();
-        closestObjectText.textProperty().bind(Bindings.createStringBinding(
-                () -> {
-                        if (manager.objectUnderMouse().get().isPresent())  
-                            return manager.objectUnderMouse().get().get().info();
-                        return "";
-                     }, 
-                manager.objectUnderMouse()));
+        Text errorLog = new Text();
+        errorLog.textProperty().bind(manager.errorMessage());
+        errorLog.setFill(Color.CRIMSON);
                     
         
         Text observerLookText = new Text();
@@ -495,7 +482,7 @@ public final class Main extends Application {
                 manager.mouseAzDeg(), manager.mouseAltDeg()));
         
         infoPane.setLeft(fieldOfViewText);
-        infoPane.setCenter(closestObjectText);
+        infoPane.setCenter(errorLog);
         infoPane.setRight(observerLookText);
         
         return infoPane;

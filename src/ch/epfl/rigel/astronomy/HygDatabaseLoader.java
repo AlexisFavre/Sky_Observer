@@ -14,6 +14,8 @@ public enum HygDatabaseLoader implements StarCatalogue.Loader {
 
     INSTANCE;
 
+    private static final double FACTOR_PARSECS_TO_LIGHT_YEARS = 3.262;
+
     /**
      * Load {@code Star} objects created using the the stream content
      * and add them to the given {@code StarCatalogue.Builder}
@@ -40,9 +42,11 @@ public enum HygDatabaseLoader implements StarCatalogue.Loader {
                         (float) Double.parseDouble(lineInfo[Id.MAG.ordinal()]) : 0;
                 float colorIndex = (!(lineInfo[Id.CI.ordinal()]).equals("")) ?
                         (float) Double.parseDouble(lineInfo[Id.CI.ordinal()]) : 0;
+                float distance = (!(lineInfo[Id.CI.ordinal()]).equals("10000000")) ?
+                        (float) (FACTOR_PARSECS_TO_LIGHT_YEARS * Double.parseDouble(lineInfo[Id.DIST.ordinal()])) : -1;
 
                 builder.addStar(new Star(hip, name, EquatorialCoordinates.of(Double.parseDouble(lineInfo[Id.RARAD.ordinal()]),
-                        Double.parseDouble(lineInfo[Id.DECRAD.ordinal()])), magnitude, colorIndex));
+                        Double.parseDouble(lineInfo[Id.DECRAD.ordinal()])), magnitude, colorIndex, distance));
             }
         }
     }
