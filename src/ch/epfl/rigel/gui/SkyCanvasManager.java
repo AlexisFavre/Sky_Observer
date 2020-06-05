@@ -105,8 +105,8 @@ public final class SkyCanvasManager {
         canvas = new Canvas();
         painter = new SkyCanvasPainter(canvas);
 
-        drawWithStars   = new SimpleBooleanProperty();
-        drawWithPlanets = new SimpleBooleanProperty();
+        drawWithStars     = new SimpleBooleanProperty();
+        drawWithPlanets   = new SimpleBooleanProperty();
         drawWithAsterisms = new SimpleBooleanProperty();
         drawWithSun       = new SimpleBooleanProperty();
         drawWithMoon      = new SimpleBooleanProperty();
@@ -236,28 +236,35 @@ public final class SkyCanvasManager {
                     HorizontalCoordinates mh = mouseHorizontalPosition.get();
                     Optional<CelestialObject> objectClicked = sky.get().objectClosestTo(mousePosition.get(),
                             TOLERANCE_FOR_OBJ_DETECTION/scaleOfView.get());
+                    
                     if(objectClicked.isEmpty() || !sky.get().isVisible(mousePosition.get())) {
                         clearSelections();
+                        
                     } else {
                         List<CelestialObject> selected = selectedObjects.get();
                         boolean newSelection = selected.isEmpty()
                                 || objectClicked.get() != selected.get(selected.size() - 1);
+                        
                         if (newSelection) {
                             if(isInCanvasLimits(screenPointFor(mh))) {
                                 addSelection(objectClicked.get());
+                                
                             } else {
                                 double deltaAz = 0;
                                 double deltaAlt = 0;
                                 CartesianCoordinates sp = screenPointFor(mh);
-                                if (sp.x() <= INFO_BOX_WIDTH / 2) {
-                                    deltaAz -= (INFO_BOX_WIDTH / 2 - sp.x()) * vpb.getFieldOfViewDeg() / canvas.getWidth()
+                                
+                                if (sp.x() <= INFO_BOX_WIDTH/2) {
+                                    deltaAz -= (INFO_BOX_WIDTH/2 - sp.x())*vpb.getFieldOfViewDeg()/canvas.getWidth()
                                             + DEG_BORDER_MARGIN;
-                                } else if (sp.x() >= canvas.getWidth() - INFO_BOX_WIDTH / 2) {
-                                    deltaAz += (INFO_BOX_WIDTH / 2 + sp.x() - canvas.getWidth())
-                                            * vpb.getFieldOfViewDeg() / canvas.getWidth() + DEG_BORDER_MARGIN;
+                                    
+                                } else if (sp.x() >= canvas.getWidth() - INFO_BOX_WIDTH/2) {
+                                    deltaAz += (INFO_BOX_WIDTH/2 + sp.x() - canvas.getWidth())
+                                            * vpb.getFieldOfViewDeg()/canvas.getWidth() + DEG_BORDER_MARGIN;
                                 }
                                 if(sp.y() >= canvas.getHeight() - INFO_BOX_HEIGTH)
                                     deltaAlt -= CONSTANT_SHIFT_AT_DOWN_BORDER*vpb.getFieldOfViewDeg();
+                                
                                 centerAnimator.setDestination(
                                         CINTER_0TO360.reduce(vpb.getCenter().azDeg() + deltaAz),
                                         ALTITUDE_RANGE.clip(vpb.getCenter().altDeg() + deltaAlt));
@@ -265,6 +272,7 @@ public final class SkyCanvasManager {
                                 waitingRepositioningObject.setValue(objectClicked);
                                 errorMessage.setValue("limite atteinte - bordure visuel");
                             }
+                            
                         } else {
                             centerAnimator.setDestination(CINTER_0TO360.reduce(mh.azDeg()),
                                     ALTITUDE_RANGE.clip(mh.altDeg()));
