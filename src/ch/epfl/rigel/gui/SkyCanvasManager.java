@@ -181,6 +181,14 @@ public final class SkyCanvasManager {
             }
         });
 
+        centerAnimator.runningProperty().addListener(e -> {
+            if(!centerAnimator.runningProperty().get() && waitingRepositioningObject.get().isPresent()) {
+                addSelection(waitingRepositioningObject.get().get());
+                waitingRepositioningObject.setValue(Optional.empty());
+                cleanErrors();
+            }
+        });
+
         //KEYBOARD PRESS LISTENER ====================================================================
         canvas.setOnKeyPressed(e -> {
             double az  = vpb.getCenter().azDeg();
@@ -233,11 +241,9 @@ public final class SkyCanvasManager {
                                 || objectClicked.get() != selected.get(selected.size() - 1);
                         if (newSelection) {
                             if(isInCanvasLimits(screenPointFor(mh))) {
-                                if(!overlappingInfos)
-                                    clearSelections();
                                 addSelection(objectClicked.get());
                             } else {
-                                /*double deltaAz = 0;
+                                double deltaAz = 0;
                                 double deltaAlt = 0;
                                 CartesianCoordinates sp = screenPointFor(mh);
                                 if(sp.x() <= INFO_BOX_WIDTH/2)
@@ -250,7 +256,7 @@ public final class SkyCanvasManager {
                                         CINTER_0TO360.reduce(vpb.getCenter().azDeg() + deltaAz),
                                         ALTITUDE_RANGE.clip(vpb.getCenter().altDeg() + deltaAlt));
                                 centerAnimator.start();
-                                waitingRepositioningObject.setValue(objectClicked);*/
+                                waitingRepositioningObject.setValue(objectClicked);
                                 errorMessage.setValue("limite atteinte - bordure visuel"); //TODO move instead
                             }
                         } else {
@@ -293,6 +299,8 @@ public final class SkyCanvasManager {
     //====================================================================================================
 
     private void addSelection(CelestialObject object) {
+        if(!overlappingInfos)
+            clearSelections();
         selectedObjects.get().add(object);
         selectionsNumber.setValue(selectedObjects.get().size());
     }
@@ -330,10 +338,6 @@ public final class SkyCanvasManager {
                     && isInCanvasLimits(screenPointFor(sky.get().horizontalPointOf(o))))
                 showInfoBoxFor(o);
         }
-        /*if(waitingRepositioningObject.get().isPresent() && centerAnimator.runningProperty().get()) {
-            showInfoBoxFor(waitingRepositioningObject.get().get());
-            waitingRepositioningObject.setValue(null);
-        }*/
     }
     //--------------------------------------------------------------------------------------------
     private boolean isInCanvasLimits(CartesianCoordinates screenPoint) {
@@ -431,7 +435,6 @@ public final class SkyCanvasManager {
             HorizontalCoordinates destination = sky.get().availableDestinationForObjectNamed(name);
             if (destination != null) {
                 centerAnimator.setDestination(destination.azDeg(), destination.altDeg());
-                clearSelections();
                 addSelection(sky.get().objectClosestTo(projection.get().apply(destination),
                                 TOLERANCE_FOR_OBJ_DETECTION/scaleOfView.get()).get());
                 centerAnimator.start();

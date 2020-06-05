@@ -72,7 +72,7 @@ public final class Main extends Application {
     
     private final static double EPFL_LON_DEG = 6.57;
     private final static double EPFL_LAT_DEG = 46.52;
-    private final static double INITIAL_FIEL_OF_VIEW_DEG = 68.4;
+    private final static double INITIAL_FIELD_OF_VIEW_DEG = 68.4;
     private final static HorizontalCoordinates INITIAl_CENTER_OF_PROJECTION = HorizontalCoordinates.ofDeg(180 + 1.e-12, 22);
     
     private final static Font FONT_AWESOME = loadFontAwesome();
@@ -101,7 +101,7 @@ public final class Main extends Application {
         ObserverLocationBean epfl    = new ObserverLocationBean();
         epfl.setLonDeg(EPFL_LON_DEG);
         epfl.setLatDeg(EPFL_LAT_DEG);
-        ViewingParametersBean view   = new ViewingParametersBean(INITIAl_CENTER_OF_PROJECTION, INITIAL_FIEL_OF_VIEW_DEG);
+        ViewingParametersBean view   = new ViewingParametersBean(INITIAl_CENTER_OF_PROJECTION, INITIAL_FIELD_OF_VIEW_DEG);
         animator = new TimeAnimator(observationTime);
         manager  = new SkyCanvasManager(CATALOG, observationTime, epfl, view);
         
