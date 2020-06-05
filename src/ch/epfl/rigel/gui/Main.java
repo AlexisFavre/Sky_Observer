@@ -102,7 +102,7 @@ public final class Main extends Application {
         // Initiate sky
         DateTimeBean observationTime = new DateTimeBean(currentInstant);
         ObserverLocationBean epfl    = new ObserverLocationBean(CityCatalogue.epfl().coordinates());
-        ViewingParametersBean view   = new ViewingParametersBean(INITIAl_CENTER_OF_PROJECTION, INITIAL_FIEL_OF_VIEW_DEG);
+        ViewingParametersBean view   = new ViewingParametersBean(INITIAl_CENTER_OF_PROJECTION, INITIAL_FIELD_OF_VIEW_DEG);
         animator = new TimeAnimator(observationTime);
         manager  = new SkyCanvasManager(CATALOG, observationTime, epfl, view);
         
@@ -112,7 +112,7 @@ public final class Main extends Application {
         mainRoot.setBottom(informationPane());
         mainRoot.setTop(controlPane(observerPosition(), observationInstant(), timePassing(), starSearch(), cityBox()));
         
-        primaryStage.setScene(welcomeSceneTo(mainRoot, primaryStage));
+        primaryStage.setScene(welcomeSceneTo(new Scene(mainRoot), primaryStage));
         primaryStage.show();
     }
     
