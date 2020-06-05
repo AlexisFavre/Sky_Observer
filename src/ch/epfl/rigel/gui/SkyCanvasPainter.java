@@ -147,13 +147,20 @@ public final class SkyCanvasPainter {
     }
 
     private void drawStars(ObservedSky sky, Transform planeToCanvas) {
+        HorizontalCoordinates pointOfAlt0 = HorizontalCoordinates.of(0, 0);
+        CartesianCoordinates pointOfAlt0inCartesian = sky.projection().apply(pointOfAlt0);
+        Point2D pointOfAlt0inCanvasRef = planeToCanvas.transform(
+                pointOfAlt0inCartesian.x(),
+                pointOfAlt0inCartesian.y());
+        double altOfHorizonInCanvas = pointOfAlt0inCanvasRef.getY();
+        
         int length = sky.starPointsRefs().length;
         double[] screenPoints = new double[length];
         planeToCanvas.transform2DPoints(sky.starPointsRefs(), 0, screenPoints, 0, length/2);
 
         int i = 0;
         for(Star s: sky.stars()) {
-            drawEllipseOf(BlackBodyColor.colorForTemperature(s.colorTemperature()),
+            drawEllipseOf(BlackBodyColor.colorForTemperature(s.colorTemperature(), screenPoints[i+1] < altOfHorizonInCanvas),
                     screenPoints[i], screenPoints[i + 1], s.magnitude(), planeToCanvas);
             i += 2;
         }
@@ -238,4 +245,8 @@ public final class SkyCanvasPainter {
         graph2D.setFill(color);
         graph2D.fillOval(planeX - radius, planeY - radius, diameter, diameter);
     }
+    
+//    private double altOfHorizonInCanvasCoodinates(ObservedSky sky, Transform planeToCanvas) {
+//        
+//    }
 }

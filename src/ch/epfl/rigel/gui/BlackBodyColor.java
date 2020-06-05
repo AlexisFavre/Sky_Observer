@@ -49,9 +49,13 @@ public final class BlackBodyColor {
      * @return the associated {@code Color} of the code black body
      * @throws IllegalArgumentException if {@code temp} does not belong in the interval [1 000, 40 000]
      */
-    public static  Color colorForTemperature(int temp) {
+    public static  Color colorForTemperature(int temp, boolean visible) {
         checkInInterval(RANGE_OF_TEMPERATURES,temp);
-        return ALL_TEMPERATURES_COLORS.get((int) Math.round((temp - SMALLEST_TEMPERATURE) / RANGE_BETWEEN_TEMPERATURES));
+        Color c = ALL_TEMPERATURES_COLORS.get((int) Math.round((temp - SMALLEST_TEMPERATURE) / RANGE_BETWEEN_TEMPERATURES));
+        
+        if(visible)
+            return c;
+        return c.deriveColor(0, 1, 1, 0.3);
     }
     
     /**
