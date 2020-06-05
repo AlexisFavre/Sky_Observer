@@ -32,7 +32,7 @@ public final class SkyCanvasPainter {
     private final static HorizontalCoordinates CENTER_OF_HORIZON_CIRCLE = HorizontalCoordinates.ofDeg(0, 0);
     private final static ClosedInterval RANGE_OF_MAGNITUDE = ClosedInterval.of(-2, 5);
     
-    private final static double DIAMETER_FACTOR    = Math.tan(Angle.ofDeg(0.5)/4.0);
+    private final static double DIAMETER_FACTOR     = Math.tan(Angle.ofDeg(0.5)/4.0);
     private final static double INFLUENCE_FACT_OF_MAG_ON_SIZE  = 17d / 140d;
     private final static double SIZE_FACTOR_FOR_ZERO_MAGNITUDE = 99d / 140d;
     private final static double SUN_HALO_SCALE_FACT = 2.2;
@@ -42,14 +42,14 @@ public final class SkyCanvasPainter {
     private final static double SUN_HALO_OPACITY    = 0.25;
     private final static double BASIC_OPACITY       = 1;
 
-    private final static int ASTERISM_LINE_WIDTH   = 1;
-    private final static int HORIZON_LINE_WIDTH    = 2;
-    private final static Color FONT_COLOR          = Color.BLACK;
-    private final static Color PLANET_COLOR        = Color.LIGHTGRAY;
-    private final static Color ASTERISM_LINE_COLOR = Color.BLUE;
-    private final static Color HORIZON_COLOR       = Color.RED;
-    private final static String SUN_MAIN_COLOR     = "yellow";
-    private final static String BASIC_COLOR        = "white";
+    private final static int ASTERISM_LINE_WIDTH    = 1;
+    private final static int HORIZON_LINE_WIDTH     = 2;
+    private final static Color FONT_COLOR           = Color.BLACK;
+    private final static Color PLANET_COLOR         = Color.LIGHTGRAY;
+    private final static Color ASTERISM_LINE_COLOR  = Color.BLUE;
+    private final static Color HORIZON_COLOR        = Color.FIREBRICK;
+    private final static String SUN_MAIN_COLOR      = "yellow";
+    private final static String BASIC_COLOR         = "white";
 
     
     private final Canvas canvas;
@@ -70,21 +70,10 @@ public final class SkyCanvasPainter {
      * @param sky the new actual sky to draw
      * @param planeToCanvas the new actual transformation to use
      */
-    public void actualize(ObservedSky sky, Transform planeToCanvas) {
+    public void actualize(ObservedSky sky, Transform planeToCanvas, 
+            boolean withStars, boolean withPlanets, boolean withAsterisms, boolean withSun, boolean withMoon, boolean withHorizon) {
         clear();
-        drawSky(sky, planeToCanvas);
-    }
-
-
-    /**
-     * Draw the sky on the canvas with all its elements apparent
-     *
-     * @param sky that is drawn
-     * @param planeToCanvas transformation used for matching projection(observed sky) to the computer screen
-     *                      (scaling, translation)
-     */
-    public void drawSky(ObservedSky sky, Transform planeToCanvas) {
-        drawSky(sky, planeToCanvas, true, true, true, true, true);
+        drawSky(sky, planeToCanvas, withStars, withPlanets,withAsterisms, withSun, withMoon, withHorizon);
     }
 
     /**
@@ -95,7 +84,10 @@ public final class SkyCanvasPainter {
      *                      (scaling, translation)
      */
     public void drawSky(ObservedSky sky, Transform planeToCanvas,
-                        boolean withStars, boolean withPlanets, boolean withSun, boolean withMoon, boolean withHorizon) {
+                        boolean withStars, boolean withPlanets, boolean withAsterisms,
+                        boolean withSun, boolean withMoon, boolean withHorizon) {
+        if(withAsterisms)
+            drawAsterisms(sky, planeToCanvas);
         if(withStars)
             drawStars(sky, planeToCanvas);
         if(withPlanets)
@@ -121,7 +113,7 @@ public final class SkyCanvasPainter {
         graph2D.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
     }
 
-    private void drawStars(ObservedSky sky, Transform planeToCanvas) {
+    private void drawAsterisms(ObservedSky sky, Transform planeToCanvas) {
         int length = sky.starPointsRefs().length;
         double[] screenPoints = new double[length];
         planeToCanvas.transform2DPoints(sky.starPointsRefs(), 0, screenPoints, 0, length/2);
@@ -129,20 +121,20 @@ public final class SkyCanvasPainter {
         graph2D.setLineWidth(ASTERISM_LINE_WIDTH);
         graph2D.beginPath();
         graph2D.setStroke(ASTERISM_LINE_COLOR);
-        
+
         for(Asterism a: sky.asterisms()) {
-            
+
             Iterator<Integer> iteratorOverID = sky.asterismIndices(a).iterator();
             int idOfStarFrom = iteratorOverID.next();
-            
+
             while(iteratorOverID.hasNext()) {
-                
+
                 int idOfStarTo = iteratorOverID.next();
                 double xFr = screenPoints[2*idOfStarFrom];
                 double yFr = screenPoints[2*idOfStarFrom+1];
                 double xTo = screenPoints[2*idOfStarTo];
                 double yTo = screenPoints[2*idOfStarTo+1];
-                
+
                 if(canvas.getBoundsInLocal().contains(xFr, yFr) || canvas.getBoundsInLocal().contains(xTo, yTo)) {
                     graph2D.moveTo(xFr, yFr);
                     graph2D.lineTo(xTo, yTo);
@@ -152,6 +144,12 @@ public final class SkyCanvasPainter {
         }
         graph2D.stroke();
         graph2D.closePath();
+    }
+
+    private void drawStars(ObservedSky sky, Transform planeToCanvas) {
+        int length = sky.starPointsRefs().length;
+        double[] screenPoints = new double[length];
+        planeToCanvas.transform2DPoints(sky.starPointsRefs(), 0, screenPoints, 0, length/2);
 
         int i = 0;
         for(Star s: sky.stars()) {

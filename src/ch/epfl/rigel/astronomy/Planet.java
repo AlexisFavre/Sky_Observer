@@ -17,7 +17,7 @@ public final class Planet extends CelestialObject{
      * @param magnitude  of the Planet
      */
     public Planet(String name, EquatorialCoordinates equatorialPos, float angularSize,
-            float magnitude) {
-        super(name, equatorialPos, angularSize, magnitude);
+            float magnitude, float dMin, float dMax, float dAv) {
+        super(name, equatorialPos, angularSize, magnitude, dMin, dMax, dAv);
     }
 }

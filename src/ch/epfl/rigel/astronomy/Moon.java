@@ -23,8 +23,8 @@ public final class Moon extends CelestialObject {
      * @throws IllegalArgumentException if phase is not in [0,1]
      */
     public Moon(EquatorialCoordinates equatorialPos,
-            float angularSize, float magnitude, float phase) throws IllegalArgumentException{
-        super("Lune", equatorialPos, angularSize, magnitude);
+            float angularSize, float magnitude, float phase, float dMin, float dMax, float dAv) throws IllegalArgumentException{
+        super("Lune", equatorialPos, angularSize, magnitude, dMin, dMax, dAv);
         this.phase = (float) checkInInterval(CINTER_0TO1, phase);
     }
 
@@ -33,7 +33,6 @@ public final class Moon extends CelestialObject {
      */
     @Override
     public String info() {
-        return String.format(Locale.ROOT, "%s (%.1f", name(), phase*100) +"%)";
+        return String.format(Locale.ROOT, "%s %.1f", name(), phase * 100) + "%";
     }
-
 }

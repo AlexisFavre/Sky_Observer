@@ -15,28 +15,40 @@ import java.util.stream.Collectors;
 import ch.epfl.rigel.astronomy.AsterismLoader;
 import ch.epfl.rigel.astronomy.HygDatabaseLoader;
 import ch.epfl.rigel.astronomy.StarCatalogue;
+import ch.epfl.rigel.city.City;
+import ch.epfl.rigel.city.CityCatalogue;
 import ch.epfl.rigel.coordinates.GeographicCoordinates;
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
+import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import javafx.util.converter.LocalTimeStringConverter;
 import javafx.util.converter.NumberStringConverter;
 
@@ -47,32 +59,32 @@ import javafx.util.converter.NumberStringConverter;
  */
 public final class Main extends Application {
 
-    private final static String PATTERN_LONG_AND_LAT = "#0.00";
-    private final static String PATTERN_TIME = "HH:mm:ss";
-    private final static String UNICODE_FOR_RESET_BUT = "\uf0e2";
-    private final static String UNICODE_FOR_PLAY_BUT = "\uf04b";
-    private final static String UNICODE_FOR_PAUSE_BUT = "\uf04c";
+    private final static String PATTERN_LONG_AND_LAT   = "#0.00";
+    private final static String PATTERN_TIME           = "HH:mm:ss";
+    private final static String UNICODE_FOR_RESET_BUT  = "\uf0e2";
+    private final static String UNICODE_FOR_PLAY_BUT   = "\uf04b";
+    private final static String UNICODE_FOR_PAUSE_BUT  = "\uf04c";
     private final static String NAME_FILE_OF_ASTERISMS = "/asterisms.txt";
-    private final static String NAME_FILE_OF_STARS = "/hygdata_v3.csv";
+    private final static String NAME_FILE_OF_STARS     = "/hygdata_v3.csv";
     
     // constants for initialization
-    private final static int MINIMAL_WIDTH_STAGE = 800;
-    private final static int MINIMAL_HEIGHT_STAGE = 600;
+    private final static int MINIMAL_WIDTH_STAGE    = 1350;
+    private final static int MINIMAL_HEIGHT_STAGE   = 800;
     private final static int INDEX_ACCELERATOR_X300 = 2;
-    private final static int FONT_SIZE = 15;
+    private final static int FONT_SIZE   = 15;
+    private final static int MAX_OPACITY = 1;
+    private final static int MIN_OPACITY = 0;
     
-    private final static double EPFL_LON_DEG = 6.57;
-    private final static double EPFL_LAT_DEG = 46.52;
-    private final static double INITIAL_FIEL_OF_VIEW_DEG = 68.4;
+    private final static double INITIAL_FIELD_OF_VIEW_DEG = 68.4;
     private final static HorizontalCoordinates INITIAl_CENTER_OF_PROJECTION = HorizontalCoordinates.ofDeg(180 + 1.e-12, 22);
     
-    private final static Font FONT_AWESOME = loadFontAwesome();
+    private final static Font FONT_AWESOME     = loadFontAwesome();
     private final static StarCatalogue CATALOG = initCatalog();
     
     private SkyCanvasManager manager;
     private TimeAnimator animator;
     private ZonedDateTime currentInstant;
-
+    
     public static void main(String[] args) {
         launch(args);
     }
@@ -89,29 +101,19 @@ public final class Main extends Application {
         
         // Initiate sky
         DateTimeBean observationTime = new DateTimeBean(currentInstant);
-        ObserverLocationBean epfl = new ObserverLocationBean();
-        epfl.setLonDeg(EPFL_LON_DEG);
-        epfl.setLatDeg(EPFL_LAT_DEG);
-        ViewingParametersBean view = new ViewingParametersBean(INITIAl_CENTER_OF_PROJECTION, INITIAL_FIEL_OF_VIEW_DEG);
+        ObserverLocationBean epfl    = new ObserverLocationBean(CityCatalogue.epfl().coordinates());
+        ViewingParametersBean view   = new ViewingParametersBean(INITIAl_CENTER_OF_PROJECTION, INITIAL_FIELD_OF_VIEW_DEG);
         animator = new TimeAnimator(observationTime);
-        manager = new SkyCanvasManager(CATALOG, observationTime, epfl, view);
-        
-        
-        // Pane containing the canvas where the sky is drawn
-        Pane skyPane = new Pane(manager.canvas());
-        manager.canvas().widthProperty().bind(skyPane.widthProperty());
-        manager.canvas().heightProperty().bind(skyPane.heightProperty());
+        manager  = new SkyCanvasManager(CATALOG, observationTime, epfl, view);
         
         // Initiate user interface
-        BorderPane root = new BorderPane();
-        root.setCenter(skyPane);
-        root.setBottom(informationPane());
-        root.setTop(controlBar(observerPosition(), observationInstant(), timePassing()));
+        BorderPane mainRoot = new BorderPane();
+        mainRoot.setCenter(manager.skyPane());
+        mainRoot.setBottom(informationPane());
+        mainRoot.setTop(controlPane(observerPosition(), observationInstant(), timePassing(), starSearch(), cityBox()));
         
-        
-        primaryStage.setScene(new Scene(root));
+        primaryStage.setScene(welcomeSceneTo(new Scene(mainRoot), primaryStage));
         primaryStage.show();
-        manager.canvas().requestFocus();
     }
     
     /* *************************************************************************
@@ -120,23 +122,166 @@ public final class Main extends Application {
      *                                                                         *
      **************************************************************************/
     
-    // top module, contain observer position, observation instant and time passing modules
-    private HBox controlBar(HBox observerPosition, HBox observationInstant, HBox timePassing) {
+    
+    //====================================================================================================
+    //==================================== Welcome Scene =================================================
+    //====================================================================================================
+    
+    //scene that the user see when he loads the application
+    private Scene welcomeSceneTo(Scene mainScene, Stage stage) {
+        StackPane welcomeRoot  = new StackPane();
+        Scene scene            = new Scene(welcomeRoot);
+        
+        ImageView background   = new ImageView(loadWelcomeImage());
+        background.fitWidthProperty().bind(welcomeRoot.widthProperty());
+        background.fitHeightProperty().bind(welcomeRoot.heightProperty());
+        
+        BorderPane presentationPane = new BorderPane();
+        
+        //box used to select celestial objects to draw
+        HBox selectionBox = new HBox(40);
+        selectionBox.setAlignment(Pos.CENTER);
+        selectionBox.setSpacing(50);
+        
+        RadioButton starSelector      = butToDrawCelestailObjects("étoiles",   manager.drawWithStars(), true);
+        RadioButton planetSelector    = butToDrawCelestailObjects("planètes",  manager.drawWithPlanets(), false);
+        RadioButton asterismsSelector = butToDrawCelestailObjects("asterimes", manager.drawWithAsterisms(), false);
+        starSelector.selectedProperty().addListener(e -> {
+            if(!planetSelector.selectedProperty().get()) {
+                starSelector.selectedProperty().setValue(true);
+            }
+            if(!starSelector.selectedProperty().get()) {
+                asterismsSelector.selectedProperty().setValue(false);
+            }
+        });
+        planetSelector.selectedProperty().addListener(e -> {
+            if(!starSelector.selectedProperty().get()) {
+                planetSelector.selectedProperty().setValue(true);
+            }
+        });
+        asterismsSelector.selectedProperty().addListener(e -> {
+            if(!starSelector.selectedProperty().get()) {
+                asterismsSelector.selectedProperty().setValue(false);
+            }
+        });
+
+        selectionBox.getChildren().addAll(starSelector, planetSelector, asterismsSelector,
+                butToDrawCelestailObjects("soleil",  manager.drawWithSun(), false),
+                butToDrawCelestailObjects("lune",    manager.drawWithMoon(), false),
+                butToDrawCelestailObjects("horizon & cardinaux", manager.drawWithHorizon(), true));
+        
+        Text drawingTxt   = new Text("Choisir les éléments à ajouter à l'observation");
+        drawingTxt.setFill(Color.GHOSTWHITE);
+        drawingTxt.setFont(Font.font(20));
+        drawingTxt.setTextAlignment(TextAlignment.CENTER);
+        
+        
+        //box used to present welcome text
+        VBox welcomeBox  = new VBox(40);
+        welcomeBox.setAlignment(Pos.CENTER);
+            
+        //presentation texts
+        Text welcomeText = new Text("Bienvenue");
+        welcomeText.setFill(Color.GHOSTWHITE);
+        welcomeText.setFont(Font.font(90));
+        
+        Text readyText   = new Text("Prêt à découvrir les étoiles, planètes et asterismes ?");
+        readyText.setWrappingWidth(700);
+        readyText.setTextAlignment(TextAlignment.CENTER);
+        readyText.setFill(Color.GHOSTWHITE);
+        readyText.setFont(Font.font(40));
+        
+        
+        // transitions between the welcome scene to the main scene
+        FadeTransition quitWelcomeScene = new FadeTransition(Duration.millis(800));
+        quitWelcomeScene.setNode(welcomeRoot);
+        quitWelcomeScene.setFromValue(MAX_OPACITY);
+        quitWelcomeScene.setToValue(MIN_OPACITY);
+        
+        FadeTransition joinMainScene = new FadeTransition(Duration.millis(1400));
+        joinMainScene.setNode(mainScene.getRoot());
+        joinMainScene.setFromValue(MIN_OPACITY);
+        joinMainScene.setToValue(MAX_OPACITY);
+        
+        quitWelcomeScene.setOnFinished(e -> {
+            joinMainScene.play();
+            stage.setScene(mainScene);
+            manager.canvas().requestFocus();
+        });
+        
+        
+        //button to switch to main scene
+        Button switchBut = new Button("Commencer l'observation");
+        switchBut.minWidth(150);
+        switchBut.setOnAction(e -> quitWelcomeScene.play());
+        
+        
+        welcomeBox.getChildren().addAll(welcomeText, readyText, drawingTxt, selectionBox, switchBut);
+        welcomeBox.setAlignment(Pos.CENTER);
+        
+        presentationPane.setCenter(welcomeBox);
+        
+        welcomeRoot.getChildren().addAll(background, presentationPane);
+        
+        return scene;
+    }
+    
+    // used to make selection buttons with enable to select what we want to draw in the sky
+    private RadioButton butToDrawCelestailObjects(String name, BooleanProperty propertyToBind, boolean preSelect) {
+        
+        RadioButton but = new RadioButton(name);
+        but.setAlignment(Pos.TOP_LEFT);
+        but.setSelected(preSelect);
+        but.setTextFill(Color.GHOSTWHITE);
+        but.setFont(Font.font(15));
+        
+        propertyToBind.bind(but.selectedProperty());
+        return but;
+    }
+    //====================================================================================================
+    //====================================== Control Pane =================================================
+    //====================================================================================================
+    
+    // top sub-pane of main scene, contain observer position, observation instant and time passing modules
+    private HBox controlPane(HBox observerPosition, HBox observationInstant, HBox timePassing, HBox searchBar, HBox cities) {
         
         HBox controlBar = new HBox();
-        Separator vertSeparator1 = new Separator(Orientation.VERTICAL);
-        Separator vertSeparator2 = new Separator(Orientation.VERTICAL);
+
         controlBar.getChildren().addAll(observerPosition,
-                                        vertSeparator1,
+                                        new Separator(Orientation.VERTICAL),
                                         observationInstant,
-                                        vertSeparator2,
-                                        timePassing);
+                                        new Separator(Orientation.VERTICAL),
+                                        timePassing,
+                                        new Separator(Orientation.VERTICAL),
+                                        searchBar,
+                                        new Separator(Orientation.VERTICAL),
+                                        cities);
         controlBar.setStyle("-fx-spacing: 4; "
                           + "-fx-padding: 4;");
         return controlBar;
     }
+
+    private HBox starSearch() {
+        HBox starSearch = new HBox();
+        starSearch.setStyle("-fx-spacing: inherit;"
+                          + "-fx-alignment: baseline-left;");
+
+        TextField searchBar = new TextField();
+        searchBar.setMinWidth(92);
+        searchBar.setPromptText("rechercher un astre");
+        searchBar.setOnAction(event -> {
+            String destination = searchBar.getText();
+            searchBar.deleteText(0, searchBar.getLength());
+            manager.goToDestinationWithName(destination);
+        });
+
+        starSearch.getChildren().addAll(searchBar);
+        return starSearch;
+    }
     
-    // observer Position ==================================================================================
+    //====================================================================================================
+    //================================ Observer Position Box =============================================
+    //====================================================================================================
     private HBox observerPosition() {
         
         HBox observerPosition = new HBox();
@@ -189,7 +334,9 @@ public final class Main extends Application {
         return coordinateDisplay;
     }
     
-    // observation instant ==============================================================
+    //====================================================================================================
+    //================================ Observation Instant Box ===========================================
+    //====================================================================================================
     private HBox observationInstant() {
         
         HBox observationInstant = new HBox();
@@ -235,7 +382,9 @@ public final class Main extends Application {
         return timeDisplay;
     }
     
-    // timePassing=======================================================================
+    //====================================================================================================
+    //==================================== Time Passing Box ==============================================
+    //====================================================================================================
     private HBox timePassing() {
         
         HBox timePassing = new HBox();
@@ -269,7 +418,6 @@ public final class Main extends Application {
             if( !animator.runningProperty().get()) {
                 playButton.setText(UNICODE_FOR_PAUSE_BUT);
                 animator.start();
-            
             } else {                                 
                 playButton.setText(UNICODE_FOR_PLAY_BUT);
                 animator.stop();
@@ -280,7 +428,57 @@ public final class Main extends Application {
         return timePassing;
     }
     
-    // Information Pane===================================================================
+    //===================================================================================
+    //=================================== Cities ========================================
+    //===================================================================================
+    private HBox cityBox() {
+        
+        HBox cityBox = new HBox();
+        cityBox.setStyle("-fx-spacing: inherit;"
+                       + "-fx-alignment: baseline-left;");
+        
+        Label cityLabel = new Label("Ville : ");
+        ComboBox<City> citiesList = new ComboBox<>();
+        citiesList.setItems(FXCollections.observableList(CityCatalogue.availableCities()));
+        citiesList.setValue(CityCatalogue.epfl());
+        citiesList.setPrefWidth(180);
+        
+        //if user has modified latitude or longitude of observation independently from the city,
+        //when he will click on the comboBox, the observation coordinates
+        //will be the coordinates of the current city
+        citiesList.setOnMouseClicked( e -> manager.observerLocationBean().
+                setCoordinates(citiesList.getValue().coordinates()));
+        
+        citiesList.valueProperty().addListener( (o, oV, nV) -> manager.observerLocationBean().
+                setCoordinates(nV.coordinates()));
+        
+        //if coordinates of Observer Position don't correspond to those of the current city in the citiesList
+        // then the color of the ComboBox will become tomato
+        manager.observerLocationBean().lonDegProperty().
+            addListener( (o, oV, nV) -> {
+                if(! (Math.abs(nV.doubleValue() - citiesList.getValue().coordinates().lonDeg()) < 1e-2))
+                    citiesList.setStyle("-fx-background-color : tomato");
+                else
+                    citiesList.setStyle("");  //take back default background color
+            });
+        
+        manager.observerLocationBean().latDegProperty().
+            addListener( (o, oV, nV) -> {
+                if(! (Math.abs(nV.doubleValue() - citiesList.getValue().coordinates().latDeg()) < 1e-2))
+                    citiesList.setStyle("-fx-background-color : tomato");
+                else
+                    citiesList.setStyle(""); //take back default background color
+            });
+        
+        cityBox.getChildren().addAll(cityLabel, citiesList);
+        return cityBox;
+    }
+    //===================================================================================
+    //=========================== Information Pane ======================================
+    //===================================================================================
+    
+    //bottom sub-pane of the main scene, display Field of View, Closest Object to the Mouse,
+    // and horizontal coordinates of the mouse
     private BorderPane informationPane() {
         
         BorderPane infoPane = new BorderPane();
@@ -292,14 +490,9 @@ public final class Main extends Application {
                 Bindings.format("Champ de vue : %.1f°", 
                         manager.viewingParameterBean().fieldOfViewDegProperty())); 
 
-        Text closestObjectText = new Text();
-        closestObjectText.textProperty().bind(Bindings.createStringBinding(
-                () -> {
-                        if (manager.objectUnderMouse().get().isPresent())  
-                            return manager.objectUnderMouse().get().get().info();
-                        return "";
-                     }, 
-                manager.objectUnderMouse()));
+        Text errorLog = new Text();
+        errorLog.textProperty().bind(manager.errorMessage());
+        errorLog.setFill(Color.CRIMSON);
                     
         
         Text observerLookText = new Text();
@@ -308,13 +501,15 @@ public final class Main extends Application {
                 manager.mouseAzDeg(), manager.mouseAltDeg()));
         
         infoPane.setLeft(fieldOfViewText);
-        infoPane.setCenter(closestObjectText);
+        infoPane.setCenter(errorLog);
         infoPane.setRight(observerLookText);
         
         return infoPane;
     }
 
-    // additional methods=================================================================
+    //====================================================================================================
+    //==================================== Additional Methods ============================================
+    //====================================================================================================
     private static StarCatalogue initCatalog() {
         
         try (InputStream hygStream = Main.class.getResourceAsStream(NAME_FILE_OF_STARS);
@@ -331,8 +526,17 @@ public final class Main extends Application {
     }
     
     private static Font loadFontAwesome() {
-        try(InputStream fontStream = Main.class.getResourceAsStream("/Font Awesome 5 Free-Solid-900.otf");){
+        try(InputStream fontStream = Main.class.getResourceAsStream("/Font Awesome 5 Free-Solid-900.otf")){
             return Font.loadFont(fontStream, FONT_SIZE);
+            
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+    
+    private static Image loadWelcomeImage() {
+        try(InputStream imgStream = Main.class.getResourceAsStream("/Sky Image.jpg")) {
+            return new Image(imgStream);
             
         } catch (IOException e) {
             throw new UncheckedIOException(e);
