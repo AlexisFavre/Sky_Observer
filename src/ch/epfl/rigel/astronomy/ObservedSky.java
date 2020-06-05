@@ -131,7 +131,6 @@ public final class ObservedSky {
         return Optional.ofNullable(closestObject);
     }
 
-    // TODO too much duplicate
     public HorizontalCoordinates horizontalPointOf(CelestialObject object) throws  IllegalArgumentException {
         if(object.name().equalsIgnoreCase("Soleil"))
             return isVisible(sunPoint) ? projection.inverseApply(sunPoint) : null;
@@ -162,23 +161,25 @@ public final class ObservedSky {
      * @return the screen point of the object or null if under the horizon
      * @throws IllegalArgumentException when the name is unknown (no corresponding objects)
      */
-    public HorizontalCoordinates availableDestinationForObjectNamed(String name) throws IllegalArgumentException {
+    public Optional<HorizontalCoordinates> availableDestinationForObjectNamed(String name) throws IllegalArgumentException {
         if(name.equalsIgnoreCase("Soleil"))
-            return isVisible(sunPoint) ? projection.inverseApply(sunPoint) : null;
+            return pointIfVisible(sunPoint);
+        
         if(name.equalsIgnoreCase("Lune"))
-            return isVisible(moonPoint) ? projection.inverseApply(moonPoint) : null;
+            return pointIfVisible(moonPoint);
+        
         for(Planet p: planets) {
             if(p.name().equalsIgnoreCase(name)) {
                 int i = planets.indexOf(p);
                 CartesianCoordinates point = CartesianCoordinates.of(planetPointsRefs[2*i], planetPointsRefs[2*i + 1]);
-                return isVisible(point) ? projection.inverseApply(point) : null;
+                return pointIfVisible(point);
             }
         }
         for(Star s: stars()) {
             if(s.name().equalsIgnoreCase(name)) {
                 int i = stars().indexOf(s);
                 CartesianCoordinates point = CartesianCoordinates.of(starPointsRefs[2*i], starPointsRefs[2*i + 1]);
-                return isVisible(point) ? projection.inverseApply(point) : null;
+                return pointIfVisible(point);
             }
         }
         throw new IllegalArgumentException("unknown object");

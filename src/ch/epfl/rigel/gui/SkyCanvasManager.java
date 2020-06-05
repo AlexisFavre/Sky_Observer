@@ -455,7 +455,7 @@ public final class SkyCanvasManager {
     public void goToDestinationWithName(String name) {
         try {
             cleanErrors();
-            HorizontalCoordinates destination = sky.get().availableDestinationForObjectNamed(name);
+            HorizontalCoordinates destination = sky.get().availableDestinationForObjectNamed(name).get();
             if (destination != null) {
                 
                 centerAnimator.setDestination(destination.azDeg(), destination.altDeg());
