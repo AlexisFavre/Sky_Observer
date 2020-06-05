@@ -185,7 +185,7 @@ public final class Main extends Application {
         welcomeText.setFill(Color.GHOSTWHITE);
         welcomeText.setFont(Font.font(90));
         
-        Text readyText  = new Text("Prêt à découvrir les étoiles, planètes et asterismes ?");
+        Text readyText   = new Text("Prêt à découvrir les étoiles, planètes et asterismes ?");
         readyText.setWrappingWidth(700);
         readyText.setTextAlignment(TextAlignment.CENTER);
         readyText.setFill(Color.GHOSTWHITE);

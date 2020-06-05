@@ -102,7 +102,7 @@ public final class SkyCanvasManager {
      */
     public SkyCanvasManager(StarCatalogue catalog, DateTimeBean dtb, ObserverLocationBean olb, ViewingParametersBean vpb) {
 
-        canvas = new Canvas();
+        canvas  = new Canvas();
         painter = new SkyCanvasPainter(canvas);
 
         drawWithStars     = new SimpleBooleanProperty();
@@ -118,14 +118,14 @@ public final class SkyCanvasManager {
         mousePosition = new SimpleObjectProperty<>(ZERO_POSITION);
 
         //--------------------------------------------------------------------------------------------
-        centerAnimator = new ViewAnimator(vpb);
-        skyPane = new AnchorPane(canvas);
+        centerAnimator  = new ViewAnimator(vpb);
+        skyPane         = new AnchorPane(canvas);
         canvas.widthProperty().bind(skyPane.widthProperty());
         canvas.heightProperty().bind(skyPane.heightProperty());
         selectedObjects = new SimpleObjectProperty<>(new ArrayList<>());
         waitingRepositioningObject = new SimpleObjectProperty<>(Optional.empty());
-        selectionsNumber = new SimpleIntegerProperty(0);
-        errorMessage = new SimpleStringProperty("");
+        selectionsNumber= new SimpleIntegerProperty(0);
+        errorMessage    = new SimpleStringProperty("");
 
         //BINDINGS =====================================================================================
         projection = Bindings.createObjectBinding(
