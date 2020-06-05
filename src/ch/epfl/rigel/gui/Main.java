@@ -69,7 +69,7 @@ public final class Main extends Application {
     private final static String NAME_FILE_OF_STARS     = "/hygdata_v3.csv";
     
     // constants for initialization
-    private final static int MINIMAL_WIDTH_STAGE    = 1440;
+    private final static int MINIMAL_WIDTH_STAGE    = 1350;
     private final static int MINIMAL_HEIGHT_STAGE   = 800;
     private final static int INDEX_ACCELERATOR_X300 = 2;
     private final static int FONT_SIZE   = 15;
