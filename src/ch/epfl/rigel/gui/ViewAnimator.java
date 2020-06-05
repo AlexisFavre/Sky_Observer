@@ -15,6 +15,9 @@ public class ViewAnimator extends AnimationTimer {
     private final static double HANDLES_PER_RISING = 40;
     private final static double MIN_DISTANCE_TO_CONSIDER_DESTIANTION_REACHED = 1e-7;
     private final static RightOpenInterval CINTER_0TO360 = RightOpenInterval.of(0, 360);
+    private final static int HALF_MAX_AZ = 180;
+    private final static int MAX_AZ      = 360;
+
     
     private final ViewingParametersBean vpb;
     private final SimpleBooleanProperty running;
@@ -35,12 +38,11 @@ public class ViewAnimator extends AnimationTimer {
     public void setDestination(double az, double alt) {
         azDegDest  = az;
         altDegDest = alt;
-        // TODO Check border (360/0 pile)
         double azDist = azDegDest - vpb.getCenter().azDeg();
-        if(azDist > 180)
-            azDist = -360 + azDist; //TODO MAGIC NUMBERS
-        else if (azDist < -180)
-            azDist = 360 - Math.abs(azDist);
+        if(azDist > HALF_MAX_AZ)
+            azDist = -MAX_AZ + azDist;
+        else if (azDist < -HALF_MAX_AZ)
+            azDist = MAX_AZ - Math.abs(azDist);
         azDegStep  = azDist / HANDLES_PER_RISING;
         altDegStep = (altDegDest - vpb.getCenter().altDeg()) / HANDLES_PER_RISING;
     }
@@ -69,7 +71,7 @@ public class ViewAnimator extends AnimationTimer {
     @Override
     public void handle(long now) {
         vpb.setCenter(HorizontalCoordinates.ofDeg(CINTER_0TO360.reduce(vpb.getCenter().azDeg() + azDegStep),
-                vpb.getCenter().altDeg() + altDegStep)); //TODO normalizer a [-90,90]
+                vpb.getCenter().altDeg() + altDegStep));
         if(destinationIsReached())
             stop();
     }

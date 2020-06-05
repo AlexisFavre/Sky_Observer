@@ -1,6 +1,5 @@
 package ch.epfl.rigel.astronomy;
 
-import java.io.OptionalDataException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -163,7 +162,6 @@ public final class ObservedSky {
      * @return the screen point of the object or null if under the horizon
      * @throws IllegalArgumentException when the name is unknown (no corresponding objects)
      */
-    // TODO javadoc
     public HorizontalCoordinates availableDestinationForObjectNamed(String name) throws IllegalArgumentException {
         if(name.equalsIgnoreCase("Soleil"))
             return isVisible(sunPoint) ? projection.inverseApply(sunPoint) : null;
@@ -198,10 +196,10 @@ public final class ObservedSky {
     }
     
     
-    private Optional<CartesianCoordinates> pointIfVisible(CartesianCoordinates pointOnPlane) {
+    private Optional<HorizontalCoordinates> pointIfVisible(CartesianCoordinates pointOnPlane) {
         HorizontalCoordinates horizontalCoordinates = projection.inverseApply(pointOnPlane);
         if(horizontalCoordinates.altDeg() > 0)
-            return Optional.of(pointOnPlane);
+            return Optional.of(horizontalCoordinates);
         else
             return Optional.empty();
     }

@@ -263,7 +263,7 @@ public final class SkyCanvasManager {
                                         ALTITUDE_RANGE.clip(vpb.getCenter().altDeg() + deltaAlt));
                                 centerAnimator.start();
                                 waitingRepositioningObject.setValue(objectClicked);
-                                errorMessage.setValue("limite atteinte - bordure visuel"); //TODO move instead
+                                errorMessage.setValue("limite atteinte - bordure visuel");
                             }
                         } else {
                             centerAnimator.setDestination(CINTER_0TO360.reduce(mh.azDeg()),
@@ -346,6 +346,7 @@ public final class SkyCanvasManager {
         }
     }
     //--------------------------------------------------------------------------------------------
+    //more restrictive than canvas.getBoundsInLocal
     private boolean isInCanvasLimits(CartesianCoordinates screenPoint) {
         return screenPoint.x() > INFO_BOX_WIDTH/2 && screenPoint.x() < canvas.getWidth() - INFO_BOX_WIDTH/2
                 && screenPoint.y() < canvas.getHeight() - INFO_BOX_HEIGTH;
@@ -365,6 +366,7 @@ public final class SkyCanvasManager {
         textBox.setAlignment(Pos.TOP_CENTER);
         textBox.setMinWidth(INFO_BOX_WIDTH);
         textBox.setMinHeight(INFO_BOX_HEIGTH - POINTER_SIZE);
+        
         VBox infoBox = new VBox();
         infoBox.setStyle("-fx-background-color: rgba(0, 0, 0, 0);" + "-fx-padding: 0;");
         infoBox.setAlignment(Pos.TOP_CENTER);
@@ -372,11 +374,12 @@ public final class SkyCanvasManager {
         infoBox.setMaxHeight(INFO_BOX_HEIGTH);
 
         // set labels ---------------------------------------------------
-        Label name = new Label(object.name());
-        name.setFont(Font.font("Verdana", FontWeight.BOLD, 13));
-        Label unity = new Label("distance en UA");
-        Label ids = new Label("Mini  Maxi  Moy");
+        Label name   = new Label(object.name());
+        Label unity  = new Label("distance en UA");
+        Label ids    = new Label("Mini  Maxi  Moy");
         Label values = new Label();
+        
+        name.setFont(Font.font("Verdana", FontWeight.BOLD, 13));
         unity.setFont(Font.font("Verdana", FontWeight.LIGHT, 11));
         ids.setFont(Font.font("Verdana", FontWeight.BOLD, 10));
         values.setFont(Font.font("Verdana", FontWeight.BOLD, 10));
@@ -384,21 +387,26 @@ public final class SkyCanvasManager {
         // fill text ----------------------------------------------------
         textBox.getChildren().addAll(name, unity);
         DecimalFormat twoDecimals = new DecimalFormat("#.##");
+        
         if(object == sky.get().sun()) {
             values.setText(twoDecimals.format(object.distances()[0]));
+            
         } else if(object == sky.get().moon()) {
             name.setText(object.info());
-            unity.setText("dist. millier KM");
             double[] dist = object.distances();
+            unity.setText("dist. millier KM");
+            
             values.setText(String.valueOf((int)dist[0]/MOON_DIST_DIVIDER).substring(0, 3) + "   "
                     + String.valueOf(dist[1] / MOON_DIST_DIVIDER).substring(0, 3) + "   "
                     + String.valueOf(dist[2] / MOON_DIST_DIVIDER).substring(0, 3));
             textBox.getChildren().add(ids);
-        } else if(object.angularSize() != 0) { //TODO find better
+            
+        } else if(object.angularSize() != 0) {
             double[] dist = object.distances();
             values.setText(twoDecimals.format(dist[0]) + "  " + twoDecimals.format(dist[1]) + "  "
                     + twoDecimals.format(dist[2]));
             textBox.getChildren().add(ids);
+            
         } else {
             unity.setText("distance en AL");
             values.setText(twoDecimals.format(object.distances()[0]));
@@ -416,6 +424,7 @@ public final class SkyCanvasManager {
         CartesianCoordinates screenPoint = screenPointFor(sky.get().horizontalPointOf(object));
         infoBox.relocate(screenPoint.x() - INFO_BOX_WIDTH/2,
                 screenPoint.y() + INFO_BOX_DOWN_SHIFT);
+        
         infoBox.getChildren().addAll(triangle, textBox);
 
         skyPane.getChildren().addAll(infoBox);
@@ -440,13 +449,16 @@ public final class SkyCanvasManager {
             cleanErrors();
             HorizontalCoordinates destination = sky.get().availableDestinationForObjectNamed(name);
             if (destination != null) {
+                
                 centerAnimator.setDestination(destination.azDeg(), destination.altDeg());
                 addSelection(sky.get().objectClosestTo(projection.get().apply(destination),
                                 TOLERANCE_FOR_OBJ_DETECTION/scaleOfView.get()).get());
                 centerAnimator.start();
                 cleanErrors();
+                
             } else
                 errorMessage.setValue("position géographique invalide pour visualiser cet astre");
+            
         } catch (IllegalArgumentException e) {
             errorMessage.setValue("astre non réferencé");
         }
